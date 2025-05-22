@@ -1,0 +1,58 @@
+---
+import '../styles/global.css'; // Tailwind CSS 전역 스타일 임포트
+
+// Props 정의 (예: 페이지 제목)
+export interface Props {
+	title: string;
+}
+const { title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="ko">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		<style>
+			/* 여기에 아주 기본적인 전역 스타일이나 레이아웃 스타일을 추가할 수 있지만,
+			대부분은 Tailwind CSS 클래스로 처리하거나 global.css에 정의합니다. */
+			body {
+				display: flex;
+				flex-direction: column;
+				min-height: 100vh;
+				font-family: system-ui, sans-serif; /* 기본적인 sans-serif 폰트 스택 */
+			}
+			main {
+				flex-grow: 1;
+			}
+		</style>
+	</head>
+	<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"> {/* 예시: Tailwind 다크모드 배경/텍스트색 */}
+		<header class="bg-blue-600 text-white shadow-md">
+			<nav class="container mx-auto px-6 py-3">
+				<div class="flex items-center justify-between">
+					<div class="text-xl font-semibold">
+						<a href="/" class="hover:text-blue-200">인천공항 버스 정보</a>
+					</div>
+					{/* 나중에 여기에 내비게이션 링크들을 추가할 수 있습니다. */}
+					{/* <div>
+						<a href="/routes" class="px-3 py-2 rounded hover:bg-blue-700">전체 노선</a>
+						<a href="/info" class="px-3 py-2 rounded hover:bg-blue-700">공항 정보</a>
+					</div> */}
+				</div>
+			</nav>
+		</header>
+
+		<main class="container mx-auto px-6 py-8">
+			<slot /> {/* 페이지별 콘텐츠가 여기에 렌더링됩니다. */}
+		</main>
+
+		<footer class="bg-gray-800 text-white text-center p-4 mt-auto">
+			<p>© {new Date().getFullYear()} 인천공항 버스 정보. All rights reserved.</p>
+			{/* <p>만든이: [사용자 이름 또는 사이트 이름]</p> */}
+		</footer>
+	</body>
+</html>

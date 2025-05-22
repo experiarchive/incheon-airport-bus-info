@@ -1,11 +1,13 @@
+node_modules/
+
 # Sanity Studio specific
 my-sanity-studio/node_modules/
 my-sanity-studio/.sanity/
 my-sanity-studio/dist/
 
 # Astro frontend specific
-incheon-astro-frontend/node_modules/
-incheon-astro-frontend/dist/
+astro-frontend/node_modules/
+astro-frontend/dist/
 
 # General Node.js
 .DS_Store
