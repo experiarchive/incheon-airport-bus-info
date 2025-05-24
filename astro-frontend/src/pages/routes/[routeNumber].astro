@@ -1,0 +1,809 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { client } from '../../lib/sanityClient.js';
+import { toHTML } from '@portabletext/to-html';
+
+// Get the route number from the URL parameter
+const { routeNumber } = Astro.params;
+
+// Fetch the specific bus route data from Sanity
+const route = await client.fetch(`
+  *[_type == "busRoute" && routeNumber == $routeNumber][0]{
+    routeName,
+    routeNumber, 
+    description,
+    mainStops,
+    usageGuide,
+    kakaoMapIframeUrl,
+    timetableNotes,
+    _id
+  }
+`, { routeNumber });
+
+// If route doesn't exist, return 404
+if (!route) {
+  return Astro.redirect('/404');
+}
+
+// Fetch JSON data for detailed route information
+let jsonData = null;
+try {
+  const response = await fetch(`${Astro.url.origin}/data/${routeNumber}.json`);
+  if (response.ok) {
+    jsonData = await response.json();
+  }
+} catch (error) {
+  console.log('JSON data not found for route:', routeNumber);
+}
+
+// Fetch related timetable entries
+const timetableEntries = await client.fetch(`
+  *[_type == "timetableEntry" && route._ref == $routeId]{
+    dayType,
+    direction,
+    departureTimes,
+    stopName,
+    effectiveDate,
+    status
+  } | order(direction asc, dayType asc, stopName asc)
+`, { routeId: route._id });
+
+// Helper function to render portable text
+const renderPortableText = (content) => {
+  if (!content) return '';
+  return toHTML(content);
+};
+
+// Group timetable entries by direction and day type
+const groupedTimetables = {};
+timetableEntries.forEach(entry => {
+  const key = `${entry.direction}-${entry.dayType}`;
+  if (!groupedTimetables[key]) {
+    groupedTimetables[key] = [];
+  }
+  groupedTimetables[key].push(entry);
+});
+
+// Helper function to get day type display name
+const getDayTypeDisplay = (dayType) => {
+  const dayTypeMap = {
+    'weekday': '평일',
+    'weekend_holiday': '주말/공휴일',
+    'everyday': '매일'
+  };
+  return dayTypeMap[dayType] || dayType;
+};
+
+// Extract main area from route name for SEO
+const getMainArea = (routeName) => {
+  if (routeName?.includes('강남')) return '강남';
+  if (routeName?.includes('잠실')) return '잠실';
+  if (routeName?.includes('동대문')) return '동대문';
+  if (routeName?.includes('홍대')) return '홍대';
+  if (routeName?.includes('명동')) return '명동';
+  return '서울';
+};
+
+const mainArea = getMainArea(route.routeName);
+
+// Generate static paths for all routes
+export async function getStaticPaths() {
+  const routes = await client.fetch(`
+    *[_type == "busRoute"]{
+      routeNumber
+    }
+  `);
+  
+  return routes.map((route) => ({
+    params: { routeNumber: route.routeNumber },
+  }));
+}
+
+// SEO-optimized title and description
+const seoTitle = `${route.routeNumber} 공항버스 시간표 예매 - ${mainArea}↔인천공항 요금/소요시간`;
+const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와 온라인 예매 서비스. ${mainArea}에서 인천공항까지의 요금, 소요시간, 정류장 위치 정보를 확인하고 편리하게 예매하세요.`;
+---
+
+<Layout title={seoTitle}>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content={seoDescription} />
+  <meta name="keywords" content={`${route.routeNumber} 공항버스, ${route.routeNumber} 공항버스 시간표, ${route.routeNumber} 공항버스 예매, ${route.routeNumber} 공항버스 요금, ${mainArea} 공항버스, 공항버스 정류장, 공항버스 소요시간`} />
+  
+  <!-- Kakao Map API -->
+  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9dee7ba39e07c39710261487dceadbcb&libraries=services,clusterer,drawing,roadview"></script>
+  
+  <!-- Structured Data for Transportation Service -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "TransportationService",
+    "name": `${route.routeNumber} 공항버스`,
+    "description": `${mainArea}에서 인천공항을 연결하는 ${route.routeNumber}번 공항버스 서비스`,
+    "provider": {
+      "@type": "Organization",
+      "name": "인천공항 버스 정보"
+    },
+    "areaServed": {
+      "@type": "Place",
+      "name": `${mainArea}, 서울특별시`
+    },
+    "hasRoute": {
+      "@type": "TransportationRoute",
+      "name": `${route.routeNumber} 공항버스 노선`,
+      "description": `${mainArea}에서 인천공항까지의 직행 노선`
+    }
+  })}></script>
+
+  <!-- Breadcrumb Schema -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "공항버스",
+        "item": "/"
+      },
+      {
+        "@type": "ListItem", 
+        "position": 2,
+        "name": "전체 노선",
+        "item": "/routes"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": `${route.routeNumber} 공항버스`
+      }
+    ]
+  })}></script>
+
+  <div class="max-w-6xl mx-auto">
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb" class="mb-6">
+      <div class="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+        <a href="/" class="hover:text-blue-600 dark:hover:text-blue-400">공항버스 홈</a>
+        <span>></span>
+        <a href="/routes" class="hover:text-blue-600 dark:hover:text-blue-400">전체 노선</a>
+        <span>></span>
+        <span class="text-gray-800 dark:text-gray-200">{route.routeNumber} 공항버스</span>
+      </div>
+    </nav>
+
+    <!-- Back Button -->
+    <div class="mb-6">
+      <a 
+        href="/routes" 
+        class="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition duration-200"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        <span>전체 공항버스 노선으로 돌아가기</span>
+      </a>
+    </div>
+
+    <!-- SEO-Optimized Route Header -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 mb-8 border border-gray-200 dark:border-gray-700">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+        <div>
+          <div class="flex items-center space-x-4 mb-4">
+            <span class="text-4xl font-bold text-blue-600 dark:text-blue-400">
+              {route.routeNumber}
+            </span>
+            <span class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm font-semibold px-3 py-1 rounded">
+              공항버스
+            </span>
+          </div>
+          <!-- SEO H1 with target keywords -->
+          <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-4">
+            기본 운행정보 - {mainArea} ↔ 인천공항
+          </h1>
+        </div>
+      </div>
+      
+      {route.description && (
+        <p class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
+          {route.description} 공항버스 예매와 요금 정보, 정류장 위치를 확인하고 편리하게 이용하세요.
+        </p>
+      )}
+
+      <!-- Enhanced Route Information from JSON -->
+      {jsonData && (
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+          <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+            <h3 class="font-semibold text-blue-800 dark:text-blue-200 mb-2">요금 정보</h3>
+            <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">{jsonData.fare?.toLocaleString()}원</p>
+          </div>
+          <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+            <h3 class="font-semibold text-green-800 dark:text-green-200 mb-2">소요 시간 (평균)</h3>
+            <p class="text-lg font-semibold text-green-600 dark:text-green-400">{jsonData.duration}</p>
+          </div>
+          <div class="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
+            <h3 class="font-semibold text-orange-800 dark:text-orange-200 mb-2">운행 간격</h3>
+            <p class="text-lg font-semibold text-orange-600 dark:text-orange-400">{jsonData.interval}</p>
+          </div>
+          <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+            <h3 class="font-semibold text-purple-800 dark:text-purple-200 mb-2">운영사</h3>
+            <p class="text-medium font-medium text-purple-600 dark:text-purple-400">{jsonData.company}</p>
+            {jsonData.companyTel && (
+              <p class="text-s text-purple-500 dark:text-purple-400 mt-1">{jsonData.companyTel}</p>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+
+    <!-- Bus Stops with Kakao Map -->
+    {jsonData?.geoInfo?.stops && jsonData.geoInfo.stops.length > 0 && (
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
+          <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+          {route.routeNumber} 공항버스 정류장 위치
+        </h2>
+        <p class="text-gray-600 dark:text-gray-300 mb-6">
+          {route.routeNumber} 공항버스가 정차하는 정류장 위치입니다. 지도에서 각 정류장의 자세한 위치를 확인해보세요.
+        </p>
+
+        <!-- Kakao Map -->
+        <div class="mb-6">
+          <div id="map" class="w-full h-96 rounded-lg border border-gray-200 dark:border-gray-600"></div>
+        </div>
+
+        <!-- Roadview Container (initially hidden) -->
+        <div id="roadviewContainer" class="mb-6" style="display: none;">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-white">로드뷰</h3>
+            <button 
+              onclick="closeRoadview()" 
+              class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium"
+            >
+              로드뷰 닫기
+            </button>
+          </div>
+          <div id="roadview" class="w-full h-96 rounded-lg border border-gray-200 dark:border-gray-600"></div>
+        </div>
+
+        <!-- Stop List with Coordinates -->
+        <div class="grid grid-cols-2 gap-4">
+          {jsonData.geoInfo.stops.map((stop, index) => (
+            <div class="flex flex-col p-3 bg-gray-50 dark:bg-gray-700 rounded-lg space-y-2 items-start">
+              <div class="flex items-center space-x-3 w-full">
+                <span class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white text-sm font-bold rounded-full flex items-center justify-center">
+                  {index + 1}
+                </span>
+                <div>
+                  <span class="text-gray-800 dark:text-gray-200 font-medium block text-sm">{stop.name}</span>
+                </div>
+              </div>
+              <div class="flex space-x-2 w-full justify-start pt-1 pl-11">
+                <button 
+                  onclick={`moveToMarker(${index})`}
+                  class="text-xs px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors duration-150 flex items-center"
+                >
+                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                  지도
+                </button>
+                <button 
+                  onclick={`showStopTimetable('${stop.name}')`}
+                  class="text-xs px-2 py-1 bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors duration-150 flex items-center"
+                >
+                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                  시간표
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <!-- Store stops data in a data attribute -->
+        <div id="stopsData" data-stops={JSON.stringify(jsonData.geoInfo.stops)} style="display: none;"></div>
+      </div>
+    )}
+
+    <!-- Main Stops Section (fallback if no JSON data) -->
+    {(!jsonData?.geoInfo?.stops || jsonData.geoInfo.stops.length === 0) && route.mainStops && route.mainStops.length > 0 && (
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
+          <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+          정류장 위치 안내
+        </h2>
+        <p class="text-gray-600 dark:text-gray-300 mb-4">
+          {route.routeNumber} 공항버스가 정차하는 주요 정류장 위치입니다. 각 정류장에서의 탑승 시간을 확인하여 여행 계획을 세우세요.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {route.mainStops.map((stop, index) => (
+            <div class="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <span class="flex-shrink-0 w-6 h-6 bg-blue-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                {index + 1}
+              </span>
+              <span class="text-gray-800 dark:text-gray-200 font-medium">{stop}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <!-- Timetable Section with SEO H2 -->
+    {Object.keys(groupedTimetables).length > 0 && (
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
+          <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          {route.routeNumber} 공항버스 시간표
+        </h2>
+        <p class="text-gray-600 dark:text-gray-300 mb-6">
+          {route.routeNumber} 공항버스의 운행 시간표입니다. '매일'이라 표시된 시간표는 평일과 주말/공휴일 시간표가 동일합니다.
+        </p>
+
+        <div class="space-y-8" id="timetable-section">
+          {Object.entries(groupedTimetables).map(([key, entries]) => {
+            const [currentDirection, currentDayType] = key.split('-');
+            // Group entries by stopName within this direction-dayType group
+            const entriesByStop = entries.reduce((acc, entry) => {
+              const stopKey = entry.stopName || 'unknown';
+              if (!acc[stopKey]) {
+                acc[stopKey] = {
+                  stopName: entry.stopName,
+                  dayTypes: {}
+                };
+              }
+              if (!acc[stopKey].dayTypes[currentDayType]) {
+                acc[stopKey].dayTypes[currentDayType] = [];
+              }
+              acc[stopKey].dayTypes[currentDayType].push(entry);
+              return acc;
+            }, {});
+
+            // Determine if this entire block is for '시내행'
+            const isCityBoundBlock = currentDirection === '시내행';
+
+            return Object.values(entriesByStop).map(stopGroup => {
+              return Object.entries(stopGroup.dayTypes).map(([dayType, dayTypeEntries]) => {
+                const firstEntryForStopDayType = dayTypeEntries[0]; // All entries here share stopName, direction, dayType
+
+                return (
+                  <div 
+                    class={`timetable-entry-item border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden mb-6 ${isCityBoundBlock ? 'city-bound-timetable' : 'specific-stop-timetable'}`}
+                    data-stop-name={firstEntryForStopDayType.stopName}
+                    data-direction={firstEntryForStopDayType.direction} 
+                    data-day-type={dayType}
+                    style={isCityBoundBlock ? '' : 'display: none;'}
+                    id={`timetable-${routeNumber}-${firstEntryForStopDayType.direction}-${dayType}-${firstEntryForStopDayType.stopName?.replace(/\s+/g, '-')}`}
+                  >
+                    <div class={`
+                      px-4 py-3 border-b border-gray-200 dark:border-gray-600 
+                      ${firstEntryForStopDayType.direction === '공항행' 
+                        ? 'bg-blue-200 dark:bg-blue-700' 
+                        : 'bg-green-200 dark:bg-green-700'}
+                    `}>
+                      <h3 class={`
+                        text-lg font-semibold 
+                        ${firstEntryForStopDayType.direction === '공항행' 
+                          ? 'text-blue-800 dark:text-blue-100' 
+                          : 'text-green-800 dark:text-green-100'}
+                      `}>
+                        {firstEntryForStopDayType.direction} - {getDayTypeDisplay(dayType)} ({firstEntryForStopDayType.stopName || '정류장명 미등록'})
+                      </h3>
+                    </div>
+                    <div class="p-4">
+                      {dayTypeEntries.map((entry, index) => (
+                        <div class="mb-6 last:mb-0" key={`${entry.stopName}-${index}`}> {/* Key should be more unique if stopName can be null */}
+                          {/* We already have stopName in the header for this block */}
+                          {entry.departureTimes && entry.departureTimes.length > 0 ? (
+                            <div class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-2">
+                              {entry.departureTimes.map((time, timeIndex) => (
+                                <span 
+                                  key={timeIndex}
+                                  class="text-center py-2 px-1 bg-blue-50 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-sm font-mono"
+                                >
+                                  {time}
+                                </span>
+                              ))}
+                            </div>
+                          ) : (
+                            <p class="text-gray-500 dark:text-gray-400">해당 날짜의 시간표 정보가 없습니다.</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              });
+            });
+          })}
+        </div>
+
+        {route.timetableNotes && (
+          <div class="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+            <h4 class="font-medium text-yellow-800 dark:text-yellow-200 mb-2">공항버스 시간표 참고사항</h4>
+            <div class="text-yellow-700 dark:text-yellow-300 prose prose-sm max-w-none" set:html={renderPortableText(route.timetableNotes)}></div>
+          </div>
+        )}
+      </div>
+    )}
+
+    <!-- Usage Guide Section - Enhanced with JSON data -->
+    {(route.usageGuide || jsonData?.usageGuide) && (
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
+          <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          이용 안내 및 예매 정보
+        </h2>
+        
+        <!-- JSON Usage Guide (priority) -->
+        {jsonData?.usageGuide && (
+          <ul class="space-y-3 list-none mb-6">
+            {jsonData.usageGuide.map((guide, index) => {
+              let displayText = guide.text;
+              if (guide.links && guide.links.length > 0) {
+                guide.links.forEach(link => {
+                  if (guide.text.includes(link.text)) {
+                    displayText = displayText.replace(
+                      link.text,
+                      `<a href="${link.url}" target="${link.target || '_self'}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline font-medium">${link.text}</a>`
+                    );
+                  }
+                });
+              }
+              return (
+                <li class="flex items-start p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
+                  <svg class="w-5 h-5 mr-3 mt-1 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                  <span class="text-gray-700 dark:text-gray-300" set:html={displayText}></span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+        
+        <!-- Sanity Usage Guide (fallback) -->
+        {route.usageGuide && !jsonData?.usageGuide && (
+          <div class="prose prose-lg max-w-none dark:prose-invert" set:html={renderPortableText(route.usageGuide)}></div>
+        )}
+      </div>
+    )}
+
+    <!-- Kakao Map Section (iframe fallback) -->
+    {route.kakaoMapIframeUrl && (
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
+          <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m-6 3l6-3"></path>
+          </svg>
+          실시간 버스 위치
+        </h2>
+        <p class="text-gray-600 dark:text-gray-300 mb-4">
+          {route.routeNumber} 공항버스의 실시간 운행 위치를 확인할 수 있습니다. 정류장 도착 예정 시간을 미리 확인하여 대기 시간을 단축하세요.
+        </p>
+        <div class="w-full h-96 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600">
+          <iframe 
+            src={route.kakaoMapIframeUrl}
+            width="100%" 
+            height="100%" 
+            frameborder="0" 
+            style="border:0;" 
+            allowfullscreen=""
+            loading="lazy"
+            title={`${route.routeNumber} 공항버스 실시간 위치`}
+          ></iframe>
+        </div>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mt-3">
+          * {route.routeNumber} 공항버스 실시간 위치 정보는 카카오맵에서 제공됩니다.
+        </p>
+      </div>
+    )}
+
+    <!-- Airport Usage Guide Section -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">
+        공항 이용 가이드
+      </h2>
+      <div class="space-y-4">
+        <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-4 border-blue-500">
+          <h3 class="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-2">
+            인천공항 공항버스 승하차장 안내
+          </h3>
+          <p class="text-blue-700 dark:text-blue-300 mb-3">
+            인천공항 제1터미널과 제2터미널의 공항버스 승하차장 위치와 이용 방법을 자세히 안내합니다.
+          </p>
+          <a 
+            href="https://koreabusinfo.com/icn-bus-info/bus-stops/" 
+            target="_blank"
+            class="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
+          >
+            <span>승하차장 안내 보기</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+          </a>
+        </div>
+        <div class="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border-l-4 border-green-500">
+          <h3 class="text-lg font-semibold text-green-800 dark:text-green-200 mb-2">
+            인천공항 공항버스 무인발권기 이용 방법
+          </h3>
+          <p class="text-green-700 dark:text-green-300 mb-3">
+            인천공항 무인발권기를 이용한 공항버스 티켓 구매 방법과 예매 내역 확인 방법을 단계별로 안내합니다.
+          </p>
+          <a 
+            href="https://koreabusinfo.com/icn-bus-info/unmanned-ticket-machine-guide/" 
+            target="_blank"
+            class="inline-flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
+          >
+            <span>무인발권기 이용법 보기</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back to Routes Button -->
+    <div class="text-center">
+      <a 
+        href="/routes" 
+        class="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition duration-200"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        <span>전체 공항버스 노선 목록으로 돌아가기</span>
+      </a>
+    </div>
+  </div>
+</Layout>
+
+<script is:inline set:html={`
+  window.timetableData = ${JSON.stringify(timetableEntries)};
+`}/>
+
+<script is:inline>
+document.addEventListener('DOMContentLoaded', function() {
+  // Check if map container and stops data exist
+  const mapContainer = document.getElementById('map');
+  const stopsDataElement = document.getElementById('stopsData');
+  
+  if (!mapContainer || !stopsDataElement) {
+    return;
+  }
+  
+  // Get stops data
+  const stopsData = stopsDataElement.getAttribute('data-stops');
+  if (!stopsData) {
+    return;
+  }
+  
+  const stops = JSON.parse(stopsData);
+  
+  // Calculate center point from all stops
+  let centerLat = 37.5665; // Default latitude
+  let centerLng = 126.9780; // Default longitude
+  
+  if (stops.length > 0) {
+    const totalLat = stops.reduce((sum, stop) => sum + stop.lat, 0);
+    const totalLng = stops.reduce((sum, stop) => sum + stop.lng, 0);
+    centerLat = totalLat / stops.length;
+    centerLng = totalLng / stops.length;
+  }
+  
+  // Initialize Kakao Map
+  const mapOption = {
+    center: new kakao.maps.LatLng(centerLat, centerLng),
+    level: 8
+  };
+  
+  const map = new kakao.maps.Map(mapContainer, mapOption);
+  const markers = [];
+  let currentInfoWindow = null; // 현재 열린 인포윈도우 추적
+  let roadview = null; // 로드뷰 객체
+  let roadviewClient = null; // 로드뷰 클라이언트
+  
+  // Initialize Roadview
+  function initRoadview() {
+    if (!roadview) {
+      const roadviewContainer = document.getElementById('roadview');
+      if (roadviewContainer) {
+        roadview = new kakao.maps.Roadview(roadviewContainer);
+        roadviewClient = new kakao.maps.RoadviewClient();
+      }
+    }
+  }
+  
+  // Show roadview for specific coordinates
+  function showRoadview(lat, lng, stopName) {
+    initRoadview();
+    
+    if (!roadview || !roadviewClient) {
+      alert('로드뷰를 불러올 수 없습니다.');
+      return;
+    }
+    
+    const position = new kakao.maps.LatLng(lat, lng);
+    
+    // Check if roadview is available at this location
+    roadviewClient.getNearestPanoId(position, 100, function(panoId) {
+      if (panoId === null) {
+        alert('이 위치에서는 로드뷰를 사용할 수 없습니다.');
+      } else {
+        // Show roadview container
+        const roadviewContainer = document.getElementById('roadviewContainer');
+        if (roadviewContainer) {
+          roadviewContainer.style.display = 'block';
+        }
+        
+        // Display roadview
+        roadview.setPanoId(panoId, position);
+        
+        // Update roadview title
+        const roadviewTitle = roadviewContainer.querySelector('h3');
+        if (roadviewTitle) {
+          roadviewTitle.textContent = stopName + ' 로드뷰';
+        }
+        
+        // Scroll to roadview
+        roadviewContainer.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  }
+  
+  // Close roadview
+  window.closeRoadview = function() {
+    const roadviewContainer = document.getElementById('roadviewContainer');
+    if (roadviewContainer) {
+      roadviewContainer.style.display = 'none';
+    }
+  };
+  
+  // Create markers for each stop
+  stops.forEach((stop, index) => {
+    const markerPosition = new kakao.maps.LatLng(stop.lat, stop.lng);
+    
+    const marker = new kakao.maps.Marker({
+      position: markerPosition,
+      map: map
+    });
+    
+    // Info window content with close button
+    const infoContent = 
+      '<div style="padding: 20px; min-width: 220px; max-width: 300px; position: relative; font-family: inherit;">' +
+        '<div style="font-weight: 600; font-size: 16px; margin-bottom: 12px; padding-right: 25px; color: #1f2937; line-height: 1.3;">' + (index + 1) + '. ' + stop.name + '</div>' +
+        '<div style="margin-bottom: 8px;">' +
+          '<button onclick="openRoadviewForStop(' + index + ')" style="background: #007bff; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,123,255,0.3);" onmouseover="this.style.background=\'#0056b3\'" onmouseout="this.style.background=\'#007bff\'">🛣️ 로드뷰 보기</button>' +
+        '</div>' +
+        '<button onclick="closeInfoWindow()" style="position: absolute; top: 10px; right: 10px; background: #f3f4f6; border: none; font-size: 16px; cursor: pointer; color: #6b7280; line-height: 1; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background=\'#e5e7eb\'" onmouseout="this.style.background=\'#f3f4f6\'">×</button>' +
+      '</div>';
+    
+    const infoWindow = new kakao.maps.InfoWindow({
+      content: infoContent
+    });
+    
+    // Show info window on marker click
+    kakao.maps.event.addListener(marker, 'click', function() {
+      // Close previous info window
+      if (currentInfoWindow) {
+        currentInfoWindow.close();
+      }
+      
+      // Open new info window
+      infoWindow.open(map, marker);
+      currentInfoWindow = infoWindow;
+    });
+    
+    markers.push({ marker: marker, infoWindow: infoWindow });
+  });
+  
+  // Close info window when clicking on map
+  kakao.maps.event.addListener(map, 'click', function() {
+    if (currentInfoWindow) {
+      currentInfoWindow.close();
+      currentInfoWindow = null;
+    }
+  });
+  
+  // Global function to close info window
+  window.closeInfoWindow = function() {
+    if (currentInfoWindow) {
+      currentInfoWindow.close();
+      currentInfoWindow = null;
+    }
+  };
+  
+  // Global function to open roadview for specific stop
+  window.openRoadviewForStop = function(index) {
+    if (index >= 0 && index < stops.length) {
+      const stop = stops[index];
+      showRoadview(stop.lat, stop.lng, stop.name);
+    }
+  };
+  
+  // Function to move to specific marker
+  window.moveToMarker = function(index) {
+    if (index < 0 || index >= stops.length) {
+      return;
+    }
+    
+    const stop = stops[index];
+    const moveLatLng = new kakao.maps.LatLng(stop.lat, stop.lng);
+    
+    map.setCenter(moveLatLng);
+    map.setLevel(3);
+    
+    // Close previous info window
+    if (currentInfoWindow) {
+      currentInfoWindow.close();
+    }
+    
+    // Open info window for the selected marker
+    markers[index].infoWindow.open(map, markers[index].marker);
+    currentInfoWindow = markers[index].infoWindow;
+  };
+  
+  // Adjust map bounds to show all markers
+  if (stops.length > 0) {
+    const bounds = new kakao.maps.LatLngBounds();
+    stops.forEach(stop => {
+      bounds.extend(new kakao.maps.LatLng(stop.lat, stop.lng));
+    });
+    map.setBounds(bounds);
+    
+    // Set specific zoom level after setBounds
+    setTimeout(function() {
+      map.setLevel(8);
+    }, 100);
+  }
+});
+
+window.showStopTimetable = function(clickedStopName) {
+  if (!window.timetableData) {
+    console.error('Timetable data not loaded.');
+    return;
+  }
+
+  // Find the direction for the clicked stopName
+  let clickedStopDirection = null;
+  const entryForClickedStop = window.timetableData.find(entry => entry.stopName === clickedStopName);
+
+  if (entryForClickedStop) {
+    clickedStopDirection = entryForClickedStop.direction;
+  } else {
+    console.warn(`No timetable entry found for stop: ${clickedStopName}. Cannot determine direction.`);
+  }
+
+  // Hide all currently shown specific (non-city-bound) stop timetables
+  const allTimetableItems = document.querySelectorAll('.timetable-entry-item');
+  allTimetableItems.forEach(item => {
+    if (item.classList.contains('specific-stop-timetable')) {
+      item.style.display = 'none';
+    }
+  });
+
+  // If we found a direction, show all timetables for the clicked stop and its determined direction
+  if (clickedStopDirection) {
+    const timetablesToShow = document.querySelectorAll(
+      `.timetable-entry-item[data-stop-name="${clickedStopName}"][data-direction="${clickedStopDirection}"]`
+    );
+    timetablesToShow.forEach(item => {
+      item.style.display = 'block';
+    });
+  } else {
+    console.log(`No specific direction found for ${clickedStopName}, only showing default city-bound timetables.`);
+  }
+
+  // Scrolling is now handled by scrollToTimetableSectionOnly or not at all for other stops.
+  // const timetableSection = document.getElementById('timetable-section');
+  // if (timetableSection) {
+  //   timetableSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // }
+};
+</script> 

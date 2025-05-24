@@ -1,0 +1,132 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { client } from '../lib/sanityClient.js';
+
+// Fetch all bus routes from Sanity
+const routes = await client.fetch(`
+  *[_type == "busRoute"]{
+    routeName, 
+    routeNumber, 
+    description, 
+    mainStops
+  }
+`);
+---
+
+<Layout title="전체 버스 노선 - 인천공항 버스 정보">
+  <div class="max-w-7xl mx-auto">
+    <!-- Page Header -->
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-gray-800 dark:text-white mb-4">전체 버스 노선</h1>
+      <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+        인천공항을 오가는 모든 버스 노선을 확인하고 상세 정보를 살펴보세요.
+      </p>
+    </div>
+
+    <!-- Routes Grid -->
+    {routes && routes.length > 0 ? (
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {routes.map((route) => (
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105 border border-gray-200 dark:border-gray-700">
+            <div class="p-6">
+              <!-- Route Number (Prominent) -->
+              <div class="flex items-center justify-between mb-4">
+                <span class="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                  {route.routeNumber}
+                </span>
+                <span class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs font-semibold px-2.5 py-0.5 rounded">
+                  버스
+                </span>
+              </div>
+
+              <!-- Route Name -->
+              <h3 class="text-xl font-semibold text-gray-800 dark:text-white mb-3">
+                {route.routeName}
+              </h3>
+
+              <!-- Description (Truncated) -->
+              {route.description && (
+                <p class="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">
+                  {route.description.length > 120 
+                    ? route.description.substring(0, 120) + "..."
+                    : route.description
+                  }
+                </p>
+              )}
+
+              <!-- Main Stops -->
+              {route.mainStops && route.mainStops.length > 0 && (
+                <div class="mb-4">
+                  <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">주요 정류장</h4>
+                  <div class="flex flex-wrap gap-1">
+                    {route.mainStops.slice(0, 3).map((stop, index) => (
+                      <span class="inline-block bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs px-2 py-1 rounded">
+                        {stop}
+                      </span>
+                    ))}
+                    {route.mainStops.length > 3 && (
+                      <span class="inline-block text-gray-500 dark:text-gray-400 text-xs px-2 py-1">
+                        +{route.mainStops.length - 3}개 더
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <!-- Action Button -->
+              <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <a 
+                  href={`/routes/${route.routeNumber}`}
+                  class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 flex items-center justify-center space-x-2 group"
+                >
+                  <span>자세히 보기</span>
+                  <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <!-- Empty State -->
+      <div class="text-center py-12">
+        <div class="mx-auto w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+          <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+          등록된 버스 노선이 없습니다
+        </h3>
+        <p class="text-gray-500 dark:text-gray-400">
+          현재 등록된 버스 노선이 없습니다. 나중에 다시 확인해주세요.
+        </p>
+      </div>
+    )}
+
+    <!-- Back to Home Link -->
+    <div class="text-center mt-12">
+      <a 
+        href="/" 
+        class="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition duration-200"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        <span>홈으로 돌아가기</span>
+      </a>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  /* Custom line-clamp utility for description truncation */
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style> 
