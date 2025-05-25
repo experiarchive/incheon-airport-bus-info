@@ -35,29 +35,114 @@ const { title } = Astro.props;
 			}
 		</style>
 	</head>
-	<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"> {/* 예시: Tailwind 다크모드 배경/텍스트색 */}
-		<header class="bg-blue-600 text-white shadow-md">
-			<nav class="container mx-auto px-6 py-3">
+	<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200">
+		<header class="bg-white text-gray-800 shadow-md sticky top-0 z-50 border-b border-gray-200">
+			<nav class="container mx-auto px-4 sm:px-6 py-3">
 				<div class="flex items-center justify-between">
-					<div class="text-xl font-semibold">
-						<a href="/" class="hover:text-blue-200">인천공항 버스 정보</a>
+					<!-- 로고/사이트명 -->
+					<div class="flex items-center">
+						<a href="/" class="hover:opacity-80 transition duration-200">
+							<img 
+								src="/website-logo.png" 
+								alt="인천공항 공항버스 정보 로고" 
+								class="h-10 w-auto"
+							/>
+						</a>
 					</div>
-					{/* 나중에 여기에 내비게이션 링크들을 추가할 수 있습니다. */}
-					{/* <div>
-						<a href="/routes" class="px-3 py-2 rounded hover:bg-blue-700">전체 노선</a>
-						<a href="/info" class="px-3 py-2 rounded hover:bg-blue-700">공항 정보</a>
-					</div> */}
+
+					<!-- 데스크톱 네비게이션 메뉴 -->
+					<div class="hidden md:flex items-center space-x-1">
+						<a href="/routes" class="px-4 py-2 rounded-lg hover:bg-gray-100 transition duration-200 font-medium text-gray-700 hover:text-blue-600">
+							전체 노선
+						</a>
+						<a href="/info" class="px-4 py-2 rounded-lg hover:bg-gray-100 transition duration-200 font-medium text-gray-700 hover:text-blue-600">
+							공항 정보
+						</a>
+					</div>
+
+					<!-- 모바일 햄버거 메뉴 버튼 -->
+					<button 
+						id="mobile-menu-button"
+						class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition duration-200 text-gray-600"
+						aria-label="메뉴 열기"
+						aria-expanded="false"
+					>
+						<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+						</svg>
+					</button>
+				</div>
+
+				<!-- 모바일 네비게이션 메뉴 -->
+				<div id="mobile-menu" class="md:hidden mt-3 pb-3 border-t border-gray-200 hidden">
+					<div class="flex flex-col space-y-2 pt-3">
+						<a href="/routes" class="block px-4 py-3 rounded-lg hover:bg-gray-100 transition duration-200 font-medium text-gray-700 hover:text-blue-600">
+							📍 전체 노선
+						</a>
+						<a href="/info" class="block px-4 py-3 rounded-lg hover:bg-gray-100 transition duration-200 font-medium text-gray-700 hover:text-blue-600">
+							ℹ️ 공항 정보
+						</a>
+					</div>
 				</div>
 			</nav>
 		</header>
 
-		<main class="container mx-auto px-6 py-8">
+		<main class="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
 			<slot /> {/* 페이지별 콘텐츠가 여기에 렌더링됩니다. */}
 		</main>
 
 		<footer class="bg-gray-800 text-white text-center p-4 mt-auto">
 			<p>© {new Date().getFullYear()} 인천공항 버스 정보. All rights reserved.</p>
-			{/* <p>만든이: [사용자 이름 또는 사이트 이름]</p> */}
 		</footer>
+
+		<!-- 모바일 메뉴 토글 스크립트 -->
+		<script>
+			document.addEventListener('DOMContentLoaded', function() {
+				const menuButton = document.getElementById('mobile-menu-button');
+				const mobileMenu = document.getElementById('mobile-menu');
+				
+				if (menuButton && mobileMenu) {
+					menuButton.addEventListener('click', function() {
+						const isExpanded = menuButton.getAttribute('aria-expanded') === 'true';
+						
+						// 메뉴 토글
+						mobileMenu.classList.toggle('hidden');
+						
+						// 접근성 속성 업데이트
+						menuButton.setAttribute('aria-expanded', (!isExpanded).toString());
+						menuButton.setAttribute('aria-label', isExpanded ? '메뉴 열기' : '메뉴 닫기');
+						
+						// 햄버거 아이콘 변경
+						const svg = menuButton.querySelector('svg');
+						if (svg) {
+							if (isExpanded) {
+								// 햄버거 아이콘으로 변경
+								svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>';
+							} else {
+								// X 아이콘으로 변경
+								svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+							}
+						}
+					});
+
+					// 메뉴 외부 클릭 시 메뉴 닫기
+					document.addEventListener('click', function(event) {
+						const target = event.target;
+						if (target && target instanceof Element) {
+							if (!menuButton.contains(target) && !mobileMenu.contains(target)) {
+								mobileMenu.classList.add('hidden');
+								menuButton.setAttribute('aria-expanded', 'false');
+								menuButton.setAttribute('aria-label', '메뉴 열기');
+								
+								const svg = menuButton.querySelector('svg');
+								if (svg) {
+									svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>';
+								}
+							}
+						}
+					});
+				}
+			});
+		</script>
 	</body>
 </html>

@@ -2,8 +2,16 @@
 import Layout from '../layouts/Layout.astro';
 import { client } from '../lib/sanityClient.js';
 
+// Define interface for better type safety
+interface BusRoute {
+  routeName: string;
+  routeNumber: string;
+  description?: string;
+  mainStops?: string[];
+}
+
 // Fetch all bus routes from Sanity
-const routes = await client.fetch(`
+const routes: BusRoute[] = await client.fetch(`
   *[_type == "busRoute"]{
     routeName, 
     routeNumber, 
@@ -26,7 +34,7 @@ const routes = await client.fetch(`
     <!-- Routes Grid -->
     {routes && routes.length > 0 ? (
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {routes.map((route) => (
+        {routes.map((route: BusRoute) => (
           <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:scale-105 border border-gray-200 dark:border-gray-700">
             <div class="p-6">
               <!-- Route Number (Prominent) -->
@@ -59,7 +67,7 @@ const routes = await client.fetch(`
                 <div class="mb-4">
                   <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">주요 정류장</h4>
                   <div class="flex flex-wrap gap-1">
-                    {route.mainStops.slice(0, 3).map((stop, index) => (
+                    {route.mainStops.slice(0, 3).map((stop: string, index: number) => (
                       <span class="inline-block bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs px-2 py-1 rounded">
                         {stop}
                       </span>

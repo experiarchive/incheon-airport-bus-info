@@ -3,11 +3,94 @@ import Layout from '../../layouts/Layout.astro';
 import { client } from '../../lib/sanityClient.js';
 import { toHTML } from '@portabletext/to-html';
 
+// Define interfaces for better type safety
+
+// Basic Portable Text block type
+interface PortableTextBlock {
+  _type: string;
+  [key: string]: any;
+}
+
+interface TimetableEntry {
+  _id?: string;
+  route?: { _ref: string; _type: 'reference' };
+  dayType: 'weekday' | 'weekend_holiday' | 'everyday' | string;
+  direction: string;
+  departureTimes: string[];
+  stopName?: string;
+  effectiveDate?: string;
+  status?: string;
+}
+
+interface BusRoute {
+  _id: string;
+  routeName: string;
+  routeNumber: string;
+  description?: string;
+  mainStops?: string[];
+  usageGuide?: PortableTextBlock[];
+  kakaoMapIframeUrl?: string;
+  timetableNotes?: PortableTextBlock[];
+}
+
+// Types for JSON data structure (inferred from usage)
+interface GeoStop {
+  name: string;
+  lat: number;
+  lng: number;
+}
+
+interface GeoInfo {
+  stops: GeoStop[];
+}
+
+interface UsageGuideLink {
+  text: string;
+  url: string;
+  target?: string;
+}
+
+interface UsageGuideItem {
+  text: string;
+  links?: UsageGuideLink[];
+}
+
+interface JsonRouteData {
+  fare?: number;
+  duration?: string;
+  interval?: string;
+  company?: string;
+  companyTel?: string;
+  geoInfo?: GeoInfo;
+  usageGuide?: UsageGuideItem[];
+  airportStopInfo?: {
+    terminal1?: { location?: string };
+    terminal2?: { location?: string };
+  };
+}
+
+// Type for groupedTimetables
+interface GroupedTimetables {
+  [key: string]: TimetableEntry[];
+}
+
+// Type for entriesByStop in timetable rendering
+interface StopGroupData {
+  stopName?: string;
+  dayTypes: {
+    [dayType: string]: TimetableEntry[];
+  };
+}
+
+interface EntriesByStop {
+  [stopKey: string]: StopGroupData;
+}
+
 // Get the route number from the URL parameter
 const { routeNumber } = Astro.params;
 
 // Fetch the specific bus route data from Sanity
-const route = await client.fetch(`
+const route: BusRoute | null = await client.fetch(`
   *[_type == "busRoute" && routeNumber == $routeNumber][0]{
     routeName,
     routeNumber, 
@@ -26,7 +109,7 @@ if (!route) {
 }
 
 // Fetch JSON data for detailed route information
-let jsonData = null;
+let jsonData: JsonRouteData | null = null;
 try {
   const response = await fetch(`${Astro.url.origin}/data/${routeNumber}.json`);
   if (response.ok) {
@@ -37,7 +120,7 @@ try {
 }
 
 // Fetch related timetable entries
-const timetableEntries = await client.fetch(`
+const timetableEntries: TimetableEntry[] = await client.fetch(`
   *[_type == "timetableEntry" && route._ref == $routeId]{
     dayType,
     direction,
@@ -49,14 +132,14 @@ const timetableEntries = await client.fetch(`
 `, { routeId: route._id });
 
 // Helper function to render portable text
-const renderPortableText = (content) => {
+const renderPortableText = (content: PortableTextBlock[] | undefined) => {
   if (!content) return '';
   return toHTML(content);
 };
 
 // Group timetable entries by direction and day type
-const groupedTimetables = {};
-timetableEntries.forEach(entry => {
+const groupedTimetables: GroupedTimetables = {};
+timetableEntries.forEach((entry: TimetableEntry) => {
   const key = `${entry.direction}-${entry.dayType}`;
   if (!groupedTimetables[key]) {
     groupedTimetables[key] = [];
@@ -65,8 +148,8 @@ timetableEntries.forEach(entry => {
 });
 
 // Helper function to get day type display name
-const getDayTypeDisplay = (dayType) => {
-  const dayTypeMap = {
+const getDayTypeDisplay = (dayType: string) => {
+  const dayTypeMap: { [key: string]: string } = {
     'weekday': '평일',
     'weekend_holiday': '주말/공휴일',
     'everyday': '매일'
@@ -75,7 +158,7 @@ const getDayTypeDisplay = (dayType) => {
 };
 
 // Extract main area from route name for SEO
-const getMainArea = (routeName) => {
+const getMainArea = (routeName: string | undefined) => {
   if (routeName?.includes('강남')) return '강남';
   if (routeName?.includes('잠실')) return '잠실';
   if (routeName?.includes('동대문')) return '동대문';
@@ -88,16 +171,32 @@ const mainArea = getMainArea(route.routeName);
 
 // Generate static paths for all routes
 export async function getStaticPaths() {
-  const routes = await client.fetch(`
+  const routes: Array<{ routeNumber: string }> = await client.fetch(`
     *[_type == "busRoute"]{
       routeNumber
     }
   `);
   
-  return routes.map((route) => ({
+  return routes.map((route: { routeNumber: string }) => ({
     params: { routeNumber: route.routeNumber },
   }));
 }
+
+// Helper function to group departure times by hour for the new layout
+const groupTimesByHour = (times: string[]): { [hour: string]: string[] } => {
+  const grouped: { [hour: string]: string[] } = {};
+  if (!times || times.length === 0) {
+    return grouped;
+  }
+  times.forEach(time => {
+    const [hour] = time.split(':');
+    if (!grouped[hour]) {
+      grouped[hour] = [];
+    }
+    grouped[hour].push(time); // Store full time string
+  });
+  return grouped;
+};
 
 // SEO-optimized title and description
 const seoTitle = `${route.routeNumber} 공항버스 시간표 예매 - ${mainArea}↔인천공항 요금/소요시간`;
@@ -210,29 +309,92 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
 
       <!-- Enhanced Route Information from JSON -->
       {jsonData && (
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
-          <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-            <h3 class="font-semibold text-blue-800 dark:text-blue-200 mb-2">요금 정보</h3>
-            <p class="text-2xl font-bold text-blue-600 dark:text-blue-400">{jsonData.fare?.toLocaleString()}원</p>
-          </div>
-          <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-            <h3 class="font-semibold text-green-800 dark:text-green-200 mb-2">소요 시간 (평균)</h3>
-            <p class="text-lg font-semibold text-green-600 dark:text-green-400">{jsonData.duration}</p>
-          </div>
-          <div class="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
-            <h3 class="font-semibold text-orange-800 dark:text-orange-200 mb-2">운행 간격</h3>
-            <p class="text-lg font-semibold text-orange-600 dark:text-orange-400">{jsonData.interval}</p>
-          </div>
-          <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
-            <h3 class="font-semibold text-purple-800 dark:text-purple-200 mb-2">운영사</h3>
-            <p class="text-medium font-medium text-purple-600 dark:text-purple-400">{jsonData.company}</p>
-            {jsonData.companyTel && (
-              <p class="text-s text-purple-500 dark:text-purple-400 mt-1">{jsonData.companyTel}</p>
-            )}
-          </div>
+        <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+          <ul class="space-y-6 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-6">
+            <li class="flex items-start">
+              <div class="flex-shrink-0 w-6 h-6 mr-3 text-blue-600 dark:text-blue-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-full h-full">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 21.75z" />
+                </svg>
+              </div>
+              <div>
+                <span class="block text-sm font-medium text-gray-600 dark:text-gray-400">요금 정보</span>
+                <span class="block text-xl font-bold text-gray-800 dark:text-gray-200">{jsonData.fare?.toLocaleString()}원</span>
+              </div>
+            </li>
+
+            <li class="flex items-start">
+              <div class="flex-shrink-0 w-6 h-6 mr-3 text-green-600 dark:text-green-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-full h-full">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <span class="block text-sm font-medium text-gray-600 dark:text-gray-400">소요 시간 (평균)</span>
+                <span class="block text-lg font-semibold text-gray-800 dark:text-gray-200">{jsonData.duration}</span>
+              </div>
+            </li>
+
+            <li class="flex items-start">
+              <div class="flex-shrink-0 w-6 h-6 mr-3 text-orange-600 dark:text-orange-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-full h-full">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.992v4.992m-4.993 0h-4.992" />
+                </svg>
+              </div>
+              <div>
+                <span class="block text-sm font-medium text-gray-600 dark:text-gray-400">운행 간격</span>
+                <span class="block text-lg font-semibold text-gray-800 dark:text-gray-200">{jsonData.interval}</span>
+              </div>
+            </li>
+
+            <li class="flex items-start">
+              <div class="flex-shrink-0 w-6 h-6 mr-3 text-purple-600 dark:text-purple-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-full h-full">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h6.75m-6.75 3.75h6.75m-6.75 3.75h6.75m-6.75 3.75h6.75M6 21v-3.09c0-.621.254-1.194.68-1.615L10.5 12M18 21v-3.09c0-.621-.254-1.194-.68-1.615L13.5 12m0 0V6.75" />
+                </svg>
+              </div>
+              <div>
+                <span class="block text-sm font-medium text-gray-600 dark:text-gray-400">운영사</span>
+                <span class="block text-lg font-semibold text-gray-800 dark:text-gray-200">{jsonData.company}</span>
+                {jsonData.companyTel && (
+                  <span class="block text-sm text-gray-500 dark:text-gray-400 mt-0.5">{jsonData.companyTel}</span>
+                )}
+              </div>
+            </li>
+          </ul>
         </div>
       )}
     </div>
+
+    <!-- Airport Terminal Stops Section -->
+    {jsonData?.airportStopInfo && (jsonData.airportStopInfo.terminal1?.location || jsonData.airportStopInfo.terminal2?.location) && (
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
+          <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
+          {route.routeNumber} 공항버스 인천공항 터미널 안내
+        </h2>
+        <div class="space-y-4">
+          {jsonData.airportStopInfo.terminal1?.location && (
+            <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
+              <div class="flex items-center mb-2">
+                <span class="bg-blue-500 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full mr-3">T1</span>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">제1여객터미널 승차장</h3>
+              </div>
+              <p class="text-gray-600 dark:text-gray-300 ml-9">{jsonData.airportStopInfo.terminal1.location}</p>
+            </div>
+          )}
+          {jsonData.airportStopInfo.terminal2?.location && (
+            <div class="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
+              <div class="flex items-center mb-2">
+                <span class="bg-green-500 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full mr-3">T2</span>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">제2여객터미널 승차장</h3>
+              </div>
+              <p class="text-gray-600 dark:text-gray-300 ml-9">{jsonData.airportStopInfo.terminal2.location}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    )}
 
     <!-- Bus Stops with Kakao Map -->
     {jsonData?.geoInfo?.stops && jsonData.geoInfo.stops.length > 0 && (
@@ -248,12 +410,10 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
           {route.routeNumber} 공항버스가 정차하는 정류장 위치입니다. 지도에서 각 정류장의 자세한 위치를 확인해보세요.
         </p>
 
-        <!-- Kakao Map -->
         <div class="mb-6">
           <div id="map" class="w-full h-96 rounded-lg border border-gray-200 dark:border-gray-600"></div>
         </div>
 
-        <!-- Roadview Container (initially hidden) -->
         <div id="roadviewContainer" class="mb-6" style="display: none;">
           <div class="flex items-center justify-between mb-3">
             <h3 class="text-lg font-semibold text-gray-800 dark:text-white">로드뷰</h3>
@@ -267,39 +427,39 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
           <div id="roadview" class="w-full h-96 rounded-lg border border-gray-200 dark:border-gray-600"></div>
         </div>
 
-        <!-- Stop List with Coordinates -->
-        <div class="grid grid-cols-2 gap-4">
-          {jsonData.geoInfo.stops.map((stop, index) => (
-            <div class="flex flex-col p-3 bg-gray-50 dark:bg-gray-700 rounded-lg space-y-2 items-start">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-1 max-h-96 overflow-y-auto">
+          {jsonData.geoInfo.stops.map((stop: GeoStop, index: number) => (
+            <div class="flex flex-col p-3 sm:p-2.5 bg-gray-50 dark:bg-gray-700 rounded-lg space-y-2 sm:space-y-1.5 items-start">
               <div class="flex items-center space-x-3 w-full">
-                <span class="flex-shrink-0 w-8 h-8 bg-blue-600 text-white text-sm font-bold rounded-full flex items-center justify-center">
+                <span class="flex-shrink-0 w-7 h-7 sm:w-6 sm:h-6 bg-blue-600 text-white text-sm sm:text-xs font-semibold rounded-full flex items-center justify-center">
                   {index + 1}
                 </span>
                 <div>
-                  <span class="text-gray-800 dark:text-gray-200 font-medium block text-sm">{stop.name}</span>
+                  <span class="text-gray-800 dark:text-gray-200 font-medium block text-base sm:text-sm">{stop.name}</span>
                 </div>
               </div>
-              <div class="flex space-x-2 w-full justify-start pt-1 pl-11">
+              <div class="flex space-x-3 sm:space-x-2 w-full pt-0.5 items-center pl-10 sm:pl-9">
                 <button 
-                  onclick={`moveToMarker(${index})`}
-                  class="text-xs px-2 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors duration-150 flex items-center"
+                  onclick={`window.moveToMarker(${index})`}
+                  class="text-sm px-4 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-blue-600 dark:text-blue-400 rounded-lg transition-colors duration-150 flex items-center justify-center flex-1 min-h-[44px] font-medium"
                 >
-                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                  지도
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                  <span class="sm:hidden">지도</span>
+                  <span class="hidden sm:inline">지도에서 보기</span>
                 </button>
                 <button 
-                  onclick={`showStopTimetable('${stop.name}')`}
-                  class="text-xs px-2 py-1 bg-green-500 hover:bg-green-600 text-white rounded-md transition-colors duration-150 flex items-center"
+                  onclick={`window.showStopTimetableWrapper(\'${String(stop.name).replace(/'/g, "\\\"'" ).replace(/"/g, '&quot;')}\')`}
+                  class="text-sm px-4 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-green-600 dark:text-green-400 rounded-lg transition-colors duration-150 flex items-center justify-center flex-1 min-h-[44px] font-medium"
                 >
-                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                  시간표
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                  <span class="sm:hidden">시간표</span>
+                  <span class="hidden sm:inline">정류장 시간표</span>
                 </button>
               </div>
             </div>
           ))}
         </div>
 
-        <!-- Store stops data in a data attribute -->
         <div id="stopsData" data-stops={JSON.stringify(jsonData.geoInfo.stops)} style="display: none;"></div>
       </div>
     )}
@@ -318,7 +478,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
           {route.routeNumber} 공항버스가 정차하는 주요 정류장 위치입니다. 각 정류장에서의 탑승 시간을 확인하여 여행 계획을 세우세요.
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {route.mainStops.map((stop, index) => (
+          {route.mainStops.map((stop: string, index: number) => (
             <div class="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <span class="flex-shrink-0 w-6 h-6 bg-blue-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
                 {index + 1}
@@ -344,10 +504,9 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
         </p>
 
         <div class="space-y-8" id="timetable-section">
-          {Object.entries(groupedTimetables).map(([key, entries]) => {
+          {Object.entries(groupedTimetables).map(([key, entries]: [string, TimetableEntry[]]) => {
             const [currentDirection, currentDayType] = key.split('-');
-            // Group entries by stopName within this direction-dayType group
-            const entriesByStop = entries.reduce((acc, entry) => {
+            const entriesByStop = entries.reduce((acc: EntriesByStop, entry: TimetableEntry) => {
               const stopKey = entry.stopName || 'unknown';
               if (!acc[stopKey]) {
                 acc[stopKey] = {
@@ -360,14 +519,13 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
               }
               acc[stopKey].dayTypes[currentDayType].push(entry);
               return acc;
-            }, {});
+            }, {} as EntriesByStop);
 
-            // Determine if this entire block is for '시내행'
             const isCityBoundBlock = currentDirection === '시내행';
 
-            return Object.values(entriesByStop).map(stopGroup => {
-              return Object.entries(stopGroup.dayTypes).map(([dayType, dayTypeEntries]) => {
-                const firstEntryForStopDayType = dayTypeEntries[0]; // All entries here share stopName, direction, dayType
+            return Object.values(entriesByStop).map((stopGroup: StopGroupData) => {
+              return Object.entries(stopGroup.dayTypes).map(([dayType, dayTypeEntries]: [string, TimetableEntry[]]) => {
+                const firstEntryForStopDayType = dayTypeEntries[0];
 
                 return (
                   <div 
@@ -390,25 +548,125 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
                           ? 'text-blue-800 dark:text-blue-100' 
                           : 'text-green-800 dark:text-green-100'}
                       `}>
-                        {firstEntryForStopDayType.direction} - {getDayTypeDisplay(dayType)} ({firstEntryForStopDayType.stopName || '정류장명 미등록'})
+                        {firstEntryForStopDayType.stopName || '정류장명 미등록'} 
+                        <span class="text-sm">({firstEntryForStopDayType.direction} - {getDayTypeDisplay(dayType)})</span>
                       </h3>
                     </div>
                     <div class="p-4">
-                      {dayTypeEntries.map((entry, index) => (
-                        <div class="mb-6 last:mb-0" key={`${entry.stopName}-${index}`}> {/* Key should be more unique if stopName can be null */}
-                          {/* We already have stopName in the header for this block */}
-                          {entry.departureTimes && entry.departureTimes.length > 0 ? (
-                            <div class="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-2">
-                              {entry.departureTimes.map((time, timeIndex) => (
-                                <span 
-                                  key={timeIndex}
-                                  class="text-center py-2 px-1 bg-blue-50 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded text-sm font-mono"
-                                >
-                                  {time}
-                                </span>
-                              ))}
-                            </div>
-                          ) : (
+                      {dayTypeEntries.map((entry: TimetableEntry) => (
+                        <div class="mb-6 last:mb-0">
+                          {entry.departureTimes && entry.departureTimes.length > 0 ? (() => {
+                            const hourlySchedule = groupTimesByHour(entry.departureTimes);
+                            const allHoursInSchedule = Object.keys(hourlySchedule).sort((a, b) => parseInt(a) - parseInt(b));
+                            
+                            // 반응형 블록 처리 - 모바일 5열, PC 8열
+                            const mobileHoursPerBlock = 5;
+                            const desktopHoursPerBlock = 8;
+                            
+                            // 모바일용 블록 생성
+                            const mobileBlocks: string[][] = [];
+                            for (let i = 0; i < allHoursInSchedule.length; i += mobileHoursPerBlock) {
+                              const block = allHoursInSchedule.slice(i, i + mobileHoursPerBlock);
+                              while(block.length < mobileHoursPerBlock) {
+                                block.push("");
+                              }
+                              mobileBlocks.push(block);
+                            }
+                            
+                            // PC용 블록 생성
+                            const desktopBlocks: string[][] = [];
+                            for (let i = 0; i < allHoursInSchedule.length; i += desktopHoursPerBlock) {
+                              const block = allHoursInSchedule.slice(i, i + desktopHoursPerBlock);
+                              while(block.length < desktopHoursPerBlock) {
+                                block.push("");
+                              }
+                              desktopBlocks.push(block);
+                            }
+
+                            return (
+                              <div class="timetable-container">
+                                {/* 모바일용 5열 레이아웃 */}
+                                <div class="block md:hidden">
+                                  {mobileBlocks.map((mobileBlock, mobileBlockIndex) => {
+                                    let maxMinutesInMobileBlock = 0;
+                                    mobileBlock.forEach(hour => {
+                                      if (hour && hourlySchedule[hour] && hourlySchedule[hour].length > maxMinutesInMobileBlock) {
+                                        maxMinutesInMobileBlock = hourlySchedule[hour].length;
+                                      }
+                                    });
+
+                                    return (
+                                      <div class={`mb-4 ${mobileBlockIndex > 0 ? 'mt-6 pt-4 border-t border-gray-200 dark:border-gray-700' : ''}`}>
+                                        {/* 모바일 시간 헤더 */}
+                                        <div class="grid grid-cols-5 gap-x-1 mb-1">
+                                          {mobileBlock.map(hour => (
+                                            <div class="text-center font-semibold text-sm text-gray-700 dark:text-gray-300 pb-1">
+                                              {hour ? `${hour}시` : ''}
+                                            </div>
+                                          ))}
+                                        </div>
+                                        {/* 모바일 분 행들 */}
+                                        {Array.from({ length: maxMinutesInMobileBlock }).map((_, minuteIndex) => (
+                                          <div class="grid grid-cols-5 gap-x-1 mb-px">
+                                            {mobileBlock.map(hour => {
+                                              const minuteVal = hour && hourlySchedule[hour]?.[minuteIndex]
+                                                ? hourlySchedule[hour][minuteIndex].split(':')[1]
+                                                : null;
+                                              return (
+                                                <div class={`text-center py-1.5 px-1 text-[15px] font-mono h-7 flex items-center justify-center rounded-sm ${minuteVal ? 'text-gray-700 dark:text-gray-300' : ''}`}>
+                                                  {minuteVal || ''}
+                                                </div>
+                                              );
+                                            })}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+
+                                {/* PC용 8열 레이아웃 */}
+                                <div class="hidden md:block">
+                                  {desktopBlocks.map((desktopBlock, desktopBlockIndex) => {
+                                    let maxMinutesInDesktopBlock = 0;
+                                    desktopBlock.forEach(hour => {
+                                      if (hour && hourlySchedule[hour] && hourlySchedule[hour].length > maxMinutesInDesktopBlock) {
+                                        maxMinutesInDesktopBlock = hourlySchedule[hour].length;
+                                      }
+                                    });
+
+                                    return (
+                                      <div class={`mb-4 ${desktopBlockIndex > 0 ? 'mt-6 pt-4 border-t border-gray-200 dark:border-gray-700' : ''}`}>
+                                        {/* PC 시간 헤더 */}
+                                        <div class="grid grid-cols-8 gap-x-1 mb-1">
+                                          {desktopBlock.map(hour => (
+                                            <div class="text-center font-semibold text-base text-gray-700 dark:text-gray-300 pb-1">
+                                              {hour ? `${hour}시` : ''}
+                                            </div>
+                                          ))}
+                                        </div>
+                                        {/* PC 분 행들 */}
+                                        {Array.from({ length: maxMinutesInDesktopBlock }).map((_, minuteIndex) => (
+                                          <div class="grid grid-cols-8 gap-x-1 mb-px">
+                                            {desktopBlock.map(hour => {
+                                              const minuteVal = hour && hourlySchedule[hour]?.[minuteIndex]
+                                                ? hourlySchedule[hour][minuteIndex].split(':')[1]
+                                                : null;
+                                              return (
+                                                <div class={`text-center py-2 px-1 text-[17px] font-mono h-8 flex items-center justify-center rounded-sm ${minuteVal ? 'text-gray-700 dark:text-gray-300' : ''}`}>
+                                                  {minuteVal || ''}
+                                                </div>
+                                              );
+                                            })}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            );
+                          })() : (
                             <p class="text-gray-500 dark:text-gray-400">해당 날짜의 시간표 정보가 없습니다.</p>
                           )}
                         </div>
@@ -443,10 +701,10 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
         <!-- JSON Usage Guide (priority) -->
         {jsonData?.usageGuide && (
           <ul class="space-y-3 list-none mb-6">
-            {jsonData.usageGuide.map((guide, index) => {
+            {jsonData.usageGuide.map((guide: UsageGuideItem, index: number) => {
               let displayText = guide.text;
               if (guide.links && guide.links.length > 0) {
-                guide.links.forEach(link => {
+                guide.links.forEach((link: UsageGuideLink) => {
                   if (guide.text.includes(link.text)) {
                     displayText = displayText.replace(
                       link.text,
@@ -455,10 +713,11 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
                   }
                 });
               }
+              const isLastItem = jsonData.usageGuide && index === jsonData.usageGuide.length - 1;
               return (
-                <li class="flex items-start p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
-                  <svg class="w-5 h-5 mr-3 mt-1 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                <li class={`flex items-start py-4 ${isLastItem ? '' : 'border-b border-gray-200 dark:border-gray-700'}`}>
+                  <svg class="w-5 h-5 mr-3 mt-1 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="5" />
                   </svg>
                   <span class="text-gray-700 dark:text-gray-300" set:html={displayText}></span>
                 </li>
@@ -564,13 +823,10 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
   </div>
 </Layout>
 
-<script is:inline set:html={`
-  window.timetableData = ${JSON.stringify(timetableEntries)};
-`}/>
+<script is:inline set:html={`window.timetableData = ${JSON.stringify(timetableEntries)};`} />
 
 <script is:inline>
 document.addEventListener('DOMContentLoaded', function() {
-  // Check if map container and stops data exist
   const mapContainer = document.getElementById('map');
   const stopsDataElement = document.getElementById('stopsData');
   
@@ -578,86 +834,82 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
   
-  // Get stops data
-  const stopsData = stopsDataElement.getAttribute('data-stops');
-  if (!stopsData) {
+  const stopsDataText = stopsDataElement.getAttribute('data-stops');
+  if (!stopsDataText) {
     return;
   }
   
-  const stops = JSON.parse(stopsData);
-  
-  // Calculate center point from all stops
-  let centerLat = 37.5665; // Default latitude
-  let centerLng = 126.9780; // Default longitude
-  
-  if (stops.length > 0) {
-    const totalLat = stops.reduce((sum, stop) => sum + stop.lat, 0);
-    const totalLng = stops.reduce((sum, stop) => sum + stop.lng, 0);
-    centerLat = totalLat / stops.length;
-    centerLng = totalLng / stops.length;
+  let stops = [];
+  try {
+    stops = JSON.parse(stopsDataText);
+    if (!Array.isArray(stops)) {
+      stops = [];
+    }
+  } catch (e) {
+    console.error('Error parsing stops data JSON:', e);
+    return;
   }
   
-  // Initialize Kakao Map
+  let centerLat = 37.5665;
+  let centerLng = 126.9780;
+  
+  if (stops.length > 0) {
+    const validStops = stops.filter(stop => typeof stop.lat === 'number' && typeof stop.lng === 'number' && !isNaN(stop.lat) && !isNaN(stop.lng));
+    if (validStops.length > 0) {
+      const totalLat = validStops.reduce((sum, stop) => sum + stop.lat, 0);
+      const totalLng = validStops.reduce((sum, stop) => sum + stop.lng, 0);
+      centerLat = totalLat / validStops.length;
+      centerLng = totalLng / validStops.length;
+    }
+  }
+  
   const mapOption = {
     center: new kakao.maps.LatLng(centerLat, centerLng),
-    level: 8
+    level: 9 
   };
   
   const map = new kakao.maps.Map(mapContainer, mapOption);
   const markers = [];
-  let currentInfoWindow = null; // 현재 열린 인포윈도우 추적
-  let roadview = null; // 로드뷰 객체
-  let roadviewClient = null; // 로드뷰 클라이언트
+  let currentInfoWindow = null;
+  let roadview = null;
+  let roadviewClient = null;
   
-  // Initialize Roadview
   function initRoadview() {
     if (!roadview) {
-      const roadviewContainer = document.getElementById('roadview');
-      if (roadviewContainer) {
-        roadview = new kakao.maps.Roadview(roadviewContainer);
+      const roadviewContainerEl = document.getElementById('roadview');
+      if (roadviewContainerEl) {
+        roadview = new kakao.maps.Roadview(roadviewContainerEl);
         roadviewClient = new kakao.maps.RoadviewClient();
       }
     }
   }
   
-  // Show roadview for specific coordinates
   function showRoadview(lat, lng, stopName) {
     initRoadview();
-    
     if (!roadview || !roadviewClient) {
-      alert('로드뷰를 불러올 수 없습니다.');
+      alert('로드뷰를 불러올 수 없습니다. 다시 시도해주세요.');
       return;
     }
-    
     const position = new kakao.maps.LatLng(lat, lng);
-    
-    // Check if roadview is available at this location
     roadviewClient.getNearestPanoId(position, 100, function(panoId) {
+      const roadviewDisplayContainer = document.getElementById('roadviewContainer');
       if (panoId === null) {
         alert('이 위치에서는 로드뷰를 사용할 수 없습니다.');
+        if (roadviewDisplayContainer) roadviewDisplayContainer.style.display = 'none';
       } else {
-        // Show roadview container
-        const roadviewContainer = document.getElementById('roadviewContainer');
-        if (roadviewContainer) {
-          roadviewContainer.style.display = 'block';
+        if (roadviewDisplayContainer) {
+          roadviewDisplayContainer.style.display = 'block';
+          const roadviewTitleEl = roadviewDisplayContainer.querySelector('h3');
+          if (roadviewTitleEl) {
+            roadviewTitleEl.textContent = stopName + ' 로드뷰';
+          }
+          roadview.setPanoId(panoId, position);
+          roadviewDisplayContainer.scrollIntoView({ behavior: 'smooth' });
         }
-        
-        // Display roadview
-        roadview.setPanoId(panoId, position);
-        
-        // Update roadview title
-        const roadviewTitle = roadviewContainer.querySelector('h3');
-        if (roadviewTitle) {
-          roadviewTitle.textContent = stopName + ' 로드뷰';
-        }
-        
-        // Scroll to roadview
-        roadviewContainer.scrollIntoView({ behavior: 'smooth' });
       }
     });
   }
   
-  // Close roadview
   window.closeRoadview = function() {
     const roadviewContainer = document.getElementById('roadviewContainer');
     if (roadviewContainer) {
@@ -665,45 +917,44 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   };
   
-  // Create markers for each stop
-  stops.forEach((stop, index) => {
-    const markerPosition = new kakao.maps.LatLng(stop.lat, stop.lng);
-    
-    const marker = new kakao.maps.Marker({
-      position: markerPosition,
-      map: map
-    });
-    
-    // Info window content with close button
-    const infoContent = 
-      '<div style="padding: 20px; min-width: 220px; max-width: 300px; position: relative; font-family: inherit;">' +
-        '<div style="font-weight: 600; font-size: 16px; margin-bottom: 12px; padding-right: 25px; color: #1f2937; line-height: 1.3;">' + (index + 1) + '. ' + stop.name + '</div>' +
-        '<div style="margin-bottom: 8px;">' +
-          '<button onclick="openRoadviewForStop(' + index + ')" style="background: #007bff; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,123,255,0.3);" onmouseover="this.style.background=\'#0056b3\'" onmouseout="this.style.background=\'#007bff\'">🛣️ 로드뷰 보기</button>' +
-        '</div>' +
-        '<button onclick="closeInfoWindow()" style="position: absolute; top: 10px; right: 10px; background: #f3f4f6; border: none; font-size: 16px; cursor: pointer; color: #6b7280; line-height: 1; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" onmouseover="this.style.background=\'#e5e7eb\'" onmouseout="this.style.background=\'#f3f4f6\'">×</button>' +
-      '</div>';
-    
-    const infoWindow = new kakao.maps.InfoWindow({
-      content: infoContent
-    });
-    
-    // Show info window on marker click
-    kakao.maps.event.addListener(marker, 'click', function() {
-      // Close previous info window
-      if (currentInfoWindow) {
-        currentInfoWindow.close();
+  if (stops.length > 0) {
+    stops.forEach((stop, index) => {
+      if (typeof stop.lat !== 'number' || typeof stop.lng !== 'number' || isNaN(stop.lat) || isNaN(stop.lng)) {
+        return;
       }
+      const markerPosition = new kakao.maps.LatLng(stop.lat, stop.lng);
+      const marker = new kakao.maps.Marker({
+        position: markerPosition,
+        map: map
+      });
       
-      // Open new info window
-      infoWindow.open(map, marker);
-      currentInfoWindow = infoWindow;
+      const stopNameForFunction = String(stop.name).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+      const infoContent = 
+        '<div style="padding:12px; min-width:200px; font-family: Arial, sans-serif; font-size: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); border-radius: 6px;">' +
+          '<div style="font-weight: 600; font-size: 15px; margin-bottom: 8px; color: #333;">' + (index + 1) + '. ' + stop.name + '</div>' +
+          '<div style="margin-bottom: 8px;">' +
+            '<button onclick="window.openRoadviewForStop(' + index + ')" style="background: #007bff; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 13px; margin-right: 5px;">로드뷰</button>' +
+            '<button onclick="window.showStopTimetableWrapper(\'' + stopNameForFunction + '\')" style="background: #28a745; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 13px;">시간표</button>' +
+          '</div>' +
+          '<button onclick="window.closeInfoWindow()" style="position: absolute; top: 8px; right: 8px; background: none; border: none; font-size: 18px; cursor: pointer; color: #888; line-height: 1;">&times;</button>' +
+        '</div>';
+      
+      const infoWindow = new kakao.maps.InfoWindow({
+        content: infoContent,
+        disableAutoPan: true
+      });
+      
+      kakao.maps.event.addListener(marker, 'click', function() {
+        if (currentInfoWindow) {
+          currentInfoWindow.close();
+        }
+        infoWindow.open(map, marker);
+        currentInfoWindow = infoWindow;
+      });
+      markers.push({ marker: marker, infoWindow: infoWindow, stopData: stop });
     });
-    
-    markers.push({ marker: marker, infoWindow: infoWindow });
-  });
+  }
   
-  // Close info window when clicking on map
   kakao.maps.event.addListener(map, 'click', function() {
     if (currentInfoWindow) {
       currentInfoWindow.close();
@@ -711,7 +962,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
-  // Global function to close info window
   window.closeInfoWindow = function() {
     if (currentInfoWindow) {
       currentInfoWindow.close();
@@ -719,91 +969,86 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   };
   
-  // Global function to open roadview for specific stop
   window.openRoadviewForStop = function(index) {
-    if (index >= 0 && index < stops.length) {
-      const stop = stops[index];
+    if (markers[index] && markers[index].stopData) {
+      const stop = markers[index].stopData;
       showRoadview(stop.lat, stop.lng, stop.name);
     }
   };
   
-  // Function to move to specific marker
   window.moveToMarker = function(index) {
-    if (index < 0 || index >= stops.length) {
-      return;
-    }
-    
-    const stop = stops[index];
+    if (index < 0 || index >= markers.length) return;
+    const markerData = markers[index];
+    if (!markerData || !markerData.stopData) return;
+    const stop = markerData.stopData;
     const moveLatLng = new kakao.maps.LatLng(stop.lat, stop.lng);
-    
     map.setCenter(moveLatLng);
-    map.setLevel(3);
-    
-    // Close previous info window
-    if (currentInfoWindow) {
-      currentInfoWindow.close();
-    }
-    
-    // Open info window for the selected marker
-    markers[index].infoWindow.open(map, markers[index].marker);
-    currentInfoWindow = markers[index].infoWindow;
+    map.setLevel(4, {animate: true});
+    if (currentInfoWindow) currentInfoWindow.close();
+    markerData.infoWindow.open(map, markerData.marker);
+    currentInfoWindow = markerData.infoWindow;
   };
   
-  // Adjust map bounds to show all markers
-  if (stops.length > 0) {
+  if (markers.length > 0) {
     const bounds = new kakao.maps.LatLngBounds();
-    stops.forEach(stop => {
-      bounds.extend(new kakao.maps.LatLng(stop.lat, stop.lng));
+    markers.forEach(markerData => {
+       if (markerData.stopData && typeof markerData.stopData.lat === 'number' && typeof markerData.stopData.lng === 'number') {
+        bounds.extend(new kakao.maps.LatLng(markerData.stopData.lat, markerData.stopData.lng));
+      }
     });
-    map.setBounds(bounds);
-    
-    // Set specific zoom level after setBounds
-    setTimeout(function() {
-      map.setLevel(8);
-    }, 100);
+    if (!bounds.isEmpty()) {
+        map.setBounds(bounds);
+    }
   }
 });
 
+window.showStopTimetableWrapper = function(stopName) {
+  if (typeof window.showStopTimetable === 'function') {
+    window.showStopTimetable(stopName);
+    const timetableSection = document.getElementById('timetable-section');
+    if (timetableSection) {
+      timetableSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+};
+
 window.showStopTimetable = function(clickedStopName) {
   if (!window.timetableData) {
-    console.error('Timetable data not loaded.');
+    console.error('Timetable data (window.timetableData) not loaded.');
     return;
   }
-
-  // Find the direction for the clicked stopName
   let clickedStopDirection = null;
   const entryForClickedStop = window.timetableData.find(entry => entry.stopName === clickedStopName);
-
   if (entryForClickedStop) {
     clickedStopDirection = entryForClickedStop.direction;
-  } else {
-    console.warn(`No timetable entry found for stop: ${clickedStopName}. Cannot determine direction.`);
   }
-
-  // Hide all currently shown specific (non-city-bound) stop timetables
   const allTimetableItems = document.querySelectorAll('.timetable-entry-item');
+  let foundSpecificTimetable = false;
   allTimetableItems.forEach(item => {
-    if (item.classList.contains('specific-stop-timetable')) {
-      item.style.display = 'none';
+    const itemStopName = item.dataset.stopName;
+    const itemDirection = item.dataset.direction;
+    if (item.classList.contains('city-bound-timetable')) {
+       item.style.display = 'block'; 
+    } else if (item.classList.contains('specific-stop-timetable')) {
+      if (itemStopName === clickedStopName && (clickedStopDirection === null || itemDirection === clickedStopDirection)) {
+        item.style.display = 'block';
+        foundSpecificTimetable = true;
+        allTimetableItems.forEach(tb => {
+            if (tb.classList.contains('city-bound-timetable')) {
+                tb.style.display = 'none';
+            }
+        });
+      } else {
+        item.style.display = 'none';
+      }
     }
   });
-
-  // If we found a direction, show all timetables for the clicked stop and its determined direction
-  if (clickedStopDirection) {
-    const timetablesToShow = document.querySelectorAll(
-      `.timetable-entry-item[data-stop-name="${clickedStopName}"][data-direction="${clickedStopDirection}"]`
-    );
-    timetablesToShow.forEach(item => {
-      item.style.display = 'block';
+  if (!foundSpecificTimetable) {
+    allTimetableItems.forEach(item => {
+        if (item.classList.contains('city-bound-timetable')) {
+            item.style.display = 'block';
+        }
     });
-  } else {
-    console.log(`No specific direction found for ${clickedStopName}, only showing default city-bound timetables.`);
   }
-
-  // Scrolling is now handled by scrollToTimetableSectionOnly or not at all for other stops.
-  // const timetableSection = document.getElementById('timetable-section');
-  // if (timetableSection) {
-  //   timetableSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  // }
 };
 </script> 
