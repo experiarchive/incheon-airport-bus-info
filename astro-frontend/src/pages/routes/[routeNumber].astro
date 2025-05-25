@@ -1057,9 +1057,10 @@ document.addEventListener('DOMContentLoaded', function() {
 window.showStopTimetableWrapper = function(stopName) {
   if (typeof window.showStopTimetable === 'function') {
     window.showStopTimetable(stopName);
+    // 시간표 섹션의 부모 요소(H2 태그가 포함된 컨테이너)로 스크롤
     const timetableSection = document.getElementById('timetable-section');
-    if (timetableSection) {
-      timetableSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (timetableSection && timetableSection.parentElement) {
+      timetableSection.parentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 };
