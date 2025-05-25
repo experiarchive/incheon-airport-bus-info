@@ -111,12 +111,31 @@ if (!route) {
 // Fetch JSON data for detailed route information
 let jsonData: JsonRouteData | null = null;
 try {
-  const response = await fetch(`${Astro.url.origin}/data/${routeNumber}.json`);
-  if (response.ok) {
-    jsonData = await response.json();
+  // 빌드 시에는 fs 모듈을 사용하여 파일을 직접 읽음
+  if (typeof process !== 'undefined' && process.cwd) {
+    // 서버 사이드 (빌드 시)
+    const fs = await import('fs');
+    const path = await import('path');
+    const jsonFilePath = path.join(process.cwd(), 'public', 'data', `${routeNumber}.json`);
+    
+    if (fs.existsSync(jsonFilePath)) {
+      const jsonContent = fs.readFileSync(jsonFilePath, 'utf-8');
+      jsonData = JSON.parse(jsonContent);
+    } else {
+      console.log('JSON data file not found:', jsonFilePath);
+    }
+  } else {
+    // 클라이언트 사이드 (런타임)
+    const jsonPath = `/data/${routeNumber}.json`;
+    const response = await fetch(jsonPath);
+    if (response.ok) {
+      jsonData = await response.json();
+    } else {
+      console.log('JSON data not found for route:', routeNumber, 'Status:', response.status);
+    }
   }
 } catch (error) {
-  console.log('JSON data not found for route:', routeNumber);
+  console.error('Error loading JSON data for route:', routeNumber, error);
 }
 
 // Fetch related timetable entries
@@ -308,7 +327,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
       )}
 
       <!-- Enhanced Route Information from JSON -->
-      {jsonData && (
+      {jsonData ? (
         <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
           <ul class="space-y-6 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-6">
             <li class="flex items-start">
@@ -362,6 +381,22 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
               </div>
             </li>
           </ul>
+        </div>
+      ) : (
+        <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
+          <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div>
+                <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">상세 정보 준비중</h3>
+                <p class="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+                  요금, 소요시간 등 상세 운행 정보를 준비중입니다. 시간표와 정류장 정보는 아래에서 확인하세요.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -834,8 +869,21 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
   
+  // Kakao Maps API가 로드되었는지 확인
+  if (typeof kakao === 'undefined' || typeof kakao.maps === 'undefined') {
+    console.error('Kakao Maps API가 로드되지 않았습니다.');
+    mapContainer.innerHTML = '<div class="flex items-center justify-center h-96 bg-gray-100 rounded-lg">' +
+      '<div class="text-center">' +
+        '<p class="text-gray-600 mb-2">지도를 불러올 수 없습니다.</p>' +
+        '<p class="text-sm text-gray-500">잠시 후 다시 시도해주세요.</p>' +
+      '</div>' +
+    '</div>';
+    return;
+  }
+  
   const stopsDataText = stopsDataElement.getAttribute('data-stops');
   if (!stopsDataText) {
+    console.error('정류장 데이터가 없습니다.');
     return;
   }
   
@@ -863,142 +911,146 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  const mapOption = {
-    center: new kakao.maps.LatLng(centerLat, centerLng),
-    level: 9 
-  };
+  try {
+    const mapOption = {
+      center: new kakao.maps.LatLng(centerLat, centerLng),
+      level: 9 
+    };
+    
+    const map = new kakao.maps.Map(mapContainer, mapOption);
+    const markers = [];
+    let currentInfoWindow = null;
+    let roadview = null;
+    let roadviewClient = null;
   
-  const map = new kakao.maps.Map(mapContainer, mapOption);
-  const markers = [];
-  let currentInfoWindow = null;
-  let roadview = null;
-  let roadviewClient = null;
-  
-  function initRoadview() {
-    if (!roadview) {
-      const roadviewContainerEl = document.getElementById('roadview');
-      if (roadviewContainerEl) {
-        roadview = new kakao.maps.Roadview(roadviewContainerEl);
-        roadviewClient = new kakao.maps.RoadviewClient();
-      }
-    }
-  }
-  
-  function showRoadview(lat, lng, stopName) {
-    initRoadview();
-    if (!roadview || !roadviewClient) {
-      alert('로드뷰를 불러올 수 없습니다. 다시 시도해주세요.');
-      return;
-    }
-    const position = new kakao.maps.LatLng(lat, lng);
-    roadviewClient.getNearestPanoId(position, 100, function(panoId) {
-      const roadviewDisplayContainer = document.getElementById('roadviewContainer');
-      if (panoId === null) {
-        alert('이 위치에서는 로드뷰를 사용할 수 없습니다.');
-        if (roadviewDisplayContainer) roadviewDisplayContainer.style.display = 'none';
-      } else {
-        if (roadviewDisplayContainer) {
-          roadviewDisplayContainer.style.display = 'block';
-          const roadviewTitleEl = roadviewDisplayContainer.querySelector('h3');
-          if (roadviewTitleEl) {
-            roadviewTitleEl.textContent = stopName + ' 로드뷰';
-          }
-          roadview.setPanoId(panoId, position);
-          roadviewDisplayContainer.scrollIntoView({ behavior: 'smooth' });
+    function initRoadview() {
+      if (!roadview) {
+        const roadviewContainerEl = document.getElementById('roadview');
+        if (roadviewContainerEl) {
+          roadview = new kakao.maps.Roadview(roadviewContainerEl);
+          roadviewClient = new kakao.maps.RoadviewClient();
         }
       }
-    });
-  }
-  
-  window.closeRoadview = function() {
-    const roadviewContainer = document.getElementById('roadviewContainer');
-    if (roadviewContainer) {
-      roadviewContainer.style.display = 'none';
     }
-  };
   
-  if (stops.length > 0) {
-    stops.forEach((stop, index) => {
-      if (typeof stop.lat !== 'number' || typeof stop.lng !== 'number' || isNaN(stop.lat) || isNaN(stop.lng)) {
+    function showRoadview(lat, lng, stopName) {
+      initRoadview();
+      if (!roadview || !roadviewClient) {
+        alert('로드뷰를 불러올 수 없습니다. 다시 시도해주세요.');
         return;
       }
-      const markerPosition = new kakao.maps.LatLng(stop.lat, stop.lng);
-      const marker = new kakao.maps.Marker({
-        position: markerPosition,
-        map: map
-      });
-      
-      const stopNameForFunction = String(stop.name).replace(/'/g, "\\'").replace(/"/g, '&quot;');
-      const infoContent = 
-        '<div style="padding:12px; min-width:200px; font-family: Arial, sans-serif; font-size: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); border-radius: 6px;">' +
-          '<div style="font-weight: 600; font-size: 15px; margin-bottom: 8px; color: #333;">' + (index + 1) + '. ' + stop.name + '</div>' +
-          '<div style="margin-bottom: 8px;">' +
-            '<button onclick="window.openRoadviewForStop(' + index + ')" style="background: #007bff; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 13px; margin-right: 5px;">로드뷰</button>' +
-            '<button onclick="window.showStopTimetableWrapper(\'' + stopNameForFunction + '\')" style="background: #28a745; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 13px;">시간표</button>' +
-          '</div>' +
-          '<button onclick="window.closeInfoWindow()" style="position: absolute; top: 8px; right: 8px; background: none; border: none; font-size: 18px; cursor: pointer; color: #888; line-height: 1;">&times;</button>' +
-        '</div>';
-      
-      const infoWindow = new kakao.maps.InfoWindow({
-        content: infoContent,
-        disableAutoPan: true
-      });
-      
-      kakao.maps.event.addListener(marker, 'click', function() {
-        if (currentInfoWindow) {
-          currentInfoWindow.close();
+      const position = new kakao.maps.LatLng(lat, lng);
+      roadviewClient.getNearestPanoId(position, 100, function(panoId) {
+        const roadviewDisplayContainer = document.getElementById('roadviewContainer');
+        if (panoId === null) {
+          alert('이 위치에서는 로드뷰를 사용할 수 없습니다.');
+          if (roadviewDisplayContainer) roadviewDisplayContainer.style.display = 'none';
+        } else {
+          if (roadviewDisplayContainer) {
+            roadviewDisplayContainer.style.display = 'block';
+            const roadviewTitleEl = roadviewDisplayContainer.querySelector('h3');
+            if (roadviewTitleEl) {
+              roadviewTitleEl.textContent = stopName + ' 로드뷰';
+            }
+            roadview.setPanoId(panoId, position);
+            roadviewDisplayContainer.scrollIntoView({ behavior: 'smooth' });
+          }
         }
-        infoWindow.open(map, marker);
-        currentInfoWindow = infoWindow;
       });
-      markers.push({ marker: marker, infoWindow: infoWindow, stopData: stop });
-    });
-  }
-  
-  kakao.maps.event.addListener(map, 'click', function() {
-    if (currentInfoWindow) {
-      currentInfoWindow.close();
-      currentInfoWindow = null;
     }
-  });
   
-  window.closeInfoWindow = function() {
-    if (currentInfoWindow) {
-      currentInfoWindow.close();
-      currentInfoWindow = null;
+    window.closeRoadview = function() {
+      const roadviewContainer = document.getElementById('roadviewContainer');
+      if (roadviewContainer) {
+        roadviewContainer.style.display = 'none';
+      }
+    };
+  
+    if (stops.length > 0) {
+      stops.forEach((stop, index) => {
+        if (typeof stop.lat !== 'number' || typeof stop.lng !== 'number' || isNaN(stop.lat) || isNaN(stop.lng)) {
+          return;
+        }
+        const markerPosition = new kakao.maps.LatLng(stop.lat, stop.lng);
+        const marker = new kakao.maps.Marker({
+          position: markerPosition,
+          map: map
+        });
+        
+        const stopNameForFunction = String(stop.name).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        const infoContent = 
+          '<div style="padding:12px; min-width:200px; font-family: Arial, sans-serif; font-size: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); border-radius: 6px;">' +
+            '<div style="font-weight: 600; font-size: 15px; margin-bottom: 8px; color: #333;">' + (index + 1) + '. ' + stop.name + '</div>' +
+            '<div style="margin-bottom: 8px;">' +
+              '<button onclick="window.openRoadviewForStop(' + index + ')" style="background: #007bff; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 13px; margin-right: 5px;">로드뷰</button>' +
+              '<button onclick="window.showStopTimetableWrapper(\'' + stopNameForFunction + '\')" style="background: #28a745; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 13px;">시간표</button>' +
+            '</div>' +
+            '<button onclick="window.closeInfoWindow()" style="position: absolute; top: 8px; right: 8px; background: none; border: none; font-size: 18px; cursor: pointer; color: #888; line-height: 1;">&times;</button>' +
+          '</div>';
+        
+        const infoWindow = new kakao.maps.InfoWindow({
+          content: infoContent,
+          disableAutoPan: true
+        });
+        
+        kakao.maps.event.addListener(marker, 'click', function() {
+          if (currentInfoWindow) {
+            currentInfoWindow.close();
+          }
+          infoWindow.open(map, marker);
+          currentInfoWindow = infoWindow;
+        });
+        markers.push({ marker: marker, infoWindow: infoWindow, stopData: stop });
+      });
     }
-  };
   
-  window.openRoadviewForStop = function(index) {
-    if (markers[index] && markers[index].stopData) {
-      const stop = markers[index].stopData;
-      showRoadview(stop.lat, stop.lng, stop.name);
-    }
-  };
-  
-  window.moveToMarker = function(index) {
-    if (index < 0 || index >= markers.length) return;
-    const markerData = markers[index];
-    if (!markerData || !markerData.stopData) return;
-    const stop = markerData.stopData;
-    const moveLatLng = new kakao.maps.LatLng(stop.lat, stop.lng);
-    map.setCenter(moveLatLng);
-    map.setLevel(4, {animate: true});
-    if (currentInfoWindow) currentInfoWindow.close();
-    markerData.infoWindow.open(map, markerData.marker);
-    currentInfoWindow = markerData.infoWindow;
-  };
-  
-  if (markers.length > 0) {
-    const bounds = new kakao.maps.LatLngBounds();
-    markers.forEach(markerData => {
-       if (markerData.stopData && typeof markerData.stopData.lat === 'number' && typeof markerData.stopData.lng === 'number') {
-        bounds.extend(new kakao.maps.LatLng(markerData.stopData.lat, markerData.stopData.lng));
+    kakao.maps.event.addListener(map, 'click', function() {
+      if (currentInfoWindow) {
+        currentInfoWindow.close();
+        currentInfoWindow = null;
       }
     });
-    if (!bounds.isEmpty()) {
-        map.setBounds(bounds);
+  
+    window.closeInfoWindow = function() {
+      if (currentInfoWindow) {
+        currentInfoWindow.close();
+        currentInfoWindow = null;
+      }
+    };
+  
+    window.openRoadviewForStop = function(index) {
+      if (markers[index] && markers[index].stopData) {
+        const stop = markers[index].stopData;
+        showRoadview(stop.lat, stop.lng, stop.name);
+      }
+    };
+  
+    window.moveToMarker = function(index) {
+      if (index < 0 || index >= markers.length) return;
+      const markerData = markers[index];
+      if (!markerData || !markerData.stopData) return;
+      const stop = markerData.stopData;
+      const moveLatLng = new kakao.maps.LatLng(stop.lat, stop.lng);
+      map.setCenter(moveLatLng);
+      map.setLevel(4, {animate: true});
+      if (currentInfoWindow) currentInfoWindow.close();
+      markerData.infoWindow.open(map, markerData.marker);
+      currentInfoWindow = markerData.infoWindow;
+    };
+  
+    if (markers.length > 0) {
+      const bounds = new kakao.maps.LatLngBounds();
+      markers.forEach(markerData => {
+         if (markerData.stopData && typeof markerData.stopData.lat === 'number' && typeof markerData.stopData.lng === 'number') {
+          bounds.extend(new kakao.maps.LatLng(markerData.stopData.lat, markerData.stopData.lng));
+        }
+      });
+      if (!bounds.isEmpty()) {
+          map.setBounds(bounds);
+      }
     }
+  } catch (e) {
+    console.error('Error initializing map:', e);
   }
 });
 
