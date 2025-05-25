@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>인천공항버스 이용 안내</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            line-height: 1.6;
+        }
+
+        .info-container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 헤더 스타일 */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #3498db;
+        }
+
+        .header .icon {
+            font-size: 24px;
+            background: #3498db;
+            padding: 8px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #ecf0f1;
+        }
+
+        /* 핵심 정보 섹션 */
+        .quick-info {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .quick-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 12px;
+            border-left: 4px solid #3498db;
+        }
+
+        .quick-item.priority {
+            background: rgba(231, 76, 60, 0.1);
+            border-left-color: #e74c3c;
+        }
+
+        .quick-item .icon {
+            font-size: 20px;
+            min-width: 24px;
+        }
+
+        .quick-item strong {
+            display: block;
+            color: #3498db;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .quick-item.priority strong {
+            color: #e74c3c;
+        }
+
+        .quick-item p {
+            font-size: 14px;
+            color: #bdc3c7;
+        }
+
+        /* 아코디언 스타일 */
+        .accordion-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .accordion-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .accordion-header {
+            width: 100%;
+            padding: 16px;
+            background: none;
+            border: none;
+            color: #ecf0f1;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .accordion-header:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .accordion-header .icon {
+            font-size: 20px;
+            min-width: 24px;
+        }
+
+        .accordion-header .title {
+            flex: 1;
+            text-align: left;
+        }
+
+        .accordion-header .arrow {
+            transition: transform 0.3s ease;
+            font-size: 12px;
+        }
+
+        .accordion-header.active .arrow {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion-content.active {
+            max-height: 1000px;
+        }
+
+        .accordion-content > div {
+            padding: 0 16px 16px 16px;
+        }
+
+        /* 단계별 안내 스타일 */
+        .content-item {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            background: #3498db;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            min-width: 24px;
+        }
+
+        .step-content h4 {
+            color: #3498db;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .step-content p {
+            color: #bdc3c7;
+            font-size: 13px;
+        }
+
+        /* 결제 수단 그리드 */
+        .payment-methods {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .payment-methods h4 {
+            color: #f39c12;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .payment-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .payment-item {
+            background: rgba(243, 156, 18, 0.1);
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 12px;
+            color: #f39c12;
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+
+        /* 공항 정보 카드 */
+        .airport-info {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .info-card {
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #3498db;
+        }
+
+        .info-card.important {
+            border-left-color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+        }
+
+        .info-card h4 {
+            color: #3498db;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .info-card.important h4 {
+            color: #e74c3c;
+        }
+
+        .info-card p {
+            color: #bdc3c7;
+            font-size: 13px;
+        }
+
+        /* 연락처 정보 */
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .contact-item h4 {
+            color: #2ecc71;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .contact-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: rgba(46, 204, 113, 0.1);
+            border-radius: 8px;
+            text-decoration: none;
+            color: #2ecc71;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            transition: all 0.3s ease;
+            margin-bottom: 4px;
+        }
+
+        .contact-link:hover {
+            background: rgba(46, 204, 113, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .phone-number {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .call-icon {
+            font-size: 18px;
+        }
+
+        .contact-desc {
+            color: #bdc3c7;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
+        .qr-link {
+            display: inline-block;
+            padding: 10px 16px;
+            background: rgba(155, 89, 182, 0.1);
+            border-radius: 6px;
+            text-decoration: none;
+            color: #9b59b6;
+            border: 1px solid rgba(155, 89, 182, 0.3);
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .qr-link:hover {
+            background: rgba(155, 89, 182, 0.2);
+        }
+
+        /* 반응형 디자인 */
+        @media (max-width: 360px) {
+            .info-container {
+                padding: 16px;
+            }
+            
+            .payment-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-item {
+                padding: 12px;
+            }
+            
+            .accordion-header {
+                padding: 12px;
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="info-container">
+        <div class="header">
+            <div class="icon">ℹ️</div>
+            <h2>이용 안내 및 예매 정보</h2>
+        </div>
+
+        <!-- 핵심 정보 섹션 -->
+        <div class="quick-info">
+            <div class="quick-item priority">
+                <span class="icon">🎫</span>
+                <div>
+                    <strong>예매 필수</strong>
+                    <p>티머니고(TmoneyGo) 앱으로만 예매 가능</p>
+                </div>
+            </div>
+            <div class="quick-item">
+                <span class="icon">📍</span>
+                <div>
+                    <strong>탑승 위치</strong>
+                    <p>본 노선은 서울 지역에서만 탑승 가능</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 상세 정보 아코디언 섹션 -->
+        <div class="accordion-container">
+            <!-- 예매 방법 섹션 -->
+            <div class="accordion-item">
+                <button class="accordion-header" onclick="toggleAccordion(this)">
+                    <span class="icon">💳</span>
+                    <span class="title">예매 방법 및 결제</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="accordion-content">
+                    <div>
+                        <div class="content-item">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>티머니고 앱 다운로드</h4>
+                                <p>구글 플레이스토어 또는 앱스토어에서 '티머니고' 검색 후 설치</p>
+                            </div>
+                        </div>
+                        <div class="content-item">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>예매 진행</h4>
+                                <p>앱 내에서 인천공항버스 노선 선택 후 예매</p>
+                            </div>
+                        </div>
+                        <div class="payment-methods">
+                            <h4>💳 결제 수단</h4>
+                            <div class="payment-grid">
+                                <span class="payment-item">현금</span>
+                                <span class="payment-item">교통카드</span>
+                                <span class="payment-item">신용카드</span>
+                                <span class="payment-item">온라인 QR</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 탑승 안내 섹션 -->
+            <div class="accordion-item">
+                <button class="accordion-header" onclick="toggleAccordion(this)">
+                    <span class="icon">✈️</span>
+                    <span class="title">공항 탑승 안내</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="accordion-content">
+                    <div>
+                        <div class="airport-info">
+                            <div class="info-card important">
+                                <h4>🎫 인천공항에서 탑승 시</h4>
+                                <p>티머니고 앱의 예매내역을 무인발권기에서 실물 티켓으로 교환 후 탑승하세요.</p>
+                            </div>
+                            <div class="info-card">
+                                <h4>📍 일반 정류장에서 탑승 시</h4>
+                                <p>예매 확인서만으로 바로 탑승 가능합니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 문의 및 지원 섹션 -->
+            <div class="accordion-item">
+                <button class="accordion-header" onclick="toggleAccordion(this)">
+                    <span class="icon">📞</span>
+                    <span class="title">문의 및 지원</span>
+                    <span class="arrow">▼</span>
+                </button>
+                <div class="accordion-content">
+                    <div>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <h4>📞 고객센터</h4>
+                                <a href="tel:02-2667-0386" class="contact-link">
+                                    <span class="phone-number">02-2667-0386</span>
+                                    <span class="call-icon">📞</span>
+                                </a>
+                                <p class="contact-desc">분실물 및 기타 문의사항</p>
+                            </div>
+                            <div class="contact-item">
+                                <h4>🌐 온라인 지원</h4>
+                                <a href="#" class="qr-link">온라인 QR 문의</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleAccordion(header) {
+            const content = header.nextElementSibling;
+            const isActive = header.classList.contains('active');
+            
+            // 모든 아코디언 닫기
+            document.querySelectorAll('.accordion-header').forEach(h => {
+                h.classList.remove('active');
+                h.nextElementSibling.classList.remove('active');
+            });
+            
+            // 클릭된 아코디언이 닫혀있었다면 열기
+            if (!isActive) {
+                header.classList.add('active');
+                content.classList.add('active');
+            }
+        }
+
+        // 페이지 로드 시 첫 번째 아코디언 열기
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstAccordion = document.querySelector('.accordion-header');
+            if (firstAccordion) {
+                firstAccordion.click();
+            }
+        });
+
+        // 전화번호 클릭 시 추가 확인 (선택사항)
+        document.addEventListener('DOMContentLoaded', function() {
+            const phoneLink = document.querySelector('a[href^="tel:"]');
+            if (phoneLink) {
+                phoneLink.addEventListener('click', function(e) {
+                    // 모바일이 아닌 경우 확인 대화상자 표시
+                    if (!/Mobi|Android/i.test(navigator.userAgent)) {
+                        const phoneNumber = this.href.replace('tel:', '');
+                        if (!confirm(`${phoneNumber}로 전화를 걸까요?`)) {
+                            e.preventDefault();
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

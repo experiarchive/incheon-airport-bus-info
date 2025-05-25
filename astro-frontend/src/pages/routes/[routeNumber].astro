@@ -427,6 +427,18 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
               <p class="text-gray-600 dark:text-gray-300 ml-9">{jsonData.airportStopInfo.terminal2.location}</p>
             </div>
           )}
+          <div class="mt-4 text-center">
+            <a 
+              href="https://koreabusinfo.com/icn-bus-info/bus-stops/" 
+              target="_blank"
+              class="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
+            >
+              <span>공항 승차/하차 위치보기</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+              </svg>
+            </a>
+          </div>
         </div>
       </div>
     )}
@@ -442,7 +454,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
           {route.routeNumber} 공항버스 정류장 위치
         </h2>
         <p class="text-gray-600 dark:text-gray-300 mb-6">
-          {route.routeNumber} 공항버스가 정차하는 정류장 위치입니다. 지도에서 각 정류장의 자세한 위치를 확인해보세요.
+          {route.routeNumber} 공항버스 정류장 위치를 지도에서 자세히 확인해보세요.
         </p>
 
         <div class="mb-6">
@@ -464,33 +476,20 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-1 max-h-96 overflow-y-auto">
           {jsonData.geoInfo.stops.map((stop: GeoStop, index: number) => (
-            <div class="flex flex-col p-3 sm:p-2.5 bg-gray-50 dark:bg-gray-700 rounded-lg space-y-2 sm:space-y-1.5 items-start">
-              <div class="flex items-center space-x-3 w-full">
-                <span class="flex-shrink-0 w-7 h-7 sm:w-6 sm:h-6 bg-blue-600 text-white text-sm sm:text-xs font-semibold rounded-full flex items-center justify-center">
+            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+              <div class="flex items-center space-x-3">
+                <span class="flex-shrink-0 w-5 h-5 bg-blue-600 text-white text-xs font-semibold rounded-full flex items-center justify-center">
                   {index + 1}
                 </span>
-                <div>
-                  <span class="text-gray-800 dark:text-gray-200 font-medium block text-base sm:text-sm">{stop.name}</span>
-                </div>
+                <span class="text-gray-800 dark:text-gray-200 font-medium text-lg">{stop.name}</span>
               </div>
-              <div class="flex space-x-3 sm:space-x-2 w-full pt-0.5 items-center pl-10 sm:pl-9">
-                <button 
-                  onclick={`window.moveToMarker(${index})`}
-                  class="text-sm px-4 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-blue-600 dark:text-blue-400 rounded-lg transition-colors duration-150 flex items-center justify-center flex-1 min-h-[44px] font-medium"
-                >
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                  <span class="sm:hidden">지도</span>
-                  <span class="hidden sm:inline">지도에서 보기</span>
-                </button>
-                <button 
-                  onclick={`window.showStopTimetableWrapper(\'${String(stop.name).replace(/'/g, "\\\"'" ).replace(/"/g, '&quot;')}\')`}
-                  class="text-sm px-4 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-green-600 dark:text-green-400 rounded-lg transition-colors duration-150 flex items-center justify-center flex-1 min-h-[44px] font-medium"
-                >
-                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                  <span class="sm:hidden">시간표</span>
-                  <span class="hidden sm:inline">정류장 시간표</span>
-                </button>
-              </div>
+              <button 
+                onclick={`window.moveToMarkerAndScroll(${index})`}
+                class="text-sm px-3 py-2 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 rounded-lg transition-colors duration-150 flex items-center justify-center font-medium"
+              >
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span>지도</span>
+              </button>
             </div>
           ))}
         </div>
@@ -525,7 +524,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
       </div>
     )}
 
-    <!-- Timetable Section with SEO H2 -->
+    <!-- Timetable Section - Redesigned for Better UX -->
     {Object.keys(groupedTimetables).length > 0 && (
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
         <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
@@ -535,188 +534,95 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
           {route.routeNumber} 공항버스 시간표
         </h2>
         <p class="text-gray-600 dark:text-gray-300 mb-6">
-          {route.routeNumber} 공항버스의 운행 시간표입니다. '매일'이라 표시된 시간표는 평일과 주말/공휴일 시간표가 동일합니다.
+          원하는 방향과 정류장을 선택하면 실시간으로 다음 출발 시간을 확인할 수 있습니다.
         </p>
 
-        <div class="space-y-8" id="timetable-section">
-          {Object.entries(groupedTimetables).map(([key, entries]: [string, TimetableEntry[]]) => {
-            const [currentDirection, currentDayType] = key.split('-');
-            const entriesByStop = entries.reduce((acc: EntriesByStop, entry: TimetableEntry) => {
-              const stopKey = entry.stopName || 'unknown';
-              if (!acc[stopKey]) {
-                acc[stopKey] = {
-                  stopName: entry.stopName,
-                  dayTypes: {}
-                };
-              }
-              if (!acc[stopKey].dayTypes[currentDayType]) {
-                acc[stopKey].dayTypes[currentDayType] = [];
-              }
-              acc[stopKey].dayTypes[currentDayType].push(entry);
-              return acc;
-            }, {} as EntriesByStop);
+        <!-- Direction Tab Navigation -->
+        <div class="mb-6" id="timetable-section">
+          <div class="flex space-x-2 mb-4" role="tablist" aria-label="버스 방향 선택">
+            <button 
+              id="tab-airport" 
+              class="flex-1 py-3 px-4 text-center font-medium rounded-lg transition-all duration-200 bg-blue-600 text-white"
+              role="tab" 
+              aria-selected="true" 
+              aria-controls="panel-airport"
+              onclick="switchDirection('airport')"
+            >
+              <div class="flex items-center justify-center space-x-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                </svg>
+                <span>공항으로</span>
+              </div>
+            </button>
+            <button 
+              id="tab-city" 
+              class="flex-1 py-3 px-4 text-center font-medium rounded-lg transition-all duration-200 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600"
+              role="tab" 
+              aria-selected="false" 
+              aria-controls="panel-city"
+              onclick="switchDirection('city')"
+            >
+              <div class="flex items-center justify-center space-x-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+                <span>시내로</span>
+              </div>
+            </button>
+          </div>
 
-            const isCityBoundBlock = currentDirection === '시내행';
+          <!-- Stop Selection -->
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              정류장 선택
+            </label>
+            <select 
+              id="stop-selector" 
+              class="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              onchange="selectStop(this.value)"
+              aria-label="정류장 선택"
+            >
+              <option value="">정류장을 선택하세요</option>
+            </select>
+          </div>
 
-            return Object.values(entriesByStop).map((stopGroup: StopGroupData) => {
-              return Object.entries(stopGroup.dayTypes).map(([dayType, dayTypeEntries]: [string, TimetableEntry[]]) => {
-                const firstEntryForStopDayType = dayTypeEntries[0];
+          <!-- Current Time Display -->
+          <div class="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+            <div class="flex items-center justify-between">
+              <span class="text-sm text-blue-700 dark:text-blue-300">현재 시간</span>
+              <span id="current-time" class="font-mono text-lg font-semibold text-blue-800 dark:text-blue-200"></span>
+            </div>
+          </div>
 
-                return (
-                  <div 
-                    class={`timetable-entry-item border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden mb-6 ${isCityBoundBlock ? 'city-bound-timetable' : 'specific-stop-timetable'}`}
-                    data-stop-name={firstEntryForStopDayType.stopName}
-                    data-direction={firstEntryForStopDayType.direction} 
-                    data-day-type={dayType}
-                    style={isCityBoundBlock ? '' : 'display: none;'}
-                    id={`timetable-${routeNumber}-${firstEntryForStopDayType.direction}-${dayType}-${firstEntryForStopDayType.stopName?.replace(/\s+/g, '-')}`}
-                  >
-                    <div class={`
-                      px-4 py-3 border-b border-gray-200 dark:border-gray-600 
-                      ${firstEntryForStopDayType.direction === '공항행' 
-                        ? 'bg-blue-200 dark:bg-blue-700' 
-                        : 'bg-green-200 dark:bg-green-700'}
-                    `}>
-                      <h3 class={`
-                        text-lg font-semibold 
-                        ${firstEntryForStopDayType.direction === '공항행' 
-                          ? 'text-blue-800 dark:text-blue-100' 
-                          : 'text-green-800 dark:text-green-100'}
-                      `}>
-                        {firstEntryForStopDayType.stopName || '정류장명 미등록'} 
-                        <span class="text-sm">({firstEntryForStopDayType.direction} - {getDayTypeDisplay(dayType)})</span>
-                      </h3>
-                    </div>
-                    <div class="p-4">
-                      {dayTypeEntries.map((entry: TimetableEntry) => (
-                        <div class="mb-6 last:mb-0">
-                          {entry.departureTimes && entry.departureTimes.length > 0 ? (() => {
-                            const hourlySchedule = groupTimesByHour(entry.departureTimes);
-                            const allHoursInSchedule = Object.keys(hourlySchedule).sort((a, b) => parseInt(a) - parseInt(b));
-                            
-                            // 반응형 블록 처리 - 모바일 5열, PC 8열
-                            const mobileHoursPerBlock = 5;
-                            const desktopHoursPerBlock = 8;
-                            
-                            // 모바일용 블록 생성
-                            const mobileBlocks: string[][] = [];
-                            for (let i = 0; i < allHoursInSchedule.length; i += mobileHoursPerBlock) {
-                              const block = allHoursInSchedule.slice(i, i + mobileHoursPerBlock);
-                              while(block.length < mobileHoursPerBlock) {
-                                block.push("");
-                              }
-                              mobileBlocks.push(block);
-                            }
-                            
-                            // PC용 블록 생성
-                            const desktopBlocks: string[][] = [];
-                            for (let i = 0; i < allHoursInSchedule.length; i += desktopHoursPerBlock) {
-                              const block = allHoursInSchedule.slice(i, i + desktopHoursPerBlock);
-                              while(block.length < desktopHoursPerBlock) {
-                                block.push("");
-                              }
-                              desktopBlocks.push(block);
-                            }
+          <!-- Airport Direction Panel -->
+          <div 
+            id="panel-airport" 
+            role="tabpanel" 
+            aria-labelledby="tab-airport" 
+            class="timetable-panel"
+          >
+            <div class="space-y-4" id="airport-timetables">
+              <!-- Airport direction timetables will be rendered here -->
+            </div>
+          </div>
 
-                            return (
-                              <div class="timetable-container">
-                                {/* 모바일용 5열 레이아웃 */}
-                                <div class="block md:hidden">
-                                  {mobileBlocks.map((mobileBlock, mobileBlockIndex) => {
-                                    let maxMinutesInMobileBlock = 0;
-                                    mobileBlock.forEach(hour => {
-                                      if (hour && hourlySchedule[hour] && hourlySchedule[hour].length > maxMinutesInMobileBlock) {
-                                        maxMinutesInMobileBlock = hourlySchedule[hour].length;
-                                      }
-                                    });
-
-                                    return (
-                                      <div class={`mb-4 ${mobileBlockIndex > 0 ? 'mt-6 pt-4 border-t border-gray-200 dark:border-gray-700' : ''}`}>
-                                        {/* 모바일 시간 헤더 */}
-                                        <div class="grid grid-cols-5 gap-x-1 mb-1">
-                                          {mobileBlock.map(hour => (
-                                            <div class="text-center font-semibold text-sm text-gray-700 dark:text-gray-300 pb-1">
-                                              {hour ? `${hour}시` : ''}
-                                            </div>
-                                          ))}
-                                        </div>
-                                        {/* 모바일 분 행들 */}
-                                        {Array.from({ length: maxMinutesInMobileBlock }).map((_, minuteIndex) => (
-                                          <div class="grid grid-cols-5 gap-x-1 mb-px">
-                                            {mobileBlock.map(hour => {
-                                              const minuteVal = hour && hourlySchedule[hour]?.[minuteIndex]
-                                                ? hourlySchedule[hour][minuteIndex].split(':')[1]
-                                                : null;
-                                              return (
-                                                <div class={`text-center py-1.5 px-1 text-[15px] font-mono h-7 flex items-center justify-center rounded-sm ${minuteVal ? 'text-gray-700 dark:text-gray-300' : ''}`}>
-                                                  {minuteVal || ''}
-                                                </div>
-                                              );
-                                            })}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-
-                                {/* PC용 8열 레이아웃 */}
-                                <div class="hidden md:block">
-                                  {desktopBlocks.map((desktopBlock, desktopBlockIndex) => {
-                                    let maxMinutesInDesktopBlock = 0;
-                                    desktopBlock.forEach(hour => {
-                                      if (hour && hourlySchedule[hour] && hourlySchedule[hour].length > maxMinutesInDesktopBlock) {
-                                        maxMinutesInDesktopBlock = hourlySchedule[hour].length;
-                                      }
-                                    });
-
-                                    return (
-                                      <div class={`mb-4 ${desktopBlockIndex > 0 ? 'mt-6 pt-4 border-t border-gray-200 dark:border-gray-700' : ''}`}>
-                                        {/* PC 시간 헤더 */}
-                                        <div class="grid grid-cols-8 gap-x-1 mb-1">
-                                          {desktopBlock.map(hour => (
-                                            <div class="text-center font-semibold text-base text-gray-700 dark:text-gray-300 pb-1">
-                                              {hour ? `${hour}시` : ''}
-                                            </div>
-                                          ))}
-                                        </div>
-                                        {/* PC 분 행들 */}
-                                        {Array.from({ length: maxMinutesInDesktopBlock }).map((_, minuteIndex) => (
-                                          <div class="grid grid-cols-8 gap-x-1 mb-px">
-                                            {desktopBlock.map(hour => {
-                                              const minuteVal = hour && hourlySchedule[hour]?.[minuteIndex]
-                                                ? hourlySchedule[hour][minuteIndex].split(':')[1]
-                                                : null;
-                                              return (
-                                                <div class={`text-center py-2 px-1 text-[17px] font-mono h-8 flex items-center justify-center rounded-sm ${minuteVal ? 'text-gray-700 dark:text-gray-300' : ''}`}>
-                                                  {minuteVal || ''}
-                                                </div>
-                                              );
-                                            })}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                            );
-                          })() : (
-                            <p class="text-gray-500 dark:text-gray-400">해당 날짜의 시간표 정보가 없습니다.</p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              });
-            });
-          })}
+          <!-- City Direction Panel -->
+          <div 
+            id="panel-city" 
+            role="tabpanel" 
+            aria-labelledby="tab-city" 
+            class="timetable-panel hidden"
+          >
+            <div class="space-y-4" id="city-timetables">
+              <!-- City direction timetables will be rendered here -->
+            </div>
+          </div>
         </div>
 
         {route.timetableNotes && (
           <div class="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-            <h4 class="font-medium text-yellow-800 dark:text-yellow-200 mb-2">공항버스 시간표 참고사항</h4>
+            <h4 class="font-medium text-yellow-800 dark:text-yellow-200 mb-2">시간표 참고사항</h4>
             <div class="text-yellow-700 dark:text-yellow-300 prose prose-sm max-w-none" set:html={renderPortableText(route.timetableNotes)}></div>
           </div>
         )}
@@ -804,30 +710,12 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
         공항 이용 가이드
       </h2>
       <div class="space-y-4">
-        <div class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-4 border-blue-500">
-          <h3 class="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-2">
-            인천공항 공항버스 승하차장 안내
-          </h3>
-          <p class="text-blue-700 dark:text-blue-300 mb-3">
-            인천공항 제1터미널과 제2터미널의 공항버스 승하차장 위치와 이용 방법을 자세히 안내합니다.
-          </p>
-          <a 
-            href="https://koreabusinfo.com/icn-bus-info/bus-stops/" 
-            target="_blank"
-            class="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
-          >
-            <span>승하차장 안내 보기</span>
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-            </svg>
-          </a>
-        </div>
         <div class="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border-l-4 border-green-500">
           <h3 class="text-lg font-semibold text-green-800 dark:text-green-200 mb-2">
             인천공항 공항버스 무인발권기 이용 방법
           </h3>
           <p class="text-green-700 dark:text-green-300 mb-3">
-            인천공항 무인발권기를 이용한 공항버스 티켓 구매 방법과 예매 내역 확인 방법을 단계별로 안내합니다.
+            무인발권기를 이용한 티켓 구매 및 예매 내역 확인 방법 안내
           </p>
           <a 
             href="https://koreabusinfo.com/icn-bus-info/unmanned-ticket-machine-guide/" 
@@ -862,6 +750,360 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
 
 <script is:inline>
 document.addEventListener('DOMContentLoaded', function() {
+  // Initialize all components
+  initializeMap();
+  initializeTimetable();
+  updateCurrentTime();
+  
+  // Update time every minute
+  setInterval(updateCurrentTime, 60000);
+});
+
+// Timetable functionality
+let currentDirection = 'airport';
+let currentSelectedStop = '';
+let processedTimetableData = null;
+
+function initializeTimetable() {
+  if (!window.timetableData) return;
+  
+  // Process raw timetable data
+  processedTimetableData = processTimetableData(window.timetableData);
+  
+  // Populate stop selector
+  populateStopSelector();
+  
+  // Render initial timetables
+  renderTimetables();
+}
+
+function processTimetableData(rawData) {
+  const processed = {
+    airport: {}, // 공항행
+    city: {}     // 시내행
+  };
+  
+  rawData.forEach(entry => {
+    const direction = entry.direction === '공항행' ? 'airport' : 'city';
+    const stopName = entry.stopName || '정류장명 미등록';
+    const dayType = entry.dayType || 'everyday';
+    
+    if (!processed[direction][stopName]) {
+      processed[direction][stopName] = {};
+    }
+    
+    if (!processed[direction][stopName][dayType]) {
+      processed[direction][stopName][dayType] = [];
+    }
+    
+    if (entry.departureTimes && entry.departureTimes.length > 0) {
+      processed[direction][stopName][dayType] = entry.departureTimes.sort();
+    }
+  });
+  
+  return processed;
+}
+
+function populateStopSelector() {
+  const selector = document.getElementById('stop-selector');
+  if (!selector || !processedTimetableData) return;
+  
+  // Clear existing options except the first one
+  while (selector.children.length > 1) {
+    selector.removeChild(selector.lastChild);
+  }
+  
+  // Get all unique stops
+  const allStops = new Set();
+  Object.keys(processedTimetableData.airport).forEach(stop => allStops.add(stop));
+  Object.keys(processedTimetableData.city).forEach(stop => allStops.add(stop));
+  
+  // Try to get stop order from JSON data (geoInfo.stops)
+  let orderedStops = [];
+  const stopsDataElement = document.getElementById('stopsData');
+  
+  if (stopsDataElement) {
+    try {
+      const stopsDataText = stopsDataElement.getAttribute('data-stops');
+      if (stopsDataText) {
+        const jsonStops = JSON.parse(stopsDataText);
+        // Use JSON order for stops that exist in timetable data
+        jsonStops.forEach(jsonStop => {
+          if (allStops.has(jsonStop.name)) {
+            orderedStops.push(jsonStop.name);
+          }
+        });
+      }
+    } catch (e) {
+      console.warn('Could not parse geo stops data for ordering');
+    }
+  }
+  
+  // Add any remaining stops that weren't in the JSON (alphabetically)
+  const remainingStops = Array.from(allStops)
+    .filter(stop => !orderedStops.includes(stop))
+    .sort();
+  
+  orderedStops = orderedStops.concat(remainingStops);
+  
+  // Add stops to selector in correct order
+  orderedStops.forEach(stopName => {
+    const option = document.createElement('option');
+    option.value = stopName;
+    option.textContent = stopName;
+    selector.appendChild(option);
+  });
+  
+  // Set initial stop based on direction
+  setInitialStop();
+}
+
+function setInitialStop() {
+  if (!processedTimetableData) return;
+  
+  let initialStop = '';
+  
+  if (currentDirection === 'airport') {
+    // For airport direction, use first stop from geo data or first available stop
+    const stopsDataElement = document.getElementById('stopsData');
+    if (stopsDataElement) {
+      try {
+        const stopsDataText = stopsDataElement.getAttribute('data-stops');
+        if (stopsDataText) {
+          const jsonStops = JSON.parse(stopsDataText);
+          if (jsonStops.length > 0 && processedTimetableData.airport[jsonStops[0].name]) {
+            initialStop = jsonStops[0].name;
+          }
+        }
+      } catch (e) {
+        console.warn('Could not parse geo stops data for initial stop');
+      }
+    }
+    
+    // Fallback to first available airport stop
+    if (!initialStop) {
+      const airportStops = Object.keys(processedTimetableData.airport);
+      if (airportStops.length > 0) {
+        initialStop = airportStops[0];
+      }
+    }
+  } else {
+    // For city direction, prefer "인천공항 제2터미널" or "인천공항 2터미널"
+    const cityStops = Object.keys(processedTimetableData.city);
+    const preferredStops = ['인천공항 제2터미널', '인천공항 2터미널', '인천공항제2터미널'];
+    
+    for (const preferred of preferredStops) {
+      if (cityStops.includes(preferred)) {
+        initialStop = preferred;
+        break;
+      }
+    }
+    
+    // Fallback to first available city stop
+    if (!initialStop && cityStops.length > 0) {
+      initialStop = cityStops[0];
+    }
+  }
+  
+  // Update selector and current selection
+  if (initialStop) {
+    const selector = document.getElementById('stop-selector');
+    if (selector) {
+      selector.value = initialStop;
+    }
+    currentSelectedStop = initialStop;
+  }
+}
+
+function switchDirection(direction) {
+  currentDirection = direction;
+  
+  // Update tab appearance
+  const airportTab = document.getElementById('tab-airport');
+  const cityTab = document.getElementById('tab-city');
+  const airportPanel = document.getElementById('panel-airport');
+  const cityPanel = document.getElementById('panel-city');
+  
+  if (direction === 'airport') {
+    airportTab.className = 'flex-1 py-3 px-4 text-center font-medium rounded-lg transition-all duration-200 bg-blue-600 text-white';
+    cityTab.className = 'flex-1 py-3 px-4 text-center font-medium rounded-lg transition-all duration-200 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600';
+    airportTab.setAttribute('aria-selected', 'true');
+    cityTab.setAttribute('aria-selected', 'false');
+    airportPanel.classList.remove('hidden');
+    cityPanel.classList.add('hidden');
+  } else {
+    cityTab.className = 'flex-1 py-3 px-4 text-center font-medium rounded-lg transition-all duration-200 bg-green-600 text-white';
+    airportTab.className = 'flex-1 py-3 px-4 text-center font-medium rounded-lg transition-all duration-200 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600';
+    cityTab.setAttribute('aria-selected', 'true');
+    airportTab.setAttribute('aria-selected', 'false');
+    cityPanel.classList.remove('hidden');
+    airportPanel.classList.add('hidden');
+  }
+  
+  // Set appropriate initial stop for the direction
+  setInitialStop();
+  
+  renderTimetables();
+}
+
+function selectStop(stopName) {
+  currentSelectedStop = stopName;
+  renderTimetables();
+}
+
+function renderTimetables() {
+  if (!processedTimetableData) return;
+  
+  const containerId = currentDirection === 'airport' ? 'airport-timetables' : 'city-timetables';
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  
+  container.innerHTML = '';
+  
+  const directionData = processedTimetableData[currentDirection];
+  
+  // If no stop is selected, don't show all stops (to avoid scroll pressure)
+  // Instead, show message to select a stop
+  if (!currentSelectedStop) {
+    container.innerHTML = `
+      <div class="text-center py-8 text-gray-600 dark:text-gray-400">
+        <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+        </svg>
+        <p class="text-lg font-medium mb-2">정류장을 선택해주세요</p>
+        <p class="text-sm">위의 드롭다운에서 정류장을 선택하면 해당 정류장의 시간표를 확인할 수 있습니다.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  const stopsToShow = [currentSelectedStop];
+  
+  if (!directionData[currentSelectedStop]) {
+    container.innerHTML = '<div class="text-center py-8 text-gray-500 dark:text-gray-400">선택한 정류장의 시간표 정보가 없습니다.</div>';
+    return;
+  }
+  
+  stopsToShow.forEach(stopName => {
+    if (!directionData[stopName]) return;
+    
+    const stopCard = createStopTimetableCard(stopName, directionData[stopName]);
+    container.appendChild(stopCard);
+  });
+}
+
+function createStopTimetableCard(stopName, stopData) {
+  const card = document.createElement('div');
+  card.className = 'border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden';
+  
+  const directionColor = currentDirection === 'airport' ? 'blue' : 'green';
+  const directionText = currentDirection === 'airport' ? '공항으로' : '시내로';
+  
+  card.innerHTML = `
+    <div class="px-4 py-3 bg-${directionColor}-100 dark:bg-${directionColor}-900/30 border-b border-gray-200 dark:border-gray-600">
+      <h3 class="text-lg font-semibold text-${directionColor}-800 dark:text-${directionColor}-200">
+        ${stopName} <span class="text-sm font-normal">(${directionText})</span>
+      </h3>
+    </div>
+    <div class="p-4">
+      ${Object.entries(stopData).map(([dayType, times]) => createDayTypeSection(dayType, times)).join('')}
+    </div>
+  `;
+  
+  return card;
+}
+
+function createDayTypeSection(dayType, times) {
+  const dayTypeDisplay = getDayTypeDisplay(dayType);
+  const now = new Date();
+  const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  
+  // Find next departure times
+  const upcomingTimes = times.filter(time => time > currentTime).slice(0, 3);
+  const nextTime = upcomingTimes[0];
+  
+  return `
+    <div class="mb-6 last:mb-0">
+      <div class="flex items-center justify-between mb-3">
+        <h4 class="font-medium text-gray-800 dark:text-gray-200">${dayTypeDisplay}</h4>
+        ${nextTime ? `<span class="text-sm text-green-600 dark:text-green-400 font-medium">다음 출발: ${nextTime}</span>` : `<span class="text-sm text-gray-500 dark:text-gray-400">운행 종료</span>`}
+      </div>
+      
+      ${upcomingTimes.length > 0 ? `
+        <div class="mb-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-700">
+          <h5 class="text-sm font-medium text-green-800 dark:text-green-200 mb-2">
+            ${upcomingTimes.length === 1 ? '다음 출발시간' : `다음 ${upcomingTimes.length}개 출발시간`}
+          </h5>
+          <div class="flex flex-wrap gap-2">
+            ${upcomingTimes.map((time, index) => `
+              <button class="px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors ${index === 0 ? 'ring-2 ring-green-300' : ''}" 
+                      onclick="highlightTime('${time}')" 
+                      aria-label="${time} 출발">
+                ${time}
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      ` : `
+        <div class="mb-4 p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-700">
+          <h5 class="text-sm font-medium text-orange-800 dark:text-orange-200 mb-1">운행 종료</h5>
+          <p class="text-sm text-orange-700 dark:text-orange-300">오늘 운행이 모두 종료되었습니다. 전체 시간표에서 첫차 시간을 확인하세요.</p>
+        </div>
+      `}
+      
+      <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-3">
+        <h5 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">전체 시간표</h5>
+        <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
+          ${times.map(time => `
+            <button class="p-2 text-sm text-center rounded border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${time === nextTime ? 'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700' : 'bg-white dark:bg-gray-800'}" 
+                    onclick="highlightTime('${time}')" 
+                    aria-label="${time} 출발">
+              ${time}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function getDayTypeDisplay(dayType) {
+  const dayTypeMap = {
+    'weekday': '평일',
+    'weekend_holiday': '주말/공휴일',
+    'everyday': '매일'
+  };
+  return dayTypeMap[dayType] || dayType;
+}
+
+function highlightTime(time) {
+  // Simple feedback for time selection
+  const button = event.target;
+  if (button) {
+    button.classList.add('ring-2', 'ring-blue-300');
+    setTimeout(() => {
+      button.classList.remove('ring-2', 'ring-blue-300');
+    }, 1000);
+  }
+}
+
+function updateCurrentTime() {
+  const now = new Date();
+  const timeString = now.toLocaleTimeString('ko-KR', { 
+    hour: '2-digit', 
+    minute: '2-digit',
+    hour12: false 
+  });
+  
+  const timeElement = document.getElementById('current-time');
+  if (timeElement) {
+    timeElement.textContent = timeString;
+  }
+}
+
+// Map functionality (existing code)
+function initializeMap() {
   const mapContainer = document.getElementById('map');
   const stopsDataElement = document.getElementById('stopsData');
   
@@ -1037,6 +1279,19 @@ document.addEventListener('DOMContentLoaded', function() {
       markerData.infoWindow.open(map, markerData.marker);
       currentInfoWindow = markerData.infoWindow;
     };
+
+    window.moveToMarkerAndScroll = function(index) {
+      // 먼저 지도로 스크롤
+      const mapContainer = document.getElementById('map');
+      if (mapContainer) {
+        mapContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      
+      // 약간의 지연 후 마커 이동 (스크롤 애니메이션과 함께 부드럽게)
+      setTimeout(() => {
+        window.moveToMarker(index);
+      }, 300);
+    };
   
     if (markers.length > 0) {
       const bounds = new kakao.maps.LatLngBounds();
@@ -1052,56 +1307,26 @@ document.addEventListener('DOMContentLoaded', function() {
   } catch (e) {
     console.error('Error initializing map:', e);
   }
-});
+}
 
+// Legacy compatibility functions
 window.showStopTimetableWrapper = function(stopName) {
-  if (typeof window.showStopTimetable === 'function') {
-    window.showStopTimetable(stopName);
-    // 시간표 섹션의 부모 요소(H2 태그가 포함된 컨테이너)로 스크롤
-    const timetableSection = document.getElementById('timetable-section');
-    if (timetableSection && timetableSection.parentElement) {
-      timetableSection.parentElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+  // Select the stop in the new interface
+  const stopSelector = document.getElementById('stop-selector');
+  if (stopSelector) {
+    stopSelector.value = stopName;
+    selectStop(stopName);
+  }
+  
+  // Scroll to timetable section
+  const timetableSection = document.getElementById('timetable-section');
+  if (timetableSection) {
+    timetableSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 };
 
-window.showStopTimetable = function(clickedStopName) {
-  if (!window.timetableData) {
-    console.error('Timetable data (window.timetableData) not loaded.');
-    return;
-  }
-  let clickedStopDirection = null;
-  const entryForClickedStop = window.timetableData.find(entry => entry.stopName === clickedStopName);
-  if (entryForClickedStop) {
-    clickedStopDirection = entryForClickedStop.direction;
-  }
-  const allTimetableItems = document.querySelectorAll('.timetable-entry-item');
-  let foundSpecificTimetable = false;
-  allTimetableItems.forEach(item => {
-    const itemStopName = item.dataset.stopName;
-    const itemDirection = item.dataset.direction;
-    if (item.classList.contains('city-bound-timetable')) {
-       item.style.display = 'block'; 
-    } else if (item.classList.contains('specific-stop-timetable')) {
-      if (itemStopName === clickedStopName && (clickedStopDirection === null || itemDirection === clickedStopDirection)) {
-        item.style.display = 'block';
-        foundSpecificTimetable = true;
-        allTimetableItems.forEach(tb => {
-            if (tb.classList.contains('city-bound-timetable')) {
-                tb.style.display = 'none';
-            }
-        });
-      } else {
-        item.style.display = 'none';
-      }
-    }
-  });
-  if (!foundSpecificTimetable) {
-    allTimetableItems.forEach(item => {
-        if (item.classList.contains('city-bound-timetable')) {
-            item.style.display = 'block';
-        }
-    });
-  }
-};
+// Expose functions globally
+window.switchDirection = switchDirection;
+window.selectStop = selectStop;
+window.highlightTime = highlightTime;
 </script> 
