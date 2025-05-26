@@ -327,7 +327,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
       )}
 
       <!-- Enhanced Route Information from JSON -->
-      {jsonData ? (
+      {jsonData && (
         <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
           <ul class="space-y-6 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-6">
             <li class="flex items-start">
@@ -382,36 +382,35 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
             </li>
           </ul>
         </div>
-      ) : (
-        <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-6">
-          <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
-            <div class="flex items-center">
-              <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <div>
-                <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">상세 정보 준비중</h3>
-                <p class="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
-                  요금, 소요시간 등 상세 운행 정보를 준비중입니다. 시간표와 정류장 정보는 아래에서 확인하세요.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
       )}
     </div>
 
-    <!-- AdSense: 기본운행정보 카드 아래 -->
-    <div class="mb-8 flex justify-center">
-      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8355312170222120" crossorigin="anonymous"></script>
-      <!-- 기본운행정보(AIR) -->
-      <ins class="adsbygoogle"
-           style="display:block"
-           data-ad-client="ca-pub-8355312170222120"
-           data-ad-slot="4961257991"
-           data-ad-format="auto"
-           data-full-width-responsive="true"></ins>
-      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    <!-- AdSense: 기본운행정보 섹션 밑 -->
+    <div class="mb-8">
+      <div class="hidden md:block">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8355312170222120" crossorigin="anonymous"></script>
+        <!-- 기본운행정보(AIR) -->
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-8355312170222120"
+             data-ad-slot="4961257991"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+      <div class="block md:hidden text-center">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8355312170222120" crossorigin="anonymous"></script>
+        <!-- 기본운행정보(모바일) -->
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:300px;height:250px"
+             data-ad-client="ca-pub-8355312170222120"
+             data-ad-slot="8588677662"></ins>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
     </div>
 
     <!-- Airport Terminal Stops Section -->
@@ -455,27 +454,6 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
         </div>
       </div>
     )}
-
-    <div class="mb-8 flex justify-center">
-      <div class="hidden md:block">
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8355312170222120" crossorigin="anonymous"></script>
-        <!-- 실시간버스(AIR) PC 고정 -->
-        <ins class="adsbygoogle"
-             style="display:block; width:300px; height:250px;"
-             data-ad-client="ca-pub-8355312170222120"
-             data-ad-slot="2003922166"></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-      </div>
-      <div class="block md:hidden">
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8355312170222120" crossorigin="anonymous"></script>
-        <!-- 실시간버스(AIR) M 고정 -->
-        <ins class="adsbygoogle"
-             style="display:block; width:300px; height:100px;"
-             data-ad-client="ca-pub-8355312170222120"
-             data-ad-slot="2003922166"></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-      </div>
-    </div>
 
     <!-- Bus Stops with Kakao Map -->
     {jsonData?.geoInfo?.stops && jsonData.geoInfo.stops.length > 0 && (
@@ -557,6 +535,32 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
         </div>
       </div>
     )}
+
+    <!-- AdSense: 정류장 위치 섹션 밑 -->
+    <div class="mb-8">
+      <div class="hidden md:block">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8355312170222120" crossorigin="anonymous"></script>
+        <!-- 정류장시간표(PC) -->
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:728px;height:90px"
+             data-ad-client="ca-pub-8355312170222120"
+             data-ad-slot="7856698853"></ins>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+      <div class="block md:hidden text-center">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8355312170222120" crossorigin="anonymous"></script>
+        <!-- 정류장시간표(모바일) -->
+        <ins class="adsbygoogle"
+             style="display:inline-block;width:320px;height:100px"
+             data-ad-client="ca-pub-8355312170222120"
+             data-ad-slot="3654322866"></ins>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
 
     <!-- Timetable Section - Redesigned for Better UX -->
     {Object.keys(groupedTimetables).length > 0 && (
@@ -708,26 +712,29 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
       </div>
     )}
 
-    <div class="mb-8 flex justify-center">
-      <div class="hidden md:block w-full max-w-lg">
+    <!-- AdSense: 실시간버스 위치 섹션 위 -->
+    <div class="mb-8">
+      <div class="hidden md:block">
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8355312170222120" crossorigin="anonymous"></script>
+        <!-- 실시간버스(PC) -->
         <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-format="fluid"
-             data-ad-layout-key="-6t+ed+2i-1n-4w"
+             style="display:inline-block;width:728px;height:90px"
              data-ad-client="ca-pub-8355312170222120"
-             data-ad-slot="8539225136"></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+             data-ad-slot="3189845476"></ins>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
       </div>
-      <div class="block md:hidden w-full max-w-xs">
+      <div class="block md:hidden text-center">
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8355312170222120" crossorigin="anonymous"></script>
+        <!-- 실시간버스(모바일) -->
         <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-format="fluid"
-             data-ad-layout-key="-gw-3+1f-3d+2z"
+             style="display:inline-block;width:320px;height:100px"
              data-ad-client="ca-pub-8355312170222120"
-             data-ad-slot="9006128994"></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+             data-ad-slot="2109548155"></ins>
+        <script>
+          (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
       </div>
     </div>
 
@@ -788,27 +795,21 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
       </div>
     </div>
 
-    <div class="mb-8 flex justify-center">
-      <div class="hidden md:block">
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8355312170222120" crossorigin="anonymous"></script>
-        <!-- 페이지최하단(AIR) PC 고정 -->
-        <ins class="adsbygoogle"
-             style="display:block; width:300px; height:250px;"
-             data-ad-client="ca-pub-8355312170222120"
-             data-ad-slot="6954680728"></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-      </div>
-      <div class="block md:hidden">
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8355312170222120" crossorigin="anonymous"></script>
-        <!-- 페이지최하단(AIR) M 고정 -->
-        <ins class="adsbygoogle"
-             style="display:block; width:320px; height:50px;"
-             data-ad-client="ca-pub-8355312170222120"
-             data-ad-slot="6954680728"></ins>
-        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-      </div>
+    <!-- AdSense: 공항이용가이드 섹션 밑 -->
+    <div class="mb-8">
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8355312170222120"
+           crossorigin="anonymous"></script>
+      <!-- 공항이용가이드 -->
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-8355312170222120"
+           data-ad-slot="5622010653"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+      <script>
+           (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
     </div>
-
     <!-- Back to Routes Button -->
     <div class="text-center">
       <a 
