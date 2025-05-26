@@ -401,6 +401,19 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
       )}
     </div>
 
+    <!-- AdSense: 기본운행정보 카드 아래 -->
+    <div class="mb-8 flex justify-center">
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8355312170222120" crossorigin="anonymous"></script>
+      <!-- 기본운행정보(AIR) -->
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-8355312170222120"
+           data-ad-slot="4961257991"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+
     <!-- Airport Terminal Stops Section -->
     {jsonData?.airportStopInfo && (jsonData.airportStopInfo.terminal1?.location || jsonData.airportStopInfo.terminal2?.location) && (
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
@@ -443,6 +456,27 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
       </div>
     )}
 
+    <div class="mb-8 flex justify-center">
+      <div class="hidden md:block">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8355312170222120" crossorigin="anonymous"></script>
+        <!-- 실시간버스(AIR) PC 고정 -->
+        <ins class="adsbygoogle"
+             style="display:block; width:300px; height:250px;"
+             data-ad-client="ca-pub-8355312170222120"
+             data-ad-slot="2003922166"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
+      <div class="block md:hidden">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8355312170222120" crossorigin="anonymous"></script>
+        <!-- 실시간버스(AIR) M 고정 -->
+        <ins class="adsbygoogle"
+             style="display:block; width:300px; height:100px;"
+             data-ad-client="ca-pub-8355312170222120"
+             data-ad-slot="2003922166"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
+    </div>
+
     <!-- Bus Stops with Kakao Map -->
     {jsonData?.geoInfo?.stops && jsonData.geoInfo.stops.length > 0 && (
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
@@ -458,7 +492,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
         </p>
 
         <div class="mb-6">
-          <div id="map" class="w-full h-96 rounded-lg border border-gray-200 dark:border-gray-600"></div>
+          <div id="map" class="w-full h-[60vh] md:h-96 rounded-lg border border-gray-200 dark:border-gray-600"></div>
         </div>
 
         <div id="roadviewContainer" class="mb-6" style="display: none;">
@@ -641,7 +675,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
         
         <!-- JSON Usage Guide (priority) -->
         {jsonData?.usageGuide && (
-          <ul class="space-y-3 list-none mb-6">
+          <ul class="space-y-2 list-none mb-4">
             {jsonData.usageGuide.map((guide: UsageGuideItem, index: number) => {
               let displayText = guide.text;
               if (guide.links && guide.links.length > 0) {
@@ -656,7 +690,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
               }
               const isLastItem = jsonData.usageGuide && index === jsonData.usageGuide.length - 1;
               return (
-                <li class={`flex items-start py-4 ${isLastItem ? '' : 'border-b border-gray-200 dark:border-gray-700'}`}>
+                <li class={`flex items-start py-2 ${isLastItem ? '' : 'border-b border-gray-200 dark:border-gray-700'}`}>
                   <svg class="w-5 h-5 mr-3 mt-1 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="5" />
                   </svg>
@@ -674,6 +708,29 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
       </div>
     )}
 
+    <div class="mb-8 flex justify-center">
+      <div class="hidden md:block w-full max-w-lg">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8355312170222120" crossorigin="anonymous"></script>
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-format="fluid"
+             data-ad-layout-key="-6t+ed+2i-1n-4w"
+             data-ad-client="ca-pub-8355312170222120"
+             data-ad-slot="8539225136"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
+      <div class="block md:hidden w-full max-w-xs">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8355312170222120" crossorigin="anonymous"></script>
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-format="fluid"
+             data-ad-layout-key="-gw-3+1f-3d+2z"
+             data-ad-client="ca-pub-8355312170222120"
+             data-ad-slot="9006128994"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
+    </div>
+
     <!-- Kakao Map Section (iframe fallback) -->
     {route.kakaoMapIframeUrl && (
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
@@ -684,9 +741,9 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
           실시간 버스 위치
         </h2>
         <p class="text-gray-600 dark:text-gray-300 mb-4">
-          {route.routeNumber} 공항버스의 실시간 운행 위치를 확인할 수 있습니다. 정류장 도착 예정 시간을 미리 확인하여 대기 시간을 단축하세요.
+          {route.routeNumber} 공항버스의 실시간 운행 위치를 확인할 수 있습니다.
         </p>
-        <div class="w-full h-96 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600">
+        <div class="w-full h-[60vh] md:h-96 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600">
           <iframe 
             src={route.kakaoMapIframeUrl}
             width="100%" 
@@ -728,6 +785,27 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
             </svg>
           </a>
         </div>
+      </div>
+    </div>
+
+    <div class="mb-8 flex justify-center">
+      <div class="hidden md:block">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8355312170222120" crossorigin="anonymous"></script>
+        <!-- 페이지최하단(AIR) PC 고정 -->
+        <ins class="adsbygoogle"
+             style="display:block; width:300px; height:250px;"
+             data-ad-client="ca-pub-8355312170222120"
+             data-ad-slot="6954680728"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+      </div>
+      <div class="block md:hidden">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8355312170222120" crossorigin="anonymous"></script>
+        <!-- 페이지최하단(AIR) M 고정 -->
+        <ins class="adsbygoogle"
+             style="display:block; width:320px; height:50px;"
+             data-ad-client="ca-pub-8355312170222120"
+             data-ad-slot="6954680728"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
       </div>
     </div>
 
