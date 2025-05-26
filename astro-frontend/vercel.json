@@ -9,6 +9,19 @@
       "main": true
     }
   },
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "destination": "https://air.koreabusinfo.com/$1",
+      "permanent": true,
+      "has": [
+        {
+          "type": "host",
+          "value": "incheon-airport-bus-info-bjkt.vercel.app"
+        }
+      ]
+    }
+  ],
   "headers": [
     {
       "source": "/data/(.*)",

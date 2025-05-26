@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# 사이트맵 위치
+Sitemap: https://air.koreabusinfo.com/sitemap-index.xml
+Sitemap: https://air.koreabusinfo.com/sitemap-0.xml
+
+# 크롤링하지 않을 디렉토리 (현재는 모든 페이지 허용)
+# Disallow: /admin/
+# Disallow: /private/ 
