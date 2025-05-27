@@ -67,6 +67,10 @@ interface JsonRouteData {
     terminal1?: { location?: string };
     terminal2?: { location?: string };
   };
+  operationHours?: {
+    first: string;
+    last: string;
+  };
 }
 
 // Type for groupedTimetables
@@ -380,6 +384,25 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
                 )}
               </div>
             </li>
+
+            {jsonData.operationHours && (
+              <li class="flex items-start">
+                <div class="flex-shrink-0 w-6 h-6 mr-3 text-cyan-600 dark:text-cyan-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-full h-full">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /> 
+                  </svg>
+                </div>
+                <div>
+                  <span class="block text-sm font-medium text-gray-600 dark:text-gray-400">운행 시간</span>
+                  <span class="block text-lg font-semibold text-gray-800 dark:text-gray-200">
+                    첫차: {jsonData.operationHours.first}
+                  </span>
+                  <span class="block text-lg font-semibold text-gray-800 dark:text-gray-200 mt-1">
+                    막차: {jsonData.operationHours.last}
+                  </span>
+                </div>
+              </li>
+            )}
           </ul>
         </div>
       )}
@@ -397,7 +420,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
              data-ad-format="auto"
              data-full-width-responsive="true"></ins>
         <script>
-          (adsbygoogle = window.adsbygoogle || []).push({});
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
         </script>
       </div>
       <div class="block md:hidden text-center">
@@ -408,7 +431,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
              data-ad-client="ca-pub-8355312170222120"
              data-ad-slot="8588677662"></ins>
         <script>
-          (adsbygoogle = window.adsbygoogle || []).push({});
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
         </script>
       </div>
     </div>
@@ -546,7 +569,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
              data-ad-client="ca-pub-8355312170222120"
              data-ad-slot="7856698853"></ins>
         <script>
-          (adsbygoogle = window.adsbygoogle || []).push({});
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
         </script>
       </div>
       <div class="block md:hidden text-center">
@@ -557,7 +580,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
              data-ad-client="ca-pub-8355312170222120"
              data-ad-slot="3654322866"></ins>
         <script>
-          (adsbygoogle = window.adsbygoogle || []).push({});
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
         </script>
       </div>
     </div>
@@ -722,7 +745,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
              data-ad-client="ca-pub-8355312170222120"
              data-ad-slot="3189845476"></ins>
         <script>
-          (adsbygoogle = window.adsbygoogle || []).push({});
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
         </script>
       </div>
       <div class="block md:hidden text-center">
@@ -733,7 +756,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
              data-ad-client="ca-pub-8355312170222120"
              data-ad-slot="2109548155"></ins>
         <script>
-          (adsbygoogle = window.adsbygoogle || []).push({});
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
         </script>
       </div>
     </div>
@@ -807,7 +830,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
            data-ad-format="auto"
            data-full-width-responsive="true"></ins>
       <script>
-           (adsbygoogle = window.adsbygoogle || []).push({});
+           (window.adsbygoogle = window.adsbygoogle || []).push({});
       </script>
     </div>
     <!-- Back to Routes Button -->
