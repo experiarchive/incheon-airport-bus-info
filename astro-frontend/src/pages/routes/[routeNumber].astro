@@ -180,17 +180,19 @@ const getDayTypeDisplay = (dayType: string) => {
   return dayTypeMap[dayType] || dayType;
 };
 
-// Extract main area from route name for SEO
-const getMainArea = (routeName: string | undefined) => {
-  if (routeName?.includes('강남')) return '강남';
-  if (routeName?.includes('잠실')) return '잠실';
-  if (routeName?.includes('동대문')) return '동대문';
-  if (routeName?.includes('홍대')) return '홍대';
-  if (routeName?.includes('명동')) return '명동';
-  return '서울';
-};
+// Determine mainArea - prioritize first stop
+let mainArea: string;
 
-const mainArea = getMainArea(route.routeName);
+if (jsonData?.geoInfo?.stops && jsonData.geoInfo.stops.length > 0) {
+  mainArea = jsonData.geoInfo.stops[0].name;
+} else if (route.mainStops && route.mainStops.length > 0) {
+  mainArea = route.mainStops[0];
+} else {
+  // This case should ideally not be reached if stops are always present.
+  // Assign a sensible default or handle as an error if appropriate.
+  mainArea = '정보 없음'; // Or route.routeName or a generic placeholder
+  console.warn(`mainArea could not be determined for route ${route.routeNumber}. Defaulting to '정보 없음'.`);
+}
 
 // Generate static paths for all routes
 export async function getStaticPaths() {
@@ -319,14 +321,14 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
           </div>
           <!-- SEO H1 with target keywords -->
           <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-4">
-            기본 운행정보 - {mainArea} ↔ 인천공항
+            {mainArea} ↔ 인천공항
           </h1>
         </div>
       </div>
       
       {route.description && (
         <p class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed mb-6">
-          {route.description} 공항버스 예매와 요금 정보, 정류장 위치를 확인하고 편리하게 이용하세요.
+          {route.description}
         </p>
       )}
 
