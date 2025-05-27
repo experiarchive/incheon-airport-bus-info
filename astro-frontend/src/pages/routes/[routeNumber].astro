@@ -277,7 +277,8 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
       {
         "@type": "ListItem",
         "position": 3,
-        "name": `${route.routeNumber} 공항버스`
+        "name": `${route.routeNumber} 공항버스`,
+        "item": Astro.url.href // 현재 페이지 URL 추가
       }
     ]
   })}></script>
