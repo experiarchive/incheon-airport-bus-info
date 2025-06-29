@@ -83,10 +83,11 @@ import Layout from '../layouts/Layout.astro';
 		// 2. Find routes that have matching stop names
 		if (results.length < MAX_RESULTS) {
 			for (const route of searchData) {
-				if (route.stops && route.stops.some((stop: string) => stop.toLowerCase().includes(query))) {
+				const matchedStop = route.stops?.find((stop: string) => stop.toLowerCase().includes(query));
+				if (matchedStop) {
 					// Avoid adding duplicate routes
 					if (!results.some(r => r.routeNumber === route.routeNumber)) {
-						results.push({ type: 'route', ...route, match: 'stop' });
+						results.push({ type: 'route', ...route, match: 'stop', matchedStop });
 					}
 				}
 				if (results.length >= MAX_RESULTS) break;
@@ -106,12 +107,19 @@ import Layout from '../layouts/Layout.astro';
 
 		searchResultsContainer.innerHTML = results.map((result: any) => {
 			if (result.type === 'route') {
-				const highlight = result.match === 'stop' ? `(정류장 일치)` : '';
+				let highlightInfo = '';
+				if (result.match === 'stop' && result.matchedStop) {
+					highlightInfo = `<span class="text-sm text-green-600 dark:text-green-400 truncate">(일치: ${result.matchedStop})</span>`;
+				}
+
 				return `
 					<a href="/routes/${result.routeNumber}" class="block p-4 hover:bg-blue-50 dark:hover:bg-blue-900 border-b border-gray-200 dark:border-gray-600 last:border-b-0">
-						<div class="flex items-center">
-							<span class="text-xl font-bold text-blue-600 dark:text-blue-400 mr-3">🚌 ${result.routeNumber}</span>
-							<span class="text-gray-700 dark:text-gray-300">${result.routeName || ''} ${highlight}</span>
+						<div class="flex items-center justify-between">
+							<div class="flex items-center min-w-0">
+								<span class="text-lg font-bold text-blue-600 dark:text-blue-400 mr-2">${result.routeNumber}</span>
+								<span class="text-gray-700 dark:text-gray-300 truncate">${result.routeName || ''}</span>
+							</div>
+							${highlightInfo}
 						</div>
 					</a>
 				`;
