@@ -6,70 +6,135 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout 
-	title="인천공항 공항버스 시간표 및 예매 - 6001, 6300, 6009번 실시간 정보"
-	description = "인천공항 공항버스 시간표, 요금, 정류장 정보를 실시간으로 확인하고 온라인 예매까지! 서울 지역 모든 노선의 상세 정보를 제공합니다.",
-	keywords = "공항버스, 인천공항, 공항버스 시간표, 공항버스 예매, 공항버스 요금, 6001, 6002, 6003, 6004, 6005, 6006, 6007, 6008, 6009, 6010, 6011, 6012, 6013, 6014, 6015, 6016, 6017, 6018, 6019, 6020, 6006, 6009, 6200, 6300, 6500, 6600, 6701, 6702, 6703, 6705A, 6100, 6102, 6103, 6104"
+	title="가장 빠른 인천공항 버스 찾기"
+	description="인천공항으로 가는 가장 빠른 버스 노선을 검색하고 실시간 시간표, 요금, 정류장 정보를 확인하세요."
+	keywords="공항버스, 인천공항, 공항버스 검색, 공항버스 시간표, 공항버스 예매"
 >
-	<div class="text-center py-12">
-		<h1 class="text-4xl font-bold text-gray-800 dark:text-white mb-6">인천공항 공항버스 시간표 및 운행 정보</h1>
-		<p class="text-lg text-gray-600 dark:text-gray-300 mb-8">
-			6001, 6300, 6009번 등 인천공항 공항버스의 실시간 시간표, 요금, 정류장 위치를 확인하고 편리하게 예매하세요.
+	<div class="flex flex-col items-center justify-center text-center py-20 md:py-32 px-4">
+		<h1 class="text-4xl md:text-5xl font-extrabold text-gray-800 dark:text-white mb-4">
+			인천공항 공항버스 찾기
+		</h1>
+		<p class="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl">
+			버스 번호, 정류장, 또는 목적지(예: 강남역)를 입력하여 실시간 운행 정보를 확인하세요.
 		</p>
-		<div class="space-x-4">
-			<a href="/routes" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
-				📍 전체 노선 시간표 보기
-			</a>
-			<a href="/info" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105">
-				✈️ 인천공항 정보 안내
-			</a>
+
+		<div id="search-container" class="relative w-full max-w-2xl">
+			<div class="relative">
+				<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+					<svg class="h-6 w-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+					</svg>
+				</div>
+				<input
+					type="text"
+					id="search-input"
+					placeholder="버스 번호 또는 정류장/지역명 검색"
+					class="w-full p-4 pl-12 text-lg border-2 border-gray-200 dark:border-gray-600 rounded-full shadow-lg focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 focus:border-blue-500 dark:focus:border-blue-500 dark:bg-gray-700 dark:text-white transition duration-300"
+				/>
+			</div>
+			<div id="search-results" class="absolute z-10 w-full mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl hidden overflow-hidden border border-gray-200 dark:border-gray-600 text-left">
+				<!-- Search results will be populated here -->
+			</div>
+		</div>
+
+		<div class="mt-8 text-center">
+			<span class="text-gray-600 dark:text-gray-400">주요 노선:</span>
+			<a href="/routes/6014" class="ml-2 text-blue-600 hover:underline">6014</a>,
+			<a href="/routes/6300" class="ml-2 text-blue-600 hover:underline">6300</a>,
+			<a href="/routes/6703" class="ml-2 text-blue-600 hover:underline">6703</a>,
+			<a href="/routes/6705A" class="ml-2 text-blue-600 hover:underline">6705A</a>
 		</div>
 	</div>
-
-	<!-- 주요 노선 미리보기 섹션 -->
-	<section class="mt-16">
-		<h2 class="text-2xl font-semibold text-center mb-8 text-gray-800 dark:text-white">인기 공항버스 노선</h2>
-		<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-			<div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-				<h3 class="text-xl font-semibold mb-2 text-blue-600">6001번 공항버스</h3>
-				<p class="text-gray-700 dark:text-gray-300 mb-3">강남 ↔ 인천공항</p>
-				<p class="text-sm text-gray-600 dark:text-gray-400">요금: 16,000원 | 소요시간: 약 70분</p>
-				<a href="/routes/6001" class="inline-block mt-3 text-blue-600 hover:text-blue-800 font-medium">시간표 보기 →</a>
-			</div>
-			<div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-				<h3 class="text-xl font-semibold mb-2 text-blue-600">6300번 공항버스</h3>
-				<p class="text-gray-700 dark:text-gray-300 mb-3">동대문 ↔ 인천공항</p>
-				<p class="text-sm text-gray-600 dark:text-gray-400">요금: 16,000원 | 소요시간: 약 65분</p>
-				<a href="/routes/6300" class="inline-block mt-3 text-blue-600 hover:text-blue-800 font-medium">시간표 보기 →</a>
-			</div>
-			<div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-				<h3 class="text-xl font-semibold mb-2 text-blue-600">6009번 공항버스</h3>
-				<p class="text-gray-700 dark:text-gray-300 mb-3">김포공항 ↔ 인천공항</p>
-				<p class="text-sm text-gray-600 dark:text-gray-400">요금: 9,000원 | 소요시간: 약 30분</p>
-				<a href="/routes/6009" class="inline-block mt-3 text-blue-600 hover:text-blue-800 font-medium">시간표 보기 →</a>
-			</div>
-		</div>
-	</section>
-
-	<!-- 공항버스 이용안내 섹션 -->
-	<section class="mt-16 bg-blue-50 dark:bg-gray-800 rounded-lg p-8">
-		<h2 class="text-2xl font-semibold text-center mb-6 text-gray-800 dark:text-white">공항버스 이용 안내</h2>
-		<div class="grid md:grid-cols-2 gap-8">
-			<div>
-				<h3 class="text-lg font-semibold mb-3 text-blue-600">💳 결제 방법</h3>
-				<ul class="text-gray-700 dark:text-gray-300 space-y-2">
-					<li>• 교통카드 (T-money, 한페이 등)</li>
-					<li>• 현금 결제</li>
-					<li>• 모바일 앱 예매</li>
-				</ul>
-			</div>
-			<div>
-				<h3 class="text-lg font-semibold mb-3 text-blue-600">🧳 수하물 안내</h3>
-				<ul class="text-gray-700 dark:text-gray-300 space-y-2">
-					<li>• 캐리어 무료 적재 (20kg 이하)</li>
-					<li>• 대형 수하물은 사전 문의</li>
-					<li>• 위험물 반입 금지</li>
-				</ul>
-			</div>
-		</div>
-	</section>
 </Layout>
+
+<script>
+	const searchInput = document.getElementById('search-input') as HTMLInputElement | null;
+	const searchResultsContainer = document.getElementById('search-results');
+	const searchContainer = document.getElementById('search-container');
+	let searchData: any[] = [];
+
+	// Fetch search data
+	fetch('/search-data.json')
+		.then(response => response.json())
+		.then(data => {
+			searchData = data;
+		})
+		.catch(error => console.error('Error fetching search data:', error));
+
+	searchInput?.addEventListener('input', (e) => {
+		const query = (e.target as HTMLInputElement).value.toLowerCase().trim();
+		
+		if (query.length === 0) {
+			hideResults();
+			return;
+		}
+
+		const results: any[] = [];
+		const MAX_RESULTS = 7;
+
+		// 1. Find routes that match the route number
+		for (const route of searchData) {
+			if (route.routeNumber && route.routeNumber.toLowerCase().startsWith(query)) {
+				results.push({ type: 'route', ...route });
+			}
+			if (results.length >= MAX_RESULTS) break;
+		}
+
+		// 2. Find routes that have matching stop names
+		if (results.length < MAX_RESULTS) {
+			for (const route of searchData) {
+				if (route.stops && route.stops.some((stop: string) => stop.toLowerCase().includes(query))) {
+					// Avoid adding duplicate routes
+					if (!results.some(r => r.routeNumber === route.routeNumber)) {
+						results.push({ type: 'route', ...route, match: 'stop' });
+					}
+				}
+				if (results.length >= MAX_RESULTS) break;
+			}
+		}
+
+		displayResults(results);
+	});
+	
+	function displayResults(results: any[]) {
+		if (!searchResultsContainer) return;
+		if (results.length === 0) {
+			searchResultsContainer.innerHTML = `<div class="p-4 text-gray-500">검색 결과가 없습니다.</div>`;
+			showResults();
+			return;
+		}
+
+		searchResultsContainer.innerHTML = results.map((result: any) => {
+			if (result.type === 'route') {
+				const highlight = result.match === 'stop' ? `(정류장 일치)` : '';
+				return `
+					<a href="/routes/${result.routeNumber}" class="block p-4 hover:bg-blue-50 dark:hover:bg-blue-900 border-b border-gray-200 dark:border-gray-600 last:border-b-0">
+						<div class="flex items-center">
+							<span class="text-xl font-bold text-blue-600 dark:text-blue-400 mr-3">🚌 ${result.routeNumber}</span>
+							<span class="text-gray-700 dark:text-gray-300">${result.routeName || ''} ${highlight}</span>
+						</div>
+					</a>
+				`;
+			}
+			return '';
+		}).join('');
+
+		showResults();
+	}
+
+	function showResults() {
+		searchResultsContainer?.classList.remove('hidden');
+	}
+
+	function hideResults() {
+		searchResultsContainer?.classList.add('hidden');
+	}
+
+	// Hide results when clicking outside
+	document.addEventListener('click', (e) => {
+		if (searchContainer && !searchContainer.contains(e.target as Node)) {
+			hideResults();
+		}
+	});
+
+</script>
