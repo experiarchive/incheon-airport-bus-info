@@ -1,19 +1,19 @@
 {
     "routeId": "N6703",
     "routeNum": "N6703",
-    "routeName": "인천공항 ↔ 반포/삼성역/잠실 롯데호텔",
+    "routeName": "인천공항 ↔ 반포/삼성역/잠실/동서울터미널/광나루역",
     "type": "normal",
     "company": "(주)한국공항리무진",
     "companyWebsite": "https://www.klimousine.com",
     "companyTel": "02-2667-0386",
     "operationHours": {
-        "first": "23:20",
-        "last": "03:15 (잠실 롯데호텔 기준)"
+        "first": "22:20",
+        "last": "03:15 (광나루역 기준)"
     },
     "realtimeBusId": "11056279",
-    "interval": "60-115분",
+    "interval": "40-120분",
     "fare": 18000,
-    "duration": "약 1시간 25분",
+    "duration": "약 1시간 45분",
     "airportStopInfo": {
         "terminal1": {
             "location": "3B-2 정류장 (1층 4 Gate 앞)"
@@ -24,28 +24,46 @@
     },
     "stations": [
         {
-            "name": "잠실 롯데호텔",
+            "name": "광나루역",
             "time": "기점"
         },
         {
+            "name": "동서울터미널(강변역)",
+            "time": "약 105분"
+        },
+        {
+            "name": "잠실 롯데호텔",
+            "time": "약 95분"
+        },
+        {
             "name": "삼성역",
-            "time": "약 75분 소요"
+            "time": "약 85분 소요"
         },
         {
             "name": "반포종합운동장",
-            "time": "약 60분 소요"
+            "time": "약 70분 소요"
         },
         {
-            "name": "인천공항 제1터미널",
+            "name": "인천공항 1터미널",
             "time": "약 1시간 30분 소요"
         },
         {
-            "name": "인천공항 제2터미널",
+            "name": "인천공항 2터미널",
             "time": "약 1시간 40분 소요"
         }
     ],
     "geoInfo": {
         "stops": [
+            {
+                "name": "광나루역",
+                "lat": 37.54419064640338,
+                "lng": 127.10334567097625
+            },
+            {
+                "name": "동서울터미널(강변역)",
+                "lat": 37.53621818800694,
+                "lng": 127.09357597640853
+            },
             {
                 "name": "잠실 롯데호텔",
                 "lat": 37.51074333032902,
