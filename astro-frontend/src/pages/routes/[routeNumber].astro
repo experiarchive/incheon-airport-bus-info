@@ -142,9 +142,14 @@ try {
   console.error('Error loading JSON data for route:', routeNumber, error);
 }
 
-// Fetch related timetable entries
+// First, get the latest effective date for this route
+const latestEffectiveDate = await client.fetch(`
+  *[_type == "timetableEntry" && route._ref == $routeId] | order(effectiveDate desc)[0].effectiveDate
+`, { routeId: route._id });
+
+// Fetch related timetable entries with the latest effective date only
 const timetableEntries: TimetableEntry[] = await client.fetch(`
-  *[_type == "timetableEntry" && route._ref == $routeId]{
+  *[_type == "timetableEntry" && route._ref == $routeId && effectiveDate == $latestDate]{
     dayType,
     direction,
     departureTimes,
@@ -152,7 +157,7 @@ const timetableEntries: TimetableEntry[] = await client.fetch(`
     effectiveDate,
     status
   } | order(direction asc, dayType asc, stopName asc)
-`, { routeId: route._id });
+`, { routeId: route._id, latestDate: latestEffectiveDate });
 
 // Helper function to render portable text
 const renderPortableText = (content: PortableTextBlock[] | undefined) => {
