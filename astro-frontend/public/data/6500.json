@@ -7,10 +7,10 @@
     "companyWebsite": "http://www.seoulairbus.com",
     "companyTel": "02-577-1343",
     "operationHours": {
-        "first": "04:00",
-        "last": "17:25 (강남우체국 기준)"
+        "first": "05:00",
+        "last": "16:30 (강남우체국 기준)"
     },
-    "interval": "60-257분",
+    "interval": "300-330분",
     "fare": 17000,
     "duration": "약 1시간 25분 ~ 2시간30분",
     "airportStopInfo": {
