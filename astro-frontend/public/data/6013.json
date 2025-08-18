@@ -15,10 +15,10 @@
     "duration": "약 1시간 30분 ~ 2시간(면목홈플러스(기점) 기준)",
     "airportStopInfo": {
         "terminal1": {
-            "location": "6A-1 정류장 (1층 6 Gate 앞)"
+            "location": "6A-2 정류장 (1층 6 Gate 앞)"
         },
         "terminal2": {
-            "location": "24번 정류장 (지하1층 교통센터)"
+            "location": "25번 정류장 (지하1층 교통센터)"
         }
     },
     "stations": [
