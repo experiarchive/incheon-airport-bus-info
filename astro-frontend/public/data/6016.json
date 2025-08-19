@@ -15,10 +15,10 @@
     "duration": "약 1시간 15분 ~ 1시간 35분(서울교대 기준)",
     "airportStopInfo": {
         "terminal1": {
-            "location": "6A-4 정류장 (1층 6 Gate 앞)"
+            "location": "6B-4 정류장 (1층 6 Gate 앞)"
         },
         "terminal2": {
-            "location": "26번 정류장 (지하1층 교통센터)"
+            "location": "27번 정류장 (지하1층 교통센터)"
         }
     },
     "stations": [
