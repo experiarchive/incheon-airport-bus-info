@@ -1,0 +1,269 @@
+﻿---
+import Layout from '../../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import mainImage from '../../assets/main.webp';
+
+// Image imports for Kiosk locations
+import t1KioskImage1 from '../../assets/Incheon-Airport-Bus-Ticket-Booth-T1 (1).webp';
+import t1KioskImage2 from '../../assets/Incheon-Airport-Bus-Ticket-Booth-T1 (2).webp';
+import t2KioskImage1 from '../../assets/Incheon-Airport-Bus-Tickets-Kiosk-T2.webp';
+import t2KioskImage2 from '../../assets/Incheon-Airport-Bus-Tickets-Kiosk-T2 (2).webp';
+
+// New Kiosk step-by-step images
+import kioskImage1 from '../../assets/Incheon-Airport-Bus-Tickets-Kiosk (1).webp'; // Main screen
+import kioskImage2 from '../../assets/Incheon-Airport-Bus-Tickets-Kiosk (2).webp'; // Online reservation - card/info
+import kioskImage3 from '../../assets/Incheon-Airport-Bus-Tickets-Kiosk (3).webp'; // Online reservation - number input
+import kioskImage4 from '../../assets/Incheon-Airport-Bus-Tickets-Kiosk (4).webp'; // On-site - destination choice start
+import kioskImage5 from '../../assets/Incheon-Airport-Bus-Tickets-Kiosk (5).webp'; // On-site - destination selection
+import kioskImage6 from '../../assets/Incheon-Airport-Bus-Tickets-Kiosk (6).webp'; // On-site - route number result
+import kioskImage7 from '../../assets/Incheon-Airport-Bus-Tickets-Kiosk (7).webp'; // On-site - time selection
+import kioskImage8 from '../../assets/Incheon-Airport-Bus-Tickets-Kiosk (8).webp'; // On-site - passenger selection
+import kioskImage9 from '../../assets/Incheon-Airport-Bus-Tickets-Kiosk (9).webp'; // On-site - payment
+
+const pageTitle = "인천공항 공항버스 무인발권기 사용법";
+const seoPageTitle = "인천공항 공항버스 무인발권기 사용법 | 티켓 구매 A to Z";
+const seoPageDescription = "인천공항 T1, T2 공항버스 무인발권기 위치, 단계별 사용법, 결제 방법, 유의사항을 사진과 함께 안내합니다. 카드 결제, 언어/목적지/좌석 선택까지 상세 가이드.";
+
+// Placeholder for images - user will replace these paths
+// const t1KioskImageMulti = "이미지: 제1여객터미널 1층 외부, 여러 대의 무인발권기가 나란히 설치된 모습"; // Replaced by t1KioskImage1
+// const t1KioskImageSign = "이미지: '버스표 사는 곳' 또는 '무인발권기(TICKET KIOSK)' 안내 표지판과 함께 있는 발권기"; // Replaced by t1KioskImage2
+// const t2KioskImageOverview = "이미지: 제2여객터미널 교통센터 지하 1층, 매표소 창구 옆이나 맞은편에 설치된 무인발권기들 전경"; // Replaced by t2KioskImage1
+const t2KioskImageUsage = "이미지: 버스 타는 곳 게이트 안내판과 함께 보이는 무인발권기 사용 모습"; // Kept for now
+const langSelectImage = "이미지: 무인발권기 초기 화면 - 언어 선택 버튼 클로즈업";
+const destSelectImageSearch = "이미지: 목적지 검색 화면 - 지역 카테고리 또는 검색창 예시";
+const destSelectImageDetail = "이미지: 특정 지역 선택 시 세부 정류장 목록 화면";
+const timeSelectImage = "이미지: 버스 시간표 나열 화면 (시간, 요금, 잔여 좌석)";
+const paxSeatImagePax = "이미지: 인원수 선택 화면 ('성인', '아동' 수량 조절)";
+const paxSeatImageSeatmap = "이미지: 좌석 배치도 화면 (선택 가능/불가 좌석 구분)";
+const paymentImageCard = "이미지: 카드 투입구 위치 또는 카드 투입 순간";
+const paymentImageQr = "이미지: QR/바코드 스캐너와 스마트폰 QR코드 예시";
+const ticketIssueImage = "이미지: 발권된 승차권 또는 승차권 나오는 출구";
+
+const imagePlaceholderDiv = (altText: string) => `
+  <div class="bg-gray-200 p-8 rounded-lg text-center text-gray-500 my-4 shadow">
+    <p class="text-sm">${altText}</p>
+    <p class="text-xs mt-1">(이미지 준비 중)</p>
+  </div>
+`;
+---
+
+<Layout title={seoPageTitle} description={seoPageDescription}>
+  <div class="container mx-auto px-4 py-8">
+    <section class="mb-12"> 
+      <div class="relative w-full h-64 md:h-96"> 
+        <Image 
+          src={mainImage} 
+          alt="인천공항 무인발권기 및 공항버스 터미널"
+          class="w-full h-full object-cover rounded-lg shadow-lg"
+          widths={[400, 800, 1200, 1920]}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1920px"
+          quality="mid"
+        />
+        <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/30 p-4 rounded-lg">
+          <header class="text-center text-white">
+            <h1 class="text-4xl md:text-5xl font-bold">{pageTitle}</h1>
+          </header>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-10">
+      <p class="text-lg text-gray-700 leading-relaxed mb-4">
+        지난 포스팅에서는 인천공항 공항버스 승차장과 하차장 위치를 자세히 알아봤는데요. 
+        (아직 못 보셨다면 👉 <a href="/icn-bus-info/bus-stops" class="text-blue-600 hover:underline">인천공항 공항버스, 어디서 타고 내려야 할까? (승차장 & 하차장 안내)</a>) 
+        오늘은 드디어! 공항 현장에서 리무진 버스 티켓을 쉽고 빠르게 구매할 수 있는 <strong>무인발권기 사용법</strong>을 알려드리려고 합니다. 🚀
+      </p>
+      <p class="text-lg text-gray-700 leading-relaxed mb-6">
+        더 이상 매표소 줄 기다릴 필요 없이, 터치 몇 번으로 간편하게! 사진과 함께 차근차근 따라 해 보세요. 😉
+      </p>
+    </section>
+
+    <section class="mb-16">
+      <h2 class="text-3xl font-semibold text-blue-600 mb-8 border-b-2 border-blue-500 pb-2">📍 먼저, 무인발권기는 어디에 있을까요?</h2>
+      <p class="text-lg text-gray-700 leading-relaxed mb-6">
+        무인발권기는 각 터미널의 버스 승차장 근처에 여러 대 설치되어 있어 쉽게 찾으실 수 있습니다.
+      </p>
+      <p class="text-sm text-blue-600 bg-blue-100 border border-blue-300 p-3 rounded-md mb-6"><span class="font-bold">클릭!</span> 🖼️ 사진을 클릭하시면 더 크고 선명한 원본 이미지를 새 창에서 확인하실 수 있습니다.</p>
+
+      <div class="mb-12 p-6 bg-white rounded-lg shadow-md">
+        <h3 class="text-2xl font-medium text-gray-700 mb-4">1. 제1여객터미널 무인발권기 위치</h3>
+        <p class="text-lg text-gray-700 leading-relaxed mb-4">
+          1층 도착층 외부 버스 매표소 주변 및 각 승차장 근처에서 무인발권기를 발견할 수 있습니다.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <a href={t1KioskImage1.src} target="_blank" rel="noopener noreferrer">
+            <Image src={t1KioskImage1} alt="제1여객터미널 1층 외부 무인발권기들" class="w-full h-auto rounded-lg shadow-md object-cover aspect-square" widths={[300, 600, 900]} sizes="(max-width: 767px) 100vw, 50vw" quality="high" />
+          </a>
+          <a href={t1KioskImage2.src} target="_blank" rel="noopener noreferrer">
+            <Image src={t1KioskImage2} alt="제1여객터미널 무인발권기 안내 표지판" class="w-full h-auto rounded-lg shadow-md object-cover aspect-square" widths={[300, 600, 900]} sizes="(max-width: 767px) 100vw, 50vw" quality="high" />
+          </a>
+        </div>
+      </div>
+
+      <div class="mb-12 p-6 bg-white rounded-lg shadow-md">
+        <h3 class="text-2xl font-medium text-gray-700 mb-4">2. 제2여객터미널 무인발권기 위치</h3>
+        <p class="text-lg text-gray-700 leading-relaxed mb-4">
+          교통센터 지하 1층 버스 터미널 내부에 무인발권기가 집중적으로 배치되어 있습니다.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <a href={t2KioskImage2.src} target="_blank" rel="noopener noreferrer">
+            <Image src={t2KioskImage2} alt="제2여객터미널 교통센터 지하 1층 무인발권기 사용 모습 (2)" class="w-full h-auto rounded-lg shadow-md object-cover aspect-square" widths={[300, 600, 900]} sizes="(max-width: 767px) 100vw, 50vw" quality="high" />
+          </a>
+          <a href={t2KioskImage1.src} target="_blank" rel="noopener noreferrer">
+            <Image src={t2KioskImage1} alt="제2여객터미널 교통센터 지하 1층 무인발권기 (1)" class="w-full h-auto rounded-lg shadow-md object-cover aspect-square" widths={[300, 600, 900]} sizes="(max-width: 767px) 100vw, 50vw" quality="high" />
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-16">
+      <h2 class="text-3xl font-semibold text-green-600 mb-8 border-b-2 border-green-500 pb-2">💳 무인발권기, 이렇게 사용하세요! (단계별 상세 안내)</h2>
+      <p class="text-lg text-gray-700 leading-relaxed mb-6">
+        자, 이제 본격적으로 무인발권기를 이용해 리무진 버스 티켓을 구매해 볼까요? 대부분의 무인발권기는 비슷한 방식으로 작동합니다.
+      </p>
+      
+      <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-900 p-4 rounded-md mb-8 shadow" role="alert">
+        <p class="font-bold text-lg">✨ 시작 전 준비물</p>
+        <p class="text-lg leading-relaxed">결제할 카드! 대부분의 무인발권기는 카드 전용입니다.</p>
+      </div>
+
+      <div class="space-y-12"> <!-- Increased spacing slightly -->
+
+        <div class="p-6 bg-white rounded-lg shadow-md">
+          <h3 class="text-2xl font-semibold text-gray-800 mb-4">🔄 티켓 구매 방법 선택</h3>
+          <p class="text-lg text-gray-700 leading-relaxed mb-2">
+            대부분의 무인발권기는 <strong class="text-blue-600">현장에서 바로 티켓을 구매</strong>하거나, <strong class="text-green-600">온라인/모바일로 사전 예매한 티켓을 교환</strong>하는 두 가지 주요 기능을 제공합니다. 
+            시작 화면에서 이 두 가지 중 하나를 선택하게 됩니다. 아래에서는 각 경우의 일반적인 단계를 안내합니다.
+          </p>
+          <a href={kioskImage1.src} target="_blank" rel="noopener noreferrer" class="block mt-4">
+            <Image src={kioskImage1} alt="키오스크 메인 스크린 - 현장 발권 또는 예매 티켓 교환 선택" class="w-full max-w-xl mx-auto h-auto rounded-lg shadow-md object-contain" widths={[400, 800]} sizes="(max-width: 640px) 100vw, 800px" quality="high" />
+          </a>
+          <p class="text-sm text-gray-600 text-center mt-2">키오스크 메인 스크린 예시. 화면 하단에서 언어 변경 가능.</p>
+        </div>
+
+        <!-- On-Site Ticketing Flow -->
+        <div class="p-6 bg-blue-50 rounded-lg shadow-md border border-blue-200">
+          <h4 class="text-2xl font-semibold text-blue-700 mb-6 border-b border-blue-300 pb-3">➡️ 현장 발권 절차 (Buy Ticket on Site)</h4>
+          <div class="space-y-8">
+
+            <div>
+              <h5 class="text-xl font-medium text-gray-700 mb-2">1. 목적지 선택 (Destination Selection)</h5>
+              <p class="text-lg text-gray-700 leading-relaxed mb-3">메인 화면에서 '현장 발권' 선택 후, 가고자 하는 목적지를 선택합니다. 지역별 또는 노선 검색으로 찾을 수 있습니다.</p>
+              <a href={kioskImage4.src} target="_blank" rel="noopener noreferrer" class="block">
+                <Image src={kioskImage4} alt="현장 발권 - 목적지 선택 시작 화면" class="w-full max-w-xl mx-auto h-auto rounded-lg shadow-md object-contain mb-3" widths={[400, 800]} sizes="(max-width: 640px) 100vw, 800px" quality="high" />
+              </a>
+              <p class="text-sm text-gray-600 mb-4 text-center">목적지 선택 화면 예시 (지역 선택)</p>
+              <a href={kioskImage5.src} target="_blank" rel="noopener noreferrer" class="block">
+                <Image src={kioskImage5} alt="현장 발권 - 세부 목적지 선택" class="w-full max-w-xl mx-auto h-auto rounded-lg shadow-md object-contain mb-3" widths={[400, 800]} sizes="(max-width: 640px) 100vw, 800px" quality="high" />
+              </a>
+              <p class="text-sm text-gray-600 mb-4 text-center">세부 목적지 선택 화면 예시 (노선 목록)</p>
+              <a href={kioskImage6.src} target="_blank" rel="noopener noreferrer" class="block">
+                <Image src={kioskImage6} alt="현장 발권 - 노선 확인" class="w-full max-w-xl mx-auto h-auto rounded-lg shadow-md object-contain mb-3" widths={[400, 800]} sizes="(max-width: 640px) 100vw, 800px" quality="high" />
+              </a>
+              <p class="text-sm text-gray-600 text-center">선택한 노선 정보 확인 화면 예시</p>
+            </div>
+
+            <div>
+              <h5 class="text-xl font-medium text-gray-700 mb-2">2. 시간 선택 (Time Selection)</h5>
+              <p class="text-lg text-gray-700 leading-relaxed mb-3">이용할 버스의 출발 시간을 선택합니다. 잔여 좌석 정보도 함께 확인하세요.</p>
+              <a href={kioskImage7.src} target="_blank" rel="noopener noreferrer" class="block">
+                <Image src={kioskImage7} alt="현장 발권 - 시간 선택 화면" class="w-full max-w-xl mx-auto h-auto rounded-lg shadow-md object-contain" widths={[400, 800]} sizes="(max-width: 640px) 100vw, 800px" quality="high" />
+              </a>
+            </div>
+
+            <div>
+              <h5 class="text-xl font-medium text-gray-700 mb-2">3. 인원 및 좌석 선택 (Passenger & Seat Selection)</h5>
+              <p class="text-lg text-gray-700 leading-relaxed mb-3">탑승 인원(성인, 아동 등)을 선택합니다. 일부 노선은 좌석 지정이 가능합니다.</p>
+              <a href={kioskImage8.src} target="_blank" rel="noopener noreferrer" class="block">
+                <Image src={kioskImage8} alt="현장 발권 - 인원수 선택 화면" class="w-full max-w-xl mx-auto h-auto rounded-lg shadow-md object-contain" widths={[400, 800]} sizes="(max-width: 640px) 100vw, 800px" quality="high" />
+              </a>
+            </div>
+
+            <div>
+              <h5 class="text-xl font-medium text-gray-700 mb-2">4. 결제 (Payment)</h5>
+              <p class="text-lg text-gray-700 leading-relaxed mb-3">결제 금액 확인 후, 신용/체크카드로 결제합니다.</p>
+              <a href={kioskImage9.src} target="_blank" rel="noopener noreferrer" class="block">
+                <Image src={kioskImage9} alt="현장 발권 - 결제 화면" class="w-full max-w-xl mx-auto h-auto rounded-lg shadow-md object-contain" widths={[400, 800]} sizes="(max-width: 640px) 100vw, 800px" quality="high" />
+              </a>
+            </div>
+            
+            <div>
+              <h5 class="text-xl font-medium text-gray-700 mb-2">5. 승차권 발권 (Ticket Issuance)</h5>
+              <p class="text-lg text-gray-700 leading-relaxed mb-3">결제가 완료되면 승차권이 발권됩니다. 탑승 정보를 확인하세요.</p>
+              <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-md my-3 shadow" role="alert">
+                <p class="font-bold">📢 중요: 발권된 티켓에서 <span class="text-red-600">노선번호, 목적지, 탑승 시간</span>을 반드시 재확인하세요!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Online Reservation Ticketing Flow -->
+        <div class="p-6 bg-green-50 rounded-lg shadow-md border border-green-200">
+          <h4 class="text-2xl font-semibold text-green-700 mb-6 border-b border-green-300 pb-3">🎟️ 온라인 예매 발권 절차 (Exchange Reserved Ticket)</h4>
+          <div class="space-y-8">
+            <div>
+              <h5 class="text-xl font-medium text-gray-700 mb-2">1. 예매 정보 입력 (Enter Reservation Details)</h5>
+              <p class="text-lg text-gray-700 leading-relaxed mb-3">메인 화면(상단 `키오스크 메인 스크린` 참조)에서 '예매 티켓 교환' 선택 후, 예매 시 사용한 카드, 예매 번호, 또는 전화번호 등을 입력합니다.</p>
+              <a href={kioskImage2.src} target="_blank" rel="noopener noreferrer" class="block">
+                <Image src={kioskImage2} alt="온라인 예매 - 카드 또는 정보 입력 안내" class="w-full max-w-xl mx-auto h-auto rounded-lg shadow-md object-contain mb-3" widths={[400, 800]} sizes="(max-width: 640px) 100vw, 800px" quality="high" />
+              </a>
+              <p class="text-sm text-gray-600 mb-4 text-center">예매 정보 확인 화면 (카드 또는 정보 입력)</p>
+              <a href={kioskImage3.src} target="_blank" rel="noopener noreferrer" class="block">
+                <Image src={kioskImage3} alt="온라인 예매 - 예매 번호 입력 화면" class="w-full max-w-xl mx-auto h-auto rounded-lg shadow-md object-contain" widths={[400, 800]} sizes="(max-width: 640px) 100vw, 800px" quality="high" />
+              </a>
+               <p class="text-sm text-gray-600 text-center">예매 번호 입력 화면</p>
+            </div>
+
+            <div>
+              <h5 class="text-xl font-medium text-gray-700 mb-2">2. 승차권 발권 (Ticket Issuance)</h5>
+              <p class="text-lg text-gray-700 leading-relaxed mb-3">예매 내역 확인 후 승차권이 발권됩니다. 탑승 정보를 확인하세요.</p>
+              <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 rounded-md my-3 shadow" role="alert">
+                <p class="font-bold">📢 중요: 발권된 티켓에서 <span class="text-red-600">노선번호, 목적지, 탑승 시간</span>을 반드시 재확인하세요!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-3xl font-semibold text-red-600 mb-8 border-b-2 border-red-500 pb-2">⚠️ 잠깐! 무인발권기 이용 시 유의사항</h2>
+      <div class="bg-gray-50 p-6 rounded-lg shadow-md">
+        <div>
+          <h4 class="font-bold text-gray-800 text-lg">✔️ 카드 준비</h4>
+          <p class="text-lg text-gray-700 leading-relaxed">대부분의 무인발권기는 카드 결제만 가능합니다. 현금 결제가 필요하다면 유인 매표소를 이용해주세요.)</p> 
+        </div>
+        <div class="mt-8">
+          <h4 class="font-bold text-gray-800 text-lg">✔️ 인터넷/모바일 예매</h4>
+          <p class="text-lg text-gray-700 leading-relaxed">이미 인터넷이나 모바일 앱으로 예매하셨다면, 해당 예매 내역(QR코드, 바코드, 예매번호 등)으로 무인발권기에서 발권하거나, 별도의 발권 절차 없이 바로 탑승 가능한 경우도 있으니 예매 시 안내사항을 잘 확인하세요.</p>
+        </div>
+        <div class="mt-8">
+          <h4 class="font-bold text-gray-800 text-lg">✔️ 기기 오류 시</h4>
+          <p class="text-lg text-gray-700 leading-relaxed">간혹 기기 오류가 발생하거나 사용법이 어렵다면, 주저하지 말고 근처에 있는 공항 안내 직원이나 버스 회사 직원에게 도움을 요청하세요. 보통 무인발권기 근처에 버스 회사 직원이 있고 그 분들이 잘 도와주실거에요!</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="text-center py-4">
+      <p class="text-lg text-gray-700 leading-relaxed">이제 인천공항에서 무인발권기로 편하게 공항버스 티켓 구매하세요! 😉</p>
+      <p class="text-lg text-gray-700 leading-relaxed">본 글이 여러분의 여행을 더욱 편리하게 만들어주길 바랍니다!</p>
+    </section>
+
+    <section class="text-center mt-4 py-6 mb-4">
+      <a 
+        href="/routes"
+        class="bg-gradient-to-br from-red-500 via-red-600 to-rose-700 hover:from-red-600 hover:via-rose-700 hover:to-rose-800 text-white font-semibold py-4 px-10 rounded-lg text-xl shadow-lg hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-0.5 inline-flex items-center focus:outline-none focus:ring-4 focus:ring-red-300 focus:ring-opacity-75"
+      >
+        인천공항 공항버스 노선 정보 <span class="ml-2 text-2xl">🚍</span>
+      </a>
+    </section>
+
+    <footer class="text-center py-8 mt-10 border-t border-gray-200">
+      <p class="text-sm text-gray-600">
+        &copy; {new Date().getFullYear()} koreabusinfo.com. All rights reserved.
+      </p>
+    </footer>
+
+  </div>
+</Layout> 
+

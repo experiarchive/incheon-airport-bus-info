@@ -1,0 +1,195 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { Image } from 'astro:assets';
+import mainImage from '../../assets/main.webp';
+import t1DropoffImg1 from '../../assets/incheon-airport-bus-stop-T1 (1).webp';
+import t1DropoffImg2 from '../../assets/incheon-airport-bus-stop-T1 (2).webp';
+import t2DropoffImg1 from '../../assets/incheon-airport-bus-stop-T2 (1).webp';
+import t2DropoffImg2 from '../../assets/incheon-airport-bus-stop-T2 (2).webp';
+
+// New imports for T1 Bus Stop (Arrivals)
+import t1BusStopOverviewImage from '../../assets/airport-bus-arrival-stop-t1.webp';
+import t1BusStopSignImage from '../../assets/Incheon-Airport-T1-Bus-Stop-1F (1).webp';
+import t1BusStopNumberImage from '../../assets/Incheon-Airport-T1-Bus-Stop-1F (2).webp';
+import t1BusStopTicketAreaImage from '../../assets/Incheon-Airport-T1-Bus-Stop-1F (3).webp';
+
+// New imports for T2 Bus Stop (Arrivals)
+import t2BusStopOverviewImage from '../../assets/airport-bus-arrival-stop-t2.webp';
+import t2BusStopSignImage from '../../assets/Incheon-Airport-T2-Bus-Stop-B1 (1).webp';
+import t2BusStopNumberImage from '../../assets/Incheon-Airport-T2-Bus-Stop-B1 (2).webp';
+import t2BusStopTicketAreaImage from '../../assets/Incheon-Airport-T2-Bus-Stop-B1 (3).webp';
+import t2BusStopPlatformImage from '../../assets/Incheon-Airport-T2-Bus-Stop-B1 (4).webp';
+import t2BusStopWaitingImage from '../../assets/Incheon-Airport-T2-Bus-Stop-B1 (5).webp';
+import t2BusStopTicketMachineImage from '../../assets/Incheon-Airport-T2-Bus-Stop-B1 (6).webp';
+
+const pageTitle = "인천공항 공항버스 승하차장 안내";
+const pageDescription = "인천공항 제1여객터미널(T1) 및 제2여객터미널(T2)의 공항버스 하차장과 승차장 위치를 상세히 안내합니다. 층별 정보, 매표소 위치, 이용 팁을 확인하세요.";
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <div class="container mx-auto px-4 py-8">
+    <section class="mb-12"> 
+      {/* Combined Hero Section: Image with Text Overlay */}
+      <div class="relative w-full h-64 md:h-96"> 
+        {/* Main Image (acts as background) */}
+        <Image 
+          src={mainImage} 
+          alt="인천공항 공항버스 터미널 풍경"
+          class="w-full h-full object-cover rounded-lg shadow-lg"
+          widths={[400, 800, 1200, 1920]}
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1920px"
+          quality="mid"
+        />
+        {/* Text Overlay Container */}
+        <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/30 p-4 rounded-lg">
+          <header class="text-center text-white">
+            <h1 class="text-4xl md:text-5xl font-bold mb-2">{pageTitle}</h1>
+            <p class="text-md md:text-lg">인천공항 1터미널, 2터미널 승하차장 위치 정보</p>
+          </header>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-10">
+      <p class="text-lg text-gray-700 leading-relaxed mb-6">
+        해외여행의 시작과 끝, 인천공항! ✈️ 공항을 오가는 가장 편리한 방법 중 하나는 바로 공항버스인데요. 하지만 막상 공항에 도착하거나 떠날 때, "어디서 타고 내려야 하지?" 헷갈릴 때가 많죠? 🤔
+      </p>
+      <p class="text-lg text-gray-700 leading-relaxed">
+        오늘 이 글에서는 인천공항 제1여객터미널과 제2여객터미널의 리무진 공항버스 하차장과 승차장 위치, 그리고 유용한 팁들을 자세히 알려드릴게요! 이 정보 하나면 헤맬 걱정 없이 편안하게 공항버스를 이용하실 수 있을 거예요. 😉
+      </p>
+    </section>
+
+    <section class="mb-16">
+      <h2 class="text-3xl font-semibold text-blue-600 mb-8 border-b-2 border-blue-500 pb-2">🚌 공항버스 내리는 위치(비행기 타는 곳) 하차장 안내 </h2>
+
+      <div class="mb-12">
+        <h3 class="text-2xl font-medium text-gray-700 mb-4">1. 제1여객터미널 하차장 ✈️➡️</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">
+          일반적으로 공항에 도착하는 리무진 버스는 3층 출국장에서 승객을 내려줍니다. 항공사 카운터가 있는 층이라고 기억하시면 쉬워요.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <Image src={t1DropoffImg1} alt="제1여객터미널 3층 출국장 공항버스 하차 구역 풍경" class="w-full h-auto rounded-lg shadow-md object-cover" widths={[300, 600, 900]} sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 900px" quality="high" />
+          <Image src={t1DropoffImg2} alt="3층 출국장 내부에서 밖으로 나가는 문과 하차하는 버스들" class="w-full h-auto rounded-lg shadow-md object-cover" widths={[300, 600, 900]} sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 900px" quality="high" />
+        </div>
+        <p class="text-gray-700 leading-relaxed">
+          짐을 찾고 입국장(1층)으로 나오셨다면, 다시 3층으로 올라가실 필요 없이 1층에서 바로 다른 교통수단을 이용하시거나, 마중나온 분들을 만나시면 됩니다. (리무진 버스 하차는 주로 3층에서 이루어집니다.)
+        </p>
+      </div>
+
+      <div class="mb-12">
+        <h3 class="text-2xl font-medium text-gray-700 mb-4">2. 제2여객터미널 하차장 ✈️➡️</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">
+          제2여객터미널도 마찬가지로 3층 출국장에 리무진 버스 하차장이 마련되어 있습니다.
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <Image src={t2DropoffImg1} alt="제2여객터미널 3층 출국장 버스 하차 구역 풍경" class="w-full h-auto rounded-lg shadow-md object-cover" widths={[300, 600, 900]} sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 900px" quality="high" />
+          <Image src={t2DropoffImg2} alt="3층 출국장 문 바로 앞에서 승객들이 내리는 모습" class="w-full h-auto rounded-lg shadow-md object-cover" widths={[300, 600, 900]} sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 900px" quality="high" />
+        </div>
+      </div>
+
+      <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md" role="alert">
+        <p class="font-bold">꿀팁! ✨</p>
+        <p>짐이 많다면 공항버스 내리는 곳 근처에 카트를 이용해 출국장까지 편리하게 이동하세요!</p>
+      </div>
+    </section>
+
+    <section class="mb-16">
+      <h2 class="text-3xl font-semibold text-green-600 mb-8 border-b-2 border-green-500 pb-2">🏡 공항버스 타는 위치(승차장 안내)</h2>
+
+      <div class="mb-12">
+        <h3 class="text-2xl font-medium text-gray-700 mb-4">1. 제1여객터미널 승차장 🚌</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">
+          공항버스를 타고 서울 시내 등으로 가실 때는 1층 도착층 외부로 나가셔야 합니다.
+        </p>
+        <p class="text-gray-700 leading-relaxed mb-4">
+          넓게 분포된 버스 승차장에는 행선지별로 탑승하는 곳의 번호가 지정되어 있습니다.
+        </p>
+        
+        {/* 메인 승차장 전경 이미지 (단독 라인) */}
+        <Image src={t1BusStopOverviewImage} alt="인천공항 1터미널 공항버스 탑승위치 약도" class="w-full h-auto rounded-lg shadow-md object-cover mb-4" widths={[400, 800, 1200]} sizes="(max-width: 767px) 100vw, (max-width: 1023px) 80vw, 1200px" quality="high" />
+
+        <p class="text-sm text-blue-600 bg-blue-100 border border-blue-300 p-3 rounded-md mb-4"><span class="font-bold">클릭!</span> 🖼️ 사진을 클릭하시면 더 크고 선명한 원본 이미지를 새 창에서 확인하실 수 있습니다.</p>
+        {/* 승차장 상세 정보 이미지들 (3열 그리드) */}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <a href={t1BusStopSignImage.src} target="_blank" rel="noopener noreferrer">
+            <Image src={t1BusStopSignImage} alt="1터미널 공항버스 탑승위치 안내 사진(1)" class="w-full rounded-lg shadow-md object-cover aspect-square" widths={[300, 600, 900]} sizes="(max-width: 767px) 100vw, 30vw" quality="high" />
+          </a>
+          <a href={t1BusStopNumberImage.src} target="_blank" rel="noopener noreferrer">
+            <Image src={t1BusStopNumberImage} alt="1터미널 공항버스 탑승위치 안내 사진(2)" class="w-full rounded-lg shadow-md object-cover aspect-square" widths={[300, 600, 900]} sizes="(max-width: 767px) 100vw, 30vw" quality="high" />
+          </a>
+          <a href={t1BusStopTicketAreaImage.src} target="_blank" rel="noopener noreferrer">
+            <Image src={t1BusStopTicketAreaImage} alt="1터미널 공항버스 탑승위치 안내 사진(3)" class="w-full rounded-lg shadow-md object-cover aspect-square" widths={[300, 600, 900]} sizes="(max-width: 767px) 100vw, 30vw" quality="high" />
+          </a>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-4">
+          매표소는 1층 도착층 내부(4, 9번 출구 근처)에 있습니다. 무인발권기는 내부, 외부 모두 있습니다. (무인발권기 이용 정보는 별도 포스팅에서 확인하세요!)
+        </p>
+      </div>
+
+      <div class="mb-12">
+        <h3 class="text-2xl font-medium text-gray-700 mb-4">2. 제2여객터미널 승차장 🚌</h3>
+        <p class="text-gray-700 leading-relaxed mb-4">
+          제2여객터미널에서 리무진 버스를 타려면 교통센터 지하 1층으로 이동해야 합니다.
+        </p>
+        <p class="text-gray-700 leading-relaxed mb-4">
+          실내에 쾌적하게 버스 터미널이 조성되어 있어 날씨에 구애받지 않고 편안하게 대기할 수 있습니다.
+        </p>
+
+        {/* 메인 승차장 전경 이미지 (단독 라인) */}
+        <Image src={t2BusStopOverviewImage} alt="인천공항 2터미널 공항버스 탑승위치 약도" class="w-full h-auto rounded-lg shadow-md object-cover mb-4" widths={[400, 800, 1200]} sizes="(max-width: 767px) 100vw, (max-width: 1023px) 80vw, 1200px" quality="high" />
+
+        <p class="text-sm text-blue-600 bg-blue-100 border border-blue-300 p-3 rounded-md mb-4"><span class="font-bold">클릭!</span> 🖼️ 사진을 클릭하시면 더 크고 선명한 원본 이미지를 새 창에서 확인하실 수 있습니다.</p>
+        {/* 승차장 상세 정보 이미지들 (3열 그리드) */}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <a href={t2BusStopSignImage.src} target="_blank" rel="noopener noreferrer">
+            <Image src={t2BusStopSignImage} alt="2터미널 공항버스 탑승위치 안내 사진(1)" class="w-full rounded-lg shadow-md object-cover aspect-square" widths={[300, 600, 900]} sizes="(max-width: 767px) 100vw, 30vw" quality="high" />
+          </a>
+          <a href={t2BusStopNumberImage.src} target="_blank" rel="noopener noreferrer">
+            <Image src={t2BusStopNumberImage} alt="2터미널 공항버스 탑승위치 안내 사진(2)" class="w-full rounded-lg shadow-md object-cover aspect-square" widths={[300, 600, 900]} sizes="(max-width: 767px) 100vw, 30vw" quality="high" />
+          </a>
+          <a href={t2BusStopTicketAreaImage.src} target="_blank" rel="noopener noreferrer">
+            <Image src={t2BusStopTicketAreaImage} alt="2터미널 공항버스 탑승위치 안내 사진(3)" class="w-full rounded-lg shadow-md object-cover aspect-square" widths={[300, 600, 900]} sizes="(max-width: 767px) 100vw, 30vw" quality="high" />
+          </a>
+        </div>
+
+        {/* 추가 상세 정보 이미지들 (3열 그리드) */}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <a href={t2BusStopPlatformImage.src} target="_blank" rel="noopener noreferrer">
+            <Image src={t2BusStopPlatformImage} alt="2터미널 공항버스 탑승위치 안내 사진(4)" class="w-full rounded-lg shadow-md object-cover aspect-square" widths={[300, 600, 900]} sizes="(max-width: 767px) 100vw, 30vw" quality="high" />
+          </a>
+          <a href={t2BusStopWaitingImage.src} target="_blank" rel="noopener noreferrer">
+            <Image src={t2BusStopWaitingImage} alt="2터미널 공항버스 탑승위치 안내 사진(5)" class="w-full rounded-lg shadow-md object-cover aspect-square" widths={[300, 600, 900]} sizes="(max-width: 767px) 100vw, 30vw" quality="high" />
+          </a>
+          <a href={t2BusStopTicketMachineImage.src} target="_blank" rel="noopener noreferrer">
+            <Image src={t2BusStopTicketMachineImage} alt="2터미널 공항버스 탑승위치 안내 사진(6)" class="w-full rounded-lg shadow-md object-cover aspect-square" widths={[300, 600, 900]} sizes="(max-width: 767px) 100vw, 30vw" quality="high" />
+          </a>
+        </div>
+
+        <p class="text-gray-700 leading-relaxed mb-4">
+          매표소와 무인발권기는 교통센터 지하 1층 버스 터미널 내부에 마련되어 있습니다.
+        </p>
+      </div>
+
+      <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md" role="alert">
+        <p class="font-bold">꿀팁! ✨</p>
+        <p>탑승 전, 본인이 타야 할 버스 노선과 승차장 번호를 다시 한번 확인하는 습관을 들이면 좋습니다. 공항 홈페이지나 앱에서도 실시간 버스 정보를 확인할 수 있어요!</p>
+      </div>
+    </section>
+
+    {/* Call to Action Button for Next Post */}
+    <div class="my-16 text-center">
+      <a href="/icn-bus-info/unmanned-ticket-machine-guide" 
+         class="inline-block bg-gradient-to-r from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 text-white font-semibold text-lg py-5 px-12 rounded-lg shadow-xl transform transition-all duration-300 ease-in-out hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
+        인천공항 무인발권기 사용법 보러가기 🎫
+      </a>
+    </div>
+
+    <footer class="text-center py-8 mt-10 border-t border-gray-200">
+      <p class="text-sm text-gray-600">
+        &copy; {new Date().getFullYear()} koreabusinfo.com. All rights reserved.
+      </p>
+    </footer>
+
+  </div>
+</Layout> 

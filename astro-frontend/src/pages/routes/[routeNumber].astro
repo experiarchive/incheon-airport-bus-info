@@ -1,4 +1,4 @@
----
+﻿---
 import Layout from '../../layouts/Layout.astro';
 import { client } from '../../lib/sanityClient.js';
 import { toHTML } from '@portabletext/to-html';
@@ -473,7 +473,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
           )}
           <div class="mt-4 text-center">
             <a 
-              href="https://koreabusinfo.com/icn-bus-info/bus-stops/" 
+              href="/icn-bus-info/bus-stops/" 
               target="_blank"
               class="inline-flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
             >
@@ -818,7 +818,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
             무인발권기를 이용한 티켓 구매 및 예매 내역 확인 방법 안내
           </p>
           <a 
-            href="https://koreabusinfo.com/icn-bus-info/unmanned-ticket-machine-guide/" 
+            href="/icn-bus-info/unmanned-ticket-machine-guide/" 
             target="_blank"
             class="inline-flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200"
           >
@@ -1445,3 +1445,4 @@ window.switchDirection = switchDirection;
 window.selectStop = selectStop;
 window.highlightTime = highlightTime;
 </script> 
+
