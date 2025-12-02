@@ -1,0 +1,1129 @@
+2025-12-02T03:29:49.514Z astro:cli --verbose flag enabled! Enabling: DEBUG="astro:*,vite:*"
+2025-12-02T03:29:49.514Z astro:cli Tip: Set the DEBUG env variable directly for more control. Example: "DEBUG=astro:*,vite:* astro build".
+2025-12-02T03:29:49.814Z astro:telemetry [notify] last notified on 1764645065701
+2025-12-02T03:29:50.368Z astro:telemetry {
+  context: {
+    isGit: true,
+    anonymousProjectId: 'afd15ba9fbe1892d791c84142e8d55c03420efb17ed640f1fc77317808842fec',
+    packageManager: 'npm',
+    packageManagerVersion: '11.6.2',
+    anonymousId: '6d2aa752563fa1dccfa744fa86c79fc934d9571e020dfe8b67dcb9085bdcfa11',
+    anonymousSessionId: '7770707e1517ef8c4a9bda31264b48e972cded82959335bc6de0da85214f2b4a'
+  },
+  meta: {
+    nodeVersion: '24.11.1',
+    viteVersion: '6.3.5',
+    astroVersion: '5.8.0',
+    systemPlatform: 'win32',
+    systemRelease: '10.0.26200',
+    systemArchitecture: 'x64',
+    cpuCount: 12,
+    cpuModel: 'AMD Ryzen 5 9600 6-Core Processor              ',
+    cpuSpeed: 3793,
+    memoryInMb: 31861,
+    isDocker: false,
+    isTTY: undefined,
+    isWSL: false,
+    isCI: false,
+    ciName: null
+  }
+}
+2025-12-02T03:29:50.369Z astro:telemetry [
+  {
+    "eventName": "ASTRO_CLI_SESSION_STARTED",
+    "payload": {
+      "cliCommand": "build",
+      "config": {
+        "site": true,
+        "output": "static",
+        "integrations": [
+          "@astrojs/tailwind",
+          "@astrojs/sitemap"
+        ],
+        "build": {
+          "assets": true
+        },
+        "server": true,
+        "image": {},
+        "markdown": {},
+        "experimental": {},
+        "legacy": {}
+      }
+    }
+  }
+]
+2025-12-02T03:29:50.374Z astro:build Initial setup...
+2025-12-02T03:29:50.411Z vite:env loading env files: [
+  'C:/개발관련/test/astro-frontend/.env',
+  'C:/개발관련/test/astro-frontend/.env.local',
+  'C:/개발관련/test/astro-frontend/.env.production',
+  'C:/개발관련/test/astro-frontend/.env.production.local'
+]
+2025-12-02T03:29:50.411Z vite:env env files loaded in 0.38ms
+2025-12-02T03:29:50.412Z vite:env using resolved env: {
+  ALLUSERSPROFILE: 'C:\\ProgramData',
+  ANTIGRAVITY_AGENT: '1',
+  ANTIGRAVITY_CLI_ALIAS: 'agy',
+  APPDATA: 'C:\\Users\\hmkim\\AppData\\Roaming',
+  ChocolateyInstall: 'C:\\ProgramData\\chocolatey',
+  ChocolateyLastPathUpdate: '134086159434239874',
+  CHROME_CRASHPAD_PIPE_NAME: '\\\\.\\pipe\\crashpad_7660_HWHMMHRISXPLYAYZ',
+  COLOR: '0',
+  COLORTERM: 'truecolor',
+  CommonProgramFiles: 'C:\\Program Files\\Common Files',
+  'CommonProgramFiles(x86)': 'C:\\Program Files (x86)\\Common Files',
+  CommonProgramW6432: 'C:\\Program Files\\Common Files',
+  COMPUTERNAME: 'DESKTOP-0ME74CG',
+  ComSpec: 'C:\\WINDOWS\\system32\\cmd.exe',
+  DEBUG: 'astro:*,vite:*',
+  DriverData: 'C:\\Windows\\System32\\Drivers\\DriverData',
+  EDITOR: 'C:\\WINDOWS\\notepad.exe',
+  EFC_6800_1592913036: '1',
+  GIT_ASKPASS: 'c:\\Users\\hmkim\\AppData\\Local\\Programs\\Antigravity\\resources\\app\\extensions\\git\\dist\\askpass.sh',
+  HOME: 'C:\\Users\\hmkim',
+  HOMEDRIVE: 'C:',
+  HOMEPATH: '\\Users\\hmkim',
+  INIT_CWD: 'C:\\개발관련\\test\\astro-frontend',
+  LANG: 'en_US.UTF-8',
+  LOCALAPPDATA: 'C:\\Users\\hmkim\\AppData\\Local',
+  LOGONSERVER: '\\\\DESKTOP-0ME74CG',
+  NODE: 'C:\\Program Files\\nodejs\\node.exe',
+  NODE_ENV: 'production',
+  NODE_EXE: 'C:\\Program Files\\nodejs\\\\node.exe',
+  npm_command: 'exec',
+  npm_config_cache: 'C:\\Users\\hmkim\\AppData\\Local\\npm-cache',
+  npm_config_globalconfig: 'C:\\Users\\hmkim\\AppData\\Roaming\\npm\\etc\\npmrc',
+  npm_config_global_prefix: 'C:\\Users\\hmkim\\AppData\\Roaming\\npm',
+  npm_config_init_module: 'C:\\Users\\hmkim\\.npm-init.js',
+  npm_config_local_prefix: 'C:\\개발관련\\test\\astro-frontend',
+  npm_config_node_gyp: 'C:\\Program Files\\nodejs\\node_modules\\npm\\node_modules\\node-gyp\\bin\\node-gyp.js',
+  npm_config_noproxy: '',
+  npm_config_npm_version: '11.6.2',
+  npm_config_prefix: 'C:\\Users\\hmkim\\AppData\\Roaming\\npm',
+  npm_config_userconfig: 'C:\\Users\\hmkim\\.npmrc',
+  npm_config_user_agent: 'npm/11.6.2 node/v24.11.1 win32 x64 workspaces/false',
+  npm_execpath: 'C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+  npm_lifecycle_event: 'npx',
+  npm_lifecycle_script: 'astro',
+  npm_node_execpath: 'C:\\Program Files\\nodejs\\node.exe',
+  npm_package_json: 'C:\\개발관련\\test\\astro-frontend\\package.json',
+  npm_package_name: 'astro-frontend',
+  npm_package_version: '0.0.1',
+  NPM_PREFIX_JS: 'C:\\Program Files\\nodejs\\\\node_modules\\npm\\bin\\npm-prefix.js',
+  NPM_PREFIX_NPX_CLI_JS: 'C:\\Users\\hmkim\\AppData\\Roaming\\npm\\node_modules\\npm\\bin\\npx-cli.js',
+  NPX_CLI_JS: 'C:\\Program Files\\nodejs\\\\node_modules\\npm\\bin\\npx-cli.js',
+  NUMBER_OF_PROCESSORS: '12',
+  OneDrive: 'C:\\Users\\hmkim\\OneDrive',
+  OneDriveConsumer: 'C:\\Users\\hmkim\\OneDrive',
+  ORIGINAL_XDG_CURRENT_DESKTOP: 'undefined',
+  OS: 'Windows_NT',
+  PAGER: 'cat',
+  Path: 'C:\\개발관련\\test\\astro-frontend\\node_modules\\.bin;C:\\개발관련\\test\\astro-frontend\\node_modules\\.bin;C:\\개발관련\\test\\node_modules\\.bin;C:\\개발관련\\node_modules\\.bin;C:\\node_modules\\.bin;C:\\Program Files\\nodejs\\node_modules\\npm\\node_modules\\@npmcli\\run-script\\lib\\node-gyp-bin;C:\\Python314\\Scripts\\;C:\\Python314\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\Bandizip\\;C:\\Program Files\\nodejs\\;C:\\ProgramData\\chocolatey\\bin;C:\\Program Files\\Git\\cmd;C:\\Users\\hmkim\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\hmkim\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Users\\hmkim\\AppData\\Roaming\\npm;C:\\Users\\hmkim\\AppData\\Local\\Programs\\Antigravity\\bin',
+  PATHEXT: '.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.PY;.PYW;.CPL',
+  PROCESSOR_ARCHITECTURE: 'AMD64',
+  PROCESSOR_IDENTIFIER: 'AMD64 Family 26 Model 68 Stepping 0, AuthenticAMD',
+  PROCESSOR_LEVEL: '26',
+  PROCESSOR_REVISION: '4400',
+  ProgramData: 'C:\\ProgramData',
+  ProgramFiles: 'C:\\Program Files',
+  'ProgramFiles(x86)': 'C:\\Program Files (x86)',
+  ProgramW6432: 'C:\\Program Files',
+  PROMPT: '$P$G',
+  PSModulePath: 'C:\\Users\\hmkim\\Documents\\WindowsPowerShell\\Modules;C:\\Program Files\\WindowsPowerShell\\Modules;C:\\WINDOWS\\system32\\WindowsPowerShell\\v1.0\\Modules',
+  PUBLIC: 'C:\\Users\\Public',
+  SESSIONNAME: 'Console',
+  SystemDrive: 'C:',
+  SystemRoot: 'C:\\WINDOWS',
+  TEMP: 'C:\\Users\\hmkim\\AppData\\Local\\Temp',
+  TERM_PROGRAM: 'vscode',
+  TERM_PROGRAM_VERSION: '1.104.0',
+  TMP: 'C:\\Users\\hmkim\\AppData\\Local\\Temp',
+  USERDOMAIN: 'DESKTOP-0ME74CG',
+  USERDOMAIN_ROAMINGPROFILE: 'DESKTOP-0ME74CG',
+  USERNAME: 'hmkim',
+  USERPROFILE: 'C:\\Users\\hmkim',
+  VSCODE_GIT_ASKPASS_EXTRA_ARGS: '',
+  VSCODE_GIT_ASKPASS_MAIN: 'c:\\Users\\hmkim\\AppData\\Local\\Programs\\Antigravity\\resources\\app\\extensions\\git\\dist\\askpass-main.js',
+  VSCODE_GIT_ASKPASS_NODE: 'C:\\Users\\hmkim\\AppData\\Local\\Programs\\Antigravity\\Antigravity.exe',
+  VSCODE_GIT_IPC_HANDLE: '\\\\.\\pipe\\vscode-git-43b488e750-sock',
+  VSCODE_INJECTION: '1',
+  VSCODE_PYTHON_AUTOACTIVATE_GUARD: '1',
+  windir: 'C:\\WINDOWS'
+}
+2025-12-02T03:29:50.416Z vite:env loading env files: [
+  'C:/개발관련/test/astro-frontend/.env',
+  'C:/개발관련/test/astro-frontend/.env.local',
+  'C:/개발관련/test/astro-frontend/.env.production',
+  'C:/개발관련/test/astro-frontend/.env.production.local'
+]
+2025-12-02T03:29:50.416Z vite:env env files loaded in 0.17ms
+2025-12-02T03:29:50.417Z vite:env using resolved env: {
+  ALLUSERSPROFILE: 'C:\\ProgramData',
+  ANTIGRAVITY_AGENT: '1',
+  ANTIGRAVITY_CLI_ALIAS: 'agy',
+  APPDATA: 'C:\\Users\\hmkim\\AppData\\Roaming',
+  ChocolateyInstall: 'C:\\ProgramData\\chocolatey',
+  ChocolateyLastPathUpdate: '134086159434239874',
+  CHROME_CRASHPAD_PIPE_NAME: '\\\\.\\pipe\\crashpad_7660_HWHMMHRISXPLYAYZ',
+  COLOR: '0',
+  COLORTERM: 'truecolor',
+  CommonProgramFiles: 'C:\\Program Files\\Common Files',
+  'CommonProgramFiles(x86)': 'C:\\Program Files (x86)\\Common Files',
+  CommonProgramW6432: 'C:\\Program Files\\Common Files',
+  COMPUTERNAME: 'DESKTOP-0ME74CG',
+  ComSpec: 'C:\\WINDOWS\\system32\\cmd.exe',
+  DEBUG: 'astro:*,vite:*',
+  DriverData: 'C:\\Windows\\System32\\Drivers\\DriverData',
+  EDITOR: 'C:\\WINDOWS\\notepad.exe',
+  EFC_6800_1592913036: '1',
+  GIT_ASKPASS: 'c:\\Users\\hmkim\\AppData\\Local\\Programs\\Antigravity\\resources\\app\\extensions\\git\\dist\\askpass.sh',
+  HOME: 'C:\\Users\\hmkim',
+  HOMEDRIVE: 'C:',
+  HOMEPATH: '\\Users\\hmkim',
+  INIT_CWD: 'C:\\개발관련\\test\\astro-frontend',
+  LANG: 'en_US.UTF-8',
+  LOCALAPPDATA: 'C:\\Users\\hmkim\\AppData\\Local',
+  LOGONSERVER: '\\\\DESKTOP-0ME74CG',
+  NODE: 'C:\\Program Files\\nodejs\\node.exe',
+  NODE_ENV: 'production',
+  NODE_EXE: 'C:\\Program Files\\nodejs\\\\node.exe',
+  npm_command: 'exec',
+  npm_config_cache: 'C:\\Users\\hmkim\\AppData\\Local\\npm-cache',
+  npm_config_globalconfig: 'C:\\Users\\hmkim\\AppData\\Roaming\\npm\\etc\\npmrc',
+  npm_config_global_prefix: 'C:\\Users\\hmkim\\AppData\\Roaming\\npm',
+  npm_config_init_module: 'C:\\Users\\hmkim\\.npm-init.js',
+  npm_config_local_prefix: 'C:\\개발관련\\test\\astro-frontend',
+  npm_config_node_gyp: 'C:\\Program Files\\nodejs\\node_modules\\npm\\node_modules\\node-gyp\\bin\\node-gyp.js',
+  npm_config_noproxy: '',
+  npm_config_npm_version: '11.6.2',
+  npm_config_prefix: 'C:\\Users\\hmkim\\AppData\\Roaming\\npm',
+  npm_config_userconfig: 'C:\\Users\\hmkim\\.npmrc',
+  npm_config_user_agent: 'npm/11.6.2 node/v24.11.1 win32 x64 workspaces/false',
+  npm_execpath: 'C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+  npm_lifecycle_event: 'npx',
+  npm_lifecycle_script: 'astro',
+  npm_node_execpath: 'C:\\Program Files\\nodejs\\node.exe',
+  npm_package_json: 'C:\\개발관련\\test\\astro-frontend\\package.json',
+  npm_package_name: 'astro-frontend',
+  npm_package_version: '0.0.1',
+  NPM_PREFIX_JS: 'C:\\Program Files\\nodejs\\\\node_modules\\npm\\bin\\npm-prefix.js',
+  NPM_PREFIX_NPX_CLI_JS: 'C:\\Users\\hmkim\\AppData\\Roaming\\npm\\node_modules\\npm\\bin\\npx-cli.js',
+  NPX_CLI_JS: 'C:\\Program Files\\nodejs\\\\node_modules\\npm\\bin\\npx-cli.js',
+  NUMBER_OF_PROCESSORS: '12',
+  OneDrive: 'C:\\Users\\hmkim\\OneDrive',
+  OneDriveConsumer: 'C:\\Users\\hmkim\\OneDrive',
+  ORIGINAL_XDG_CURRENT_DESKTOP: 'undefined',
+  OS: 'Windows_NT',
+  PAGER: 'cat',
+  Path: 'C:\\개발관련\\test\\astro-frontend\\node_modules\\.bin;C:\\개발관련\\test\\astro-frontend\\node_modules\\.bin;C:\\개발관련\\test\\node_modules\\.bin;C:\\개발관련\\node_modules\\.bin;C:\\node_modules\\.bin;C:\\Program Files\\nodejs\\node_modules\\npm\\node_modules\\@npmcli\\run-script\\lib\\node-gyp-bin;C:\\Python314\\Scripts\\;C:\\Python314\\;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\;C:\\WINDOWS\\System32\\OpenSSH\\;C:\\Program Files\\Bandizip\\;C:\\Program Files\\nodejs\\;C:\\ProgramData\\chocolatey\\bin;C:\\Program Files\\Git\\cmd;C:\\Users\\hmkim\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\hmkim\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Users\\hmkim\\AppData\\Roaming\\npm;C:\\Users\\hmkim\\AppData\\Local\\Programs\\Antigravity\\bin',
+  PATHEXT: '.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.PY;.PYW;.CPL',
+  PROCESSOR_ARCHITECTURE: 'AMD64',
+  PROCESSOR_IDENTIFIER: 'AMD64 Family 26 Model 68 Stepping 0, AuthenticAMD',
+  PROCESSOR_LEVEL: '26',
+  PROCESSOR_REVISION: '4400',
+  ProgramData: 'C:\\ProgramData',
+  ProgramFiles: 'C:\\Program Files',
+  'ProgramFiles(x86)': 'C:\\Program Files (x86)',
+  ProgramW6432: 'C:\\Program Files',
+  PROMPT: '$P$G',
+  PSModulePath: 'C:\\Users\\hmkim\\Documents\\WindowsPowerShell\\Modules;C:\\Program Files\\WindowsPowerShell\\Modules;C:\\WINDOWS\\system32\\WindowsPowerShell\\v1.0\\Modules',
+  PUBLIC: 'C:\\Users\\Public',
+  SESSIONNAME: 'Console',
+  SystemDrive: 'C:',
+  SystemRoot: 'C:\\WINDOWS',
+  TEMP: 'C:\\Users\\hmkim\\AppData\\Local\\Temp',
+  TERM_PROGRAM: 'vscode',
+  TERM_PROGRAM_VERSION: '1.104.0',
+  TMP: 'C:\\Users\\hmkim\\AppData\\Local\\Temp',
+  USERDOMAIN: 'DESKTOP-0ME74CG',
+  USERDOMAIN_ROAMINGPROFILE: 'DESKTOP-0ME74CG',
+  USERNAME: 'hmkim',
+  USERPROFILE: 'C:\\Users\\hmkim',
+  VSCODE_GIT_ASKPASS_EXTRA_ARGS: '',
+  VSCODE_GIT_ASKPASS_MAIN: 'c:\\Users\\hmkim\\AppData\\Local\\Programs\\Antigravity\\resources\\app\\extensions\\git\\dist\\askpass-main.js',
+  VSCODE_GIT_ASKPASS_NODE: 'C:\\Users\\hmkim\\AppData\\Local\\Programs\\Antigravity\\Antigravity.exe',
+  VSCODE_GIT_IPC_HANDLE: '\\\\.\\pipe\\vscode-git-43b488e750-sock',
+  VSCODE_INJECTION: '1',
+  VSCODE_PYTHON_AUTOACTIVATE_GUARD: '1',
+  windir: 'C:\\WINDOWS'
+}
+2025-12-02T03:29:50.418Z vite:env loading env files: [
+  'C:/개발관련/test/astro-frontend/.env',
+  'C:/개발관련/test/astro-frontend/.env.local',
+  'C:/개발관련/test/astro-frontend/.env.production',
+  'C:/개발관련/test/astro-frontend/.env.production.local'
+]
+2025-12-02T03:29:50.419Z vite:env env files loaded in 0.15ms
+2025-12-02T03:29:50.419Z vite:env using resolved env: {}
+2025-12-02T03:29:50.423Z vite:config using resolved config: {
+  configFile: undefined,
+  mode: 'production',
+  cacheDir: 'C:/개발관련/test/astro-frontend/node_modules/.vite',
+  clearScreen: false,
+  customLogger: {
+    hasWarned: false,
+    info: [Function: info],
+    warn: [Function: warn],
+    warnOnce: [Function: warnOnce],
+    error: [Function: error],
+    clearScreen: [Function: clearScreen],
+    hasErrorLogged: [Function: hasErrorLogged]
+  },
+  appType: 'custom',
+  optimizeDeps: {
+    include: [
+      'astro > cssesc',
+      'astro > aria-query',
+      'astro > axobject-query'
+    ],
+    exclude: [ 'astro', 'node-fetch' ],
+    needsInterop: [],
+    extensions: [],
+    disabled: undefined,
+    holdUntilCrawlEnd: true,
+    force: false,
+    noDiscovery: true,
+    esbuildOptions: { preserveSymlinks: false },
+    entries: [
+      'C:/개발관련/test/astro-frontend/src/**/*.{jsx,tsx,vue,svelte,html,astro}'
+    ]
+  },
+  plugins: [
+    'vite:optimized-deps',
+    'vite:watch-package-data',
+    'vite:pre-alias',
+    'alias',
+    'astro-manifest-plugin',
+    'astro:build',
+    'astro-env-plugin',
+    'astro:markdown',
+    'astro:head-metadata',
+    'astro-content-virtual-mod-plugin',
+    'astro:content-asset-propagation',
+    'astro:assets:esm',
+    'astro:vite-plugin-file-url',
+    'astro:i18n',
+    'astro:actions',
+    'astro:container',
+    'vite:modulepreload-polyfill',
+    'vite:resolve',
+    'vite:html-inline-proxy',
+    'vite:css',
+    'vite:esbuild',
+    'vite:json',
+    'vite:wasm-helper',
+    'vite:worker',
+    'vite:asset',
+    'astro:build:normal',
+    'astro:scripts',
+    'astro:html',
+    'astro:postprocess',
+    'astro:integration-container',
+    'astro:content-imports',
+    '@astro/plugin-middleware',
+    'astro:assets',
+    'astro:fonts:fallback',
+    'astro:prefetch',
+    'astro:transitions',
+    'astro:dev-toolbar',
+    '@astro/plugin-actions',
+    'vite:wasm-fallback',
+    'astro:vite-plugin-env',
+    'vite:define',
+    'vite:css-post',
+    'vite:worker-import-meta-url',
+    'vite:asset-import-meta-url',
+    'vite:dynamic-import-vars',
+    'vite:import-glob',
+    'astro:scripts:page-ssr',
+    'astro:scanner',
+    '@astrojs/vite-plugin-astro-ssr-manifest',
+    'astro:server-islands',
+    'astro:hmr-reload',
+    'vite:client-inject',
+    'vite:css-analysis',
+    'vite:import-analysis'
+  ],
+  publicDir: 'C:/개발관련/test/astro-frontend/public',
+  root: 'C:/개발관련/test/astro-frontend',
+  envPrefix: 'PUBLIC_',
+  define: {
+    'import.meta.env.SITE': '"https://air.koreabusinfo.com"',
+    'import.meta.env.BASE_URL': '"/"',
+    'import.meta.env.ASSETS_PREFIX': 'undefined',
+    __ASTRO_INTERNAL_I18N_CONFIG__: '{"base":"/","format":"directory","site":"https://air.koreabusinfo.com","trailingSlash":"ignore","isBuild":false}'
+  },
+  server: {
+    port: 5173,
+    strictPort: false,
+    host: undefined,
+    allowedHosts: [],
+    https: undefined,
+    open: false,
+    proxy: undefined,
+    cors: {
+      origin: /^https?:\/\/(?:(?:[^:]+\.)?localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/
+    },
+    headers: {},
+    warmup: { clientFiles: [], ssrFiles: [] },
+    middlewareMode: true,
+    fs: {
+      strict: true,
+      deny: [ '.env', '.env.*', '*.{crt,pem}', '**/.git/**' ],
+      allow: [ 'C:/개발관련/test/astro-frontend' ]
+    },
+    preTransformRequests: true,
+    perEnvironmentStartEndDuringDev: false,
+    sourcemapIgnoreList: [Function: isInNodeModules$1],
+    hmr: false,
+    watch: { ignored: [ '**' ] },
+    ws: false
+  },
+  resolve: {
+    externalConditions: [ 'node' ],
+    extensions: [
+      '.mjs',  '.js',
+      '.mts',  '.ts',
+      '.jsx',  '.tsx',
+      '.json'
+    ],
+    dedupe: [ 'astro' ],
+    noExternal: [],
+    external: [],
+    preserveSymlinks: false,
+    alias: [
+      { find: 'randombytes', replacement: 'randombytes/browser' },
+      {
+        find: /^astro$/,
+        replacement: 'C:\\개발관련\\test\\astro-frontend\\node_modules\\astro\\dist\\types\\public\\index.js'
+      },
+      {
+        find: 'astro:middleware',
+        replacement: 'astro/virtual-modules/middleware.js'
+      },
+      { find: 'astro:schema', replacement: 'astro/zod' },
+      { find: 'astro:components', replacement: 'astro/components' },
+      {
+        find: /^\/?@vite\/env/,
+        replacement: '/@fs/C:/개발관련/test/astro-frontend/node_modules/vite/dist/client/env.mjs'
+      },
+      {
+        find: /^\/?@vite\/client/,
+        replacement: '/@fs/C:/개발관련/test/astro-frontend/node_modules/vite/dist/client/client.mjs'
+      }
+    ],
+    mainFields: [ 'browser', 'module', 'jsnext:main', 'jsnext' ],
+    conditions: [ 'module', 'browser', 'development|production', 'astro' ],
+    builtins: []
+  },
+  ssr: {
+    target: 'node',
+    optimizeDeps: {
+      esbuildOptions: { preserveSymlinks: false },
+      include: [],
+      exclude: [],
+      needsInterop: [],
+      extensions: [],
+      holdUntilCrawlEnd: true,
+      force: false,
+      noDiscovery: true
+    },
+    noExternal: [
+      'astro',
+      'astro/components',
+      '@nanostores/preact',
+      '@fontsource/*',
+      '@astrojs/tailwind',
+      '@astrojs/sitemap'
+    ],
+    external: [],
+    resolve: {
+      conditions: [ 'module', 'node', 'development|production', 'astro' ],
+      externalConditions: [ 'node' ]
+    }
+  },
+  build: {
+    target: [ 'es2020', 'edge88', 'firefox78', 'chrome87', 'safari14' ],
+    polyfillModulePreload: true,
+    modulePreload: { polyfill: true },
+    outDir: 'dist',
+    assetsDir: '_astro',
+    assetsInlineLimit: 4096,
+    sourcemap: false,
+    terserOptions: {},
+    rollupOptions: {},
+    commonjsOptions: { include: [ /node_modules/ ], extensions: [ '.js', '.cjs' ] },
+    dynamicImportVarsOptions: { warnOnError: true, exclude: [ /node_modules/ ] },
+    write: true,
+    emptyOutDir: null,
+    copyPublicDir: true,
+    manifest: false,
+    lib: false,
+    ssrManifest: false,
+    ssrEmitAssets: false,
+    reportCompressedSize: true,
+    chunkSizeWarningLimit: 500,
+    watch: null,
+    cssCodeSplit: true,
+    minify: 'esbuild',
+    ssr: false,
+    emitAssets: false,
+    createEnvironment: [Function: createEnvironment],
+    cssTarget: [ 'es2020', 'edge88', 'firefox78', 'chrome87', 'safari14' ],
+    cssMinify: true
+  },
+  css: {
+    transformer: 'postcss',
+    preprocessorMaxWorkers: 0,
+    devSourcemap: false,
+    postcss: {
+      plugins: [
+        {
+          postcssPlugin: 'tailwindcss',
+          plugins: [ [AsyncFunction (anonymous)] ]
+        },
+        {
+          browsers: undefined,
+          info: [Function: info],
+          options: {},
+          postcssPlugin: 'autoprefixer',
+          prepare: [Function: prepare]
+        }
+      ]
+    }
+  },
+  logLevel: 'silent',
+  environments: {
+    client: {
+      define: {
+        'import.meta.env.SITE': '"https://air.koreabusinfo.com"',
+        'import.meta.env.BASE_URL': '"/"',
+        'import.meta.env.ASSETS_PREFIX': 'undefined',
+        __ASTRO_INTERNAL_I18N_CONFIG__: '{"base":"/","format":"directory","site":"https://air.koreabusinfo.com","trailingSlash":"ignore","isBuild":false}'
+      },
+      resolve: {
+        externalConditions: [ 'node' ],
+        extensions: [
+          '.mjs',  '.js',
+          '.mts',  '.ts',
+          '.jsx',  '.tsx',
+          '.json'
+        ],
+        dedupe: [ 'astro' ],
+        noExternal: [],
+        external: [],
+        preserveSymlinks: false,
+        alias: [
+          { find: 'randombytes', replacement: 'randombytes/browser' },
+          {
+            find: /^astro$/,
+            replacement: 'C:\\개발관련\\test\\astro-frontend\\node_modules\\astro\\dist\\types\\public\\index.js'
+          },
+          {
+            find: 'astro:middleware',
+            replacement: 'astro/virtual-modules/middleware.js'
+          },
+          { find: 'astro:schema', replacement: 'astro/zod' },
+          { find: 'astro:components', replacement: 'astro/components' },
+          {
+            find: /^\/?@vite\/env/,
+            replacement: '/@fs/C:/개발관련/test/astro-frontend/node_modules/vite/dist/client/env.mjs'
+          },
+          {
+            find: /^\/?@vite\/client/,
+            replacement: '/@fs/C:/개발관련/test/astro-frontend/node_modules/vite/dist/client/client.mjs'
+          }
+        ],
+        mainFields: [ 'browser', 'module', 'jsnext:main', 'jsnext' ],
+        conditions: [ 'module', 'browser', 'development|production', 'astro' ],
+        builtins: []
+      },
+      keepProcessEnv: false,
+      consumer: 'client',
+      optimizeDeps: {
+        include: [
+          'astro > cssesc',
+          'astro > aria-query',
+          'astro > axobject-query'
+        ],
+        exclude: [ 'astro', 'node-fetch' ],
+        needsInterop: [],
+        extensions: [],
+        disabled: undefined,
+        holdUntilCrawlEnd: true,
+        force: false,
+        noDiscovery: true,
+        esbuildOptions: { preserveSymlinks: false },
+        entries: [
+          'C:/개발관련/test/astro-frontend/src/**/*.{jsx,tsx,vue,svelte,html,astro}'
+        ]
+      },
+      dev: {
+        warmup: [],
+        sourcemap: { js: true },
+        sourcemapIgnoreList: [Function: isInNodeModules$1],
+        preTransformRequests: true,
+        createEnvironment: [Function: defaultCreateClientDevEnvironment],
+        recoverable: true,
+        moduleRunnerTransform: false
+      },
+      build: {
+        target: [ 'es2020', 'edge88', 'firefox78', 'chrome87', 'safari14' ],
+        polyfillModulePreload: true,
+        modulePreload: { polyfill: true },
+        outDir: 'dist',
+        assetsDir: '_astro',
+        assetsInlineLimit: 4096,
+        sourcemap: false,
+        terserOptions: {},
+        rollupOptions: {},
+        commonjsOptions: { include: [ /node_modules/ ], extensions: [ '.js', '.cjs' ] },
+        dynamicImportVarsOptions: { warnOnError: true, exclude: [ /node_modules/ ] },
+        write: true,
+        emptyOutDir: null,
+        copyPublicDir: true,
+        manifest: false,
+        lib: false,
+        ssrManifest: false,
+        ssrEmitAssets: false,
+        reportCompressedSize: true,
+        chunkSizeWarningLimit: 500,
+        watch: null,
+        cssCodeSplit: true,
+        minify: 'esbuild',
+        ssr: false,
+        emitAssets: true,
+        createEnvironment: [Function: createEnvironment],
+        cssTarget: [ 'es2020', 'edge88', 'firefox78', 'chrome87', 'safari14' ],
+        cssMinify: true
+      }
+    },
+    ssr: {
+      define: {
+        'import.meta.env.SITE': '"https://air.koreabusinfo.com"',
+        'import.meta.env.BASE_URL': '"/"',
+        'import.meta.env.ASSETS_PREFIX': 'undefined',
+        __ASTRO_INTERNAL_I18N_CONFIG__: '{"base":"/","format":"directory","site":"https://air.koreabusinfo.com","trailingSlash":"ignore","isBuild":false}'
+      },
+      resolve: {
+        externalConditions: [ 'node' ],
+        extensions: [
+          '.mjs',  '.js',
+          '.mts',  '.ts',
+          '.jsx',  '.tsx',
+          '.json'
+        ],
+        dedupe: [ 'astro' ],
+        noExternal: [
+          'astro',
+          'astro/components',
+          '@nanostores/preact',
+          '@fontsource/*',
+          '@astrojs/tailwind',
+          '@astrojs/sitemap'
+        ],
+        external: [],
+        preserveSymlinks: false,
+        alias: [
+          { find: 'randombytes', replacement: 'randombytes/browser' },
+          {
+            find: /^astro$/,
+            replacement: 'C:\\개발관련\\test\\astro-frontend\\node_modules\\astro\\dist\\types\\public\\index.js'
+          },
+          {
+            find: 'astro:middleware',
+            replacement: 'astro/virtual-modules/middleware.js'
+          },
+          { find: 'astro:schema', replacement: 'astro/zod' },
+          { find: 'astro:components', replacement: 'astro/components' },
+          {
+            find: /^\/?@vite\/env/,
+            replacement: '/@fs/C:/개발관련/test/astro-frontend/node_modules/vite/dist/client/env.mjs'
+          },
+          {
+            find: /^\/?@vite\/client/,
+            replacement: '/@fs/C:/개발관련/test/astro-frontend/node_modules/vite/dist/client/client.mjs'
+          }
+        ],
+        mainFields: [ 'module', 'jsnext:main', 'jsnext' ],
+        conditions: [ 'module', 'node', 'development|production', 'astro' ],
+        builtins: [
+          '_http_agent',         '_http_client',        '_http_common',
+          '_http_incoming',      '_http_outgoing',      '_http_server',
+          '_stream_duplex',      '_stream_passthrough', '_stream_readable',
+          '_stream_transform',   '_stream_wrap',        '_stream_writable',
+          '_tls_common',         '_tls_wrap',           'assert',
+          'assert/strict',       'async_hooks',         'buffer',
+          'child_process',       'cluster',             'console',
+          'constants',           'crypto',              'dgram',
+          'diagnostics_channel', 'dns',                 'dns/promises',
+          'domain',              'events',              'fs',
+          'fs/promises',         'http',                'http2',
+          'https',               'inspector',           'inspector/promises',
+          'module',              'net',                 'os',
+          'path',                'path/posix',          'path/win32',
+          'perf_hooks',          'process',             'punycode',
+          'querystring',         'readline',            'readline/promises',
+          'repl',                'stream',              'stream/consumers',
+          'stream/promises',     'stream/web',          'string_decoder',
+          'sys',                 'timers',              'timers/promises',
+          'tls',                 'trace_events',        'tty',
+          'url',                 'util',                'util/types',
+          'v8',                  'vm',                  'wasi',
+          'worker_threads',      'zlib',                /^node:/,
+          /^npm:/,               /^bun:/
+        ]
+      },
+      keepProcessEnv: true,
+      consumer: 'server',
+      optimizeDeps: {
+        include: [],
+        exclude: [],
+        needsInterop: [],
+        extensions: [],
+        disabled: undefined,
+        holdUntilCrawlEnd: true,
+        force: false,
+        noDiscovery: true,
+        esbuildOptions: { preserveSymlinks: false }
+      },
+      dev: {
+        warmup: [],
+        sourcemap: { js: true },
+        sourcemapIgnoreList: [Function: isInNodeModules$1],
+        preTransformRequests: false,
+        createEnvironment: [Function: defaultCreateDevEnvironment],
+        recoverable: false,
+        moduleRunnerTransform: true
+      },
+      build: {
+        target: [ 'es2020', 'edge88', 'firefox78', 'chrome87', 'safari14' ],
+        polyfillModulePreload: true,
+        modulePreload: { polyfill: true },
+        outDir: 'dist',
+        assetsDir: '_astro',
+        assetsInlineLimit: 4096,
+        sourcemap: false,
+        terserOptions: {},
+        rollupOptions: {},
+        commonjsOptions: { include: [ /node_modules/ ], extensions: [ '.js', '.cjs' ] },
+        dynamicImportVarsOptions: { warnOnError: true, exclude: [ /node_modules/ ] },
+        write: true,
+        emptyOutDir: null,
+        copyPublicDir: true,
+        manifest: false,
+        lib: false,
+        ssrManifest: false,
+        ssrEmitAssets: false,
+        reportCompressedSize: true,
+        chunkSizeWarningLimit: 500,
+        watch: null,
+        cssCodeSplit: true,
+        minify: false,
+        ssr: true,
+        emitAssets: false,
+        createEnvironment: [Function: createEnvironment],
+        cssTarget: [ 'es2020', 'edge88', 'firefox78', 'chrome87', 'safari14' ],
+        cssMinify: 'esbuild'
+      }
+    }
+  },
+  configFileDependencies: [],
+  inlineConfig: {
+    configFile: false,
+    mode: 'production',
+    cacheDir: 'C:\\개발관련\\test\\astro-frontend\\node_modules\\.vite\\',
+    clearScreen: false,
+    customLogger: {
+      hasWarned: false,
+      info: [Function: info],
+      warn: [Function: warn],
+      warnOnce: [Function: warnOnce],
+      error: [Function: error],
+      clearScreen: [Function: clearScreen],
+      hasErrorLogged: [Function: hasErrorLogged]
+    },
+    appType: 'custom',
+    optimizeDeps: {
+      entries: [
+        'C:/개발관련/test/astro-frontend/src/**/*.{jsx,tsx,vue,svelte,html,astro}'
+      ],
+      exclude: [ 'astro', 'node-fetch' ],
+      noDiscovery: true
+    },
+    plugins: [
+      {
+        enforce: 'pre',
+        name: 'astro-manifest-plugin',
+        resolveId: [Function: resolveId],
+        load: [Function: load]
+      },
+      null,
+      false,
+      [
+        {
+          name: 'astro:build',
+          enforce: 'pre',
+          configEnvironment: [AsyncFunction: configEnvironment],
+          configResolved: [Function: configResolved],
+          configureServer: [Function: configureServer],
+          buildStart: [Function: buildStart],
+          load: [AsyncFunction: load],
+          transform: [AsyncFunction: transform],
+          handleHotUpdate: [AsyncFunction: handleHotUpdate]
+        },
+        {
+          name: 'astro:build:normal',
+          resolveId: [Function: resolveId]
+        }
+      ],
+      {
+        name: 'astro:scripts',
+        config: [Function: config],
+        resolveId: [AsyncFunction: resolveId],
+        load: [AsyncFunction: load],
+        buildStart: [Function: buildStart]
+      },
+      false,
+      {
+        name: 'astro:vite-plugin-env',
+        config: [Function: config],
+        configResolved: [Function: configResolved],
+        transform: [Function: transform]
+      },
+      {
+        name: 'astro-env-plugin',
+        enforce: 'pre',
+        config: [Function: config],
+        buildStart: [Function: buildStart],
+        buildEnd: [Function: buildEnd],
+        resolveId: [Function: resolveId],
+        load: [Function: load]
+      },
+      {
+        enforce: 'pre',
+        name: 'astro:markdown',
+        buildEnd: [Function: buildEnd],
+        resolveId: [AsyncFunction: resolveId],
+        load: [AsyncFunction: load]
+      },
+      {
+        name: 'astro:html',
+        options: [Function: options],
+        transform: [AsyncFunction: transform]
+      },
+      {
+        name: 'astro:postprocess',
+        transform: [AsyncFunction: transform]
+      },
+      {
+        name: 'astro:integration-container',
+        configureServer: [AsyncFunction: configureServer],
+        buildStart: [AsyncFunction: buildStart]
+      },
+      {
+        name: 'astro:scripts:page-ssr',
+        enforce: 'post',
+        transform: [Function: transform]
+      },
+      {
+        name: 'astro:head-metadata',
+        enforce: 'pre',
+        apply: 'serve',
+        configureServer: [Function: configureServer],
+        resolveId: [Function: resolveId],
+        transform: [Function: transform]
+      },
+      {
+        name: 'astro:scanner',
+        enforce: 'post',
+        transform: [AsyncFunction: transform],
+        handleHotUpdate: [AsyncFunction: handleHotUpdate]
+      },
+      {
+        name: 'astro-content-virtual-mod-plugin',
+        enforce: 'pre',
+        config: [Function: config],
+        buildStart: [Function: buildStart],
+        resolveId: [AsyncFunction: resolveId],
+        load: [AsyncFunction: load],
+        configureServer: [Function: configureServer]
+      },
+      [
+        {
+          name: 'astro:content-imports',
+          config: [Function: config],
+          buildStart: [AsyncFunction: buildStart],
+          transform: [AsyncFunction: transform],
+          configureServer: [Function: configureServer]
+        }
+      ],
+      {
+        name: 'astro:content-asset-propagation',
+        enforce: 'pre',
+        resolveId: [AsyncFunction: resolveId],
+        configureServer: [Function: configureServer],
+        transform: [AsyncFunction: transform]
+      },
+      {
+        name: '@astro/plugin-middleware',
+        resolveId: [AsyncFunction: resolveId],
+        load: [AsyncFunction: load]
+      },
+      {
+        name: '@astrojs/vite-plugin-astro-ssr-manifest',
+        enforce: 'post',
+        resolveId: [Function: resolveId],
+        load: [Function: load]
+      },
+      [
+        {
+          name: 'astro:assets',
+          config: [Function: config],
+          resolveId: [AsyncFunction: resolveId],
+          load: [Function: load],
+          buildStart: [Function: buildStart],
+          renderChunk: [AsyncFunction: renderChunk]
+        },
+        {
+          name: 'astro:assets:esm',
+          enforce: 'pre',
+          config: [Function: config],
+          configResolved: [Function: configResolved],
+          load: [AsyncFunction: load]
+        },
+        {
+          name: 'astro:fonts:fallback',
+          resolveId: [Function: resolveId],
+          load: [Function: load]
+        }
+      ],
+      {
+        name: 'astro:prefetch',
+        resolveId: [AsyncFunction: resolveId],
+        load: [Function: load],
+        transform: [Function: transform]
+      },
+      {
+        name: 'astro:transitions',
+        config: [Function: config],
+        resolveId: [AsyncFunction: resolveId],
+        load: [Function: load],
+        transform: [Function: transform]
+      },
+      {
+        name: 'astro:dev-toolbar',
+        config: [Function: config],
+        resolveId: [Function: resolveId],
+        configureServer: [Function: configureServer],
+        load: [AsyncFunction: load]
+      },
+      {
+        name: 'astro:vite-plugin-file-url',
+        enforce: 'pre',
+        resolveId: [Function: resolveId]
+      },
+      {
+        name: 'astro:i18n',
+        enforce: 'pre',
+        config: [Function: config],
+        resolveId: [Function: resolveId]
+      },
+      {
+        name: 'astro:actions',
+        enforce: 'pre',
+        resolveId: [Function: resolveId],
+        configureServer: [AsyncFunction: configureServer],
+        load: [AsyncFunction: load]
+      },
+      {
+        name: '@astro/plugin-actions',
+        resolveId: [AsyncFunction: resolveId],
+        load: [Function: load]
+      },
+      {
+        name: 'astro:server-islands',
+        enforce: 'post',
+        config: [Function: config],
+        configureServer: [Function: configureServer],
+        resolveId: [Function: resolveId],
+        load: [Function: load],
+        transform: [Function: transform],
+        renderChunk: [Function: renderChunk]
+      },
+      {
+        name: 'astro:container',
+        enforce: 'pre',
+        resolveId: [Function: resolveId]
+      },
+      {
+        name: 'astro:hmr-reload',
+        enforce: 'post',
+        hotUpdate: { order: 'post', handler: [Function: handler] }
+      }
+    ],
+    publicDir: 'C:\\개발관련\\test\\astro-frontend\\public\\',
+    root: 'C:\\개발관련\\test\\astro-frontend\\',
+    envPrefix: 'PUBLIC_',
+    define: {
+      'import.meta.env.SITE': '"https://air.koreabusinfo.com"',
+      'import.meta.env.BASE_URL': '"/"',
+      'import.meta.env.ASSETS_PREFIX': 'undefined'
+    },
+    server: {
+      hmr: false,
+      watch: { ignored: [ '**' ] },
+      middlewareMode: true,
+      ws: false
+    },
+    resolve: {
+      alias: [
+        { find: 'randombytes', replacement: 'randombytes/browser' },
+        {
+          find: /^astro$/,
+          replacement: 'C:\\개발관련\\test\\astro-frontend\\node_modules\\astro\\dist\\types\\public\\index.js'
+        },
+        {
+          find: 'astro:middleware',
+          replacement: 'astro/virtual-modules/middleware.js'
+        },
+        { find: 'astro:schema', replacement: 'astro/zod' },
+        { find: 'astro:components', replacement: 'astro/components' }
+      ],
+      dedupe: [ 'astro' ],
+      conditions: [ 'module', 'browser', 'development|production', 'astro' ],
+      mainFields: undefined
+    },
+    ssr: {
+      noExternal: [
+        'astro',
+        'astro/components',
+        '@nanostores/preact',
+        '@fontsource/*',
+        '@astrojs/tailwind',
+        '@astrojs/sitemap'
+      ],
+      external: []
+    },
+    build: { assetsDir: '_astro' },
+    css: {
+      postcss: {
+        plugins: [
+          {
+            postcssPlugin: 'tailwindcss',
+            plugins: [ [AsyncFunction (anonymous)] ]
+          },
+          {
+            browsers: undefined,
+            info: [Function: info],
+            options: {},
+            postcssPlugin: 'autoprefixer',
+            prepare: [Function: prepare]
+          }
+        ]
+      }
+    },
+    logLevel: 'silent'
+  },
+  base: '/',
+  decodedBase: '/',
+  rawBase: '/',
+  command: 'serve',
+  isWorker: false,
+  mainConfig: null,
+  bundleChain: [],
+  isProduction: true,
+  json: { namedExports: true, stringify: 'auto' },
+  esbuild: { jsxDev: false },
+  builder: undefined,
+  preview: {
+    port: 4173,
+    strictPort: false,
+    host: undefined,
+    allowedHosts: [],
+    https: undefined,
+    open: false,
+    proxy: undefined,
+    cors: {
+      origin: /^https?:\/\/(?:(?:[^:]+\.)?localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/
+    },
+    headers: {}
+  },
+  envDir: 'C:/개발관련/test/astro-frontend',
+  env: { BASE_URL: '/', MODE: 'production', DEV: false, PROD: true },
+  assetsInclude: [Function: assetsInclude],
+  logger: {
+    hasWarned: false,
+    info: [Function: info],
+    warn: [Function: warn],
+    warnOnce: [Function: warnOnce],
+    error: [Function: error],
+    clearScreen: [Function: clearScreen],
+    hasErrorLogged: [Function: hasErrorLogged]
+  },
+  packageCache: Map(1) {
+    'fnpd_C:/개발관련/test/astro-frontend' => {
+      dir: 'C:/개발관련/test/astro-frontend',
+      data: {
+        name: 'astro-frontend',
+        type: 'module',
+        version: '0.0.1',
+        scripts: {
+          dev: 'astro dev',
+          start: 'astro dev',
+          prebuild: 'node ./scripts/generate-search-data.mjs',
+          build: 'astro build',
+          preview: 'astro preview',
+          astro: 'astro'
+        },
+        dependencies: {
+          '@astrojs/check': '^0.9.6',
+          '@astrojs/sitemap': '^3.4.0',
+          '@astrojs/tailwind': '^6.0.2',
+          '@portabletext/to-html': '^2.0.14',
+          '@sanity/client': '^7.3.0',
+          astro: '^5.8.0',
+          tailwindcss: '^3.4.0',
+          typescript: '^5.9.3'
+        }
+      },
+      hasSideEffects: [Function: hasSideEffects],
+      setResolvedCache: [Function: setResolvedCache],
+      getResolvedCache: [Function: getResolvedCache]
+    },
+    set: [Function (anonymous)]
+  },
+  worker: { format: 'iife', plugins: '() => plugins', rollupOptions: {} },
+  experimental: { importGlobRestoreExtension: false, hmrPartialAccept: false },
+  future: undefined,
+  dev: {
+    warmup: [],
+    sourcemap: { js: true },
+    sourcemapIgnoreList: [Function: isInNodeModules$1],
+    preTransformRequests: false,
+    createEnvironment: [Function: defaultCreateDevEnvironment],
+    recoverable: false,
+    moduleRunnerTransform: false
+  },
+  webSocketToken: 'JIOdiTxguUAc',
+  getSortedPlugins: [Function: getSortedPlugins],
+  getSortedPluginHooks: [Function: getSortedPluginHooks],
+  createResolver: [Function: createResolver],
+  fsDenyGlob: [Function: arrayMatcher],
+  safeModulePaths: Set(0) {},
+  additionalAllowedHosts: []
+}
+2025-12-02T03:29:50.434Z vite:deps (client) Hash is consistent. Skipping. Use --force to override.
+12:29:50 [content] Syncing content
+12:29:50 [content] Synced content
+12:29:50 [types] Generated 26ms
+12:29:50 [build] output: "static"
+12:29:50 [build] mode: "static"
+12:29:50 [build] directory: C:\개발관련\test\astro-frontend\dist\
+12:29:50 [build] Collecting build info...
+2025-12-02T03:29:50.440Z astro:build ├── ✔ src/pages/icn-bus-info/bus-stops.astro → /icn-bus-info/bus-stops/index.html
+2025-12-02T03:29:50.440Z astro:build ├── ✔ src/pages/icn-bus-info/unmanned-ticket-machine-guide.astro → /icn-bus-info/unmanned-ticket-machine-guide/index.html
+2025-12-02T03:29:50.440Z astro:build ├── ✔ src/pages/routes.astro → /routes/index.html
+2025-12-02T03:29:50.440Z astro:build ├── ✔ src/pages/index.astro → /index.html
+2025-12-02T03:29:50.440Z astro:build All pages loaded   1764646189.5s
+12:29:50 [build] ✓ Completed in 66ms.

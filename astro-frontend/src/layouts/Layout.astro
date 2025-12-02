@@ -1,5 +1,7 @@
 ---
 import '../styles/global.css'; // Tailwind CSS 전역 스타일 임포트
+import { Image } from 'astro:assets';
+import websiteLogo from '../assets/website-logo.png';
 
 // Props 정의 (예: 페이지 제목)
 export interface Props {
@@ -104,10 +106,11 @@ const canonicalUrl = canonical ? new URL(canonical, Astro.site) : currentUrl;
 					<!-- 로고/사이트명 -->
 					<div class="flex items-center">
 						<a href="/" class="hover:opacity-80 transition duration-200">
-							<img 
-								src="/website-logo.png" 
+							<Image 
+								src={websiteLogo} 
 								alt="인천공항 공항버스 정보 - 실시간 시간표 및 예매 서비스" 
 								class="h-10 w-auto"
+								loading="eager"
 							/>
 						</a>
 					</div>
