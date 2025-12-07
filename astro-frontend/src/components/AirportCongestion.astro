@@ -64,10 +64,14 @@
       if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         console.warn('Using mock data for development testing.');
         const MOCK_DATA = [
+          // T1: Typically Gates 2, 3, 4, 5 are main. Gate 6 is sometimes open. Gate 1 is rare/closed.
           { ternimalId: 'T1', gatenm: '2번 출국장', gateinfo: 120, cgtdt: '202312071300' },
           { ternimalId: 'T1', gatenm: '3번 출국장', gateinfo: 230, cgtdt: '202312071300' },
           { ternimalId: 'T1', gatenm: '4번 출국장', gateinfo: 150, cgtdt: '202312071300' },
           { ternimalId: 'T1', gatenm: '5번 출국장', gateinfo: 80, cgtdt: '202312071300' },
+          { ternimalId: 'T1', gatenm: '6번 출국장', gateinfo: 90, cgtdt: '202312071300' },
+          
+          // T2: Typically Gates 1, 2
           { ternimalId: 'T2', gatenm: '1번 출국장', gateinfo: 300, cgtdt: '202312071300' },
           { ternimalId: 'T2', gatenm: '2번 출국장', gateinfo: 450, cgtdt: '202312071300' }
         ];
