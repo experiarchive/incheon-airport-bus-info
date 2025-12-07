@@ -49,12 +49,16 @@ const publisherId = 'ca-pub-8355312170222120';
           
           if (adSlot && !adSlot.hasAttribute('data-ad-loaded')) {
             // Check if slot itself has dimensions (it should if w-full is applied and container has width)
-            if (adSlot.clientWidth > 0) {
+            // Check if slot itself has dimensions (it should if w-full is applied and container has width)
+            if (adSlot.offsetWidth > 0) {
               adSlot.setAttribute('data-ad-loaded', 'true');
               try {
                 (window.adsbygoogle = window.adsbygoogle || []).push({});
               } catch (e) {
-                console.error('AdSense push error:', e);
+                // Suppress error on localhost
+                if (!window.location.hostname.includes('localhost')) {
+                   console.error('AdSense push error:', e);
+                }
               }
               // Only stop observing if we successfully attempted to load
               observer.unobserve(container);
@@ -62,7 +66,7 @@ const publisherId = 'ca-pub-8355312170222120';
               // If width is 0, keep observing. It might be hidden or layout not ready.
               // The observer will trigger again if layout changes cause intersection updates,
               // or we can rely on next scroll event.
-              console.warn('AdSense slot has 0 width, skipping push');
+              // console.warn('AdSense slot has 0 width, skipping push'); // Squelch this warning
             }
           }
         }
