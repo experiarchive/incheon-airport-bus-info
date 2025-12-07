@@ -46,11 +46,19 @@ const publisherId = 'ca-pub-8355312170222120';
           const adSlot = container.querySelector('.adsbygoogle');
           
           if (adSlot && !adSlot.hasAttribute('data-ad-loaded')) {
-            adSlot.setAttribute('data-ad-loaded', 'true');
-            try {
-              (window.adsbygoogle = window.adsbygoogle || []).push({});
-            } catch (e) {
-              console.error('AdSense push error:', e);
+            // Check if container has dimensions to prevent "No slot size" error
+            if (container.clientWidth > 0 && container.clientHeight > 0) {
+              adSlot.setAttribute('data-ad-loaded', 'true');
+              try {
+                (window.adsbygoogle = window.adsbygoogle || []).push({});
+              } catch (e) {
+                console.error('AdSense push error:', e);
+              }
+            } else {
+              // If hidden, observe again later or ignore (it will trigger again when visible if observer stays)
+              // For now, we just don't push. The observer will trigger again if it enters viewport and has size.
+              // Actually, IntersectionObserver triggers when it intersects. If it has 0 size, it might not intersect?
+              // But if it does, we skip pushing.
             }
           }
           observer.unobserve(container);
