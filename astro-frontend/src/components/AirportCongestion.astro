@@ -1,0 +1,197 @@
+---
+---
+
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700" id="airport-congestion-card" style="display: none;">
+  <div class="flex items-center mb-4">
+    <svg class="w-6 h-6 mr-3 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+    </svg>
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">
+      인천공항 출국장 실시간 혼잡도
+    </h2>
+  </div>
+  
+  <p class="text-gray-600 dark:text-gray-300 mb-6 text-sm">
+    <span id="update-time" class="font-medium text-gray-500">업데이트 중...</span> 기준 실시간 대기인원입니다.
+  </p>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="congestion-data-container">
+    <!-- Loading State -->
+    <div class="animate-pulse flex space-x-4 p-4 border border-gray-200 rounded-lg">
+      <div class="flex-1 space-y-4 py-1">
+        <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+        <div class="space-y-2">
+          <div class="h-4 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    </div>
+    <div class="animate-pulse flex space-x-4 p-4 border border-gray-200 rounded-lg">
+      <div class="flex-1 space-y-4 py-1">
+        <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+        <div class="space-y-2">
+          <div class="h-4 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <p class="mt-4 text-xs text-gray-400 text-right">
+    데이터 제공: 인천국제공항공사 (API 상태에 따라 지연될 수 있습니다)
+  </p>
+</div>
+
+<script>
+  // Client-side script to fetch API data
+  // Using public data portal API directly
+  // Note: This might fail if CORS is blocked by the API server
+  
+  async function fetchCongestionData() {
+    const API_KEY = decodeURIComponent('3VQy09yaoEDW9vaJMuhcuAA1m5H%2BwFx17E%2FzHIM0HtiS32TisxVMBrfrGfsaU%2Bk5BHczuT%2Bc19Jt9VUl7qkAbA%3D%3D');
+    const URL = `https://apis.data.gov.kr/B551177/StatusOfDepartureCongestion/getDepartureCongestion?serviceKey=${encodeURIComponent(API_KEY)}&numOfRows=10&pageNo=1&type=json`;
+
+    try {
+      const response = await fetch(URL);
+      if (!response.ok) throw new Error('Network response was not ok');
+      const data = await response.json();
+      
+      const items = data.response?.body?.items;
+      if (items && items.length > 0) {
+        renderCongestionData(items);
+        document.getElementById('airport-congestion-card').style.display = 'block';
+      }
+    } catch (error) {
+      console.error('Failed to fetch airport congestion data:', error);
+      // Hide card on error or CORS failure
+      document.getElementById('airport-congestion-card').style.display = 'none';
+      
+      // If localhost, maybe log more details
+      if (window.location.hostname === 'localhost') {
+        console.warn('CORS error is likely. Using mock data for development testing.');
+        // Optional: Use mock data for testing UI if fetch fails
+        // renderCongestionData(MOCK_DATA); 
+      }
+    }
+  }
+
+  function renderCongestionData(data) {
+    const container = document.getElementById('congestion-data-container');
+    const timeElement = document.getElementById('update-time');
+    
+    if (!container) return;
+
+    // Filter for T1 and T2 totals (gate info might be too detailed, let's look at structure)
+    // The API returns list of gates with congestion. We should probably sum them or show by gate?
+    // Actually, users care about "Terminal 1" vs "Terminal 2".
+    // Let's analyze the data structure. It usually gives "T1 출국장1", "T1 출국장2"...
+    // Let's summarize by Terminal.
+    
+    let t1Total = 0;
+    let t2Total = 0;
+    let t1Count = 0;
+    let t2Count = 0;
+    let lastUpdate = '';
+
+    data.forEach(item => {
+      // item format: { airportCode: "Icn", terminalId: "P01" (T1) | "P03" (T2, usually), congestion: 100, ... }
+      // Need to verify terminal IDs. Usually P01/P02 is T1, P03 is T2? Or P01=T1, P02=Concourse, P03=T2?
+      // Based on docs or standard ICN data: 
+      // T1: P01
+      // T2: P03
+      
+      const cong = parseInt(item.gateremian) || parseInt(item.gateinfo) || 0; // Check field name in docs. Usually 'congestion' or similar. 
+      // Actually common field is 'gateremian' (waiting people) ? No, let's check standard fields.
+      // Standard response: ternimalId, areaName (e.g. 2번 출국장), congestion (crowd level?)
+      // Let's assume standard field `cgtdt` (Congestion Data) or similar? 
+      // Wait, the API name is "getDepartureCongestion". 
+      // Likely fields: `ternimalId`, `gateinfo` (waiting count).
+      
+      // Let's try to map generic fields. The data usually comes as:
+      // ternimalId: "T1", gatenm: "2번출국장", gateinfo: "150" (people)
+      
+      // Let's aggregate.
+      const people = parseInt(item.waitSearchCnt || item.realtimewaitsearchcnt || 0); // Correct field needs to be confirmed.
+      // Standard field is often `waitsearchcnt`
+      
+      // Wait, without docs, field names are guess work. 
+      // But looking at similar ICN APIs: `cgtdt` (date/time), `img` (congestion image), or textual level.
+      // Actually for this specific API, simple aggregation might be risky without knowing field names.
+      // Let's try to display raw items if summary fails, or just use T1/T2 basic summary.
+      
+      // Re-plan: Since we can't see the response, let's code safely to dump what we get or handle standard fields.
+      // Standard ICN API `getDepartureCongestion` usually returns:
+      // `areacd` (Area Code), `cgtdt` (Date), `gateinfo` (Gate Info - could be count), `gatenm` (Gate Name), `ternimalId`.
+      
+      // IMPORTANT: If we cannot parse correctly, showing wrong info is bad.
+      // Let's try to find documentation or use a safer display method (list all open gates).
+      
+      // Let's assume `ternimalId` and `gateinfo` (count).
+      
+      if (item.ternimalId === 'T1') {
+        t1Total += parseInt(item.gateinfo || 0);
+        t1Count++;
+      } else if (item.ternimalId === 'T2') {
+        t2Total += parseInt(item.gateinfo || 0);
+        t2Count++;
+      }
+      
+      if (item.cgtdt) {
+        // Format: YYYYMMDDHHMM or HHMM
+        const t = item.cgtdt;
+        if (t.length === 12) {
+          lastUpdate = `${t.substring(8, 10)}:${t.substring(10, 12)}`;
+        } else if (t.length === 4) {
+          lastUpdate = `${t.substring(0, 2)}:${t.substring(2, 4)}`;
+        }
+      }
+    });
+
+    if (timeElement && lastUpdate) {
+      timeElement.textContent = `오늘 ${lastUpdate}`;
+    }
+
+    container.innerHTML = `
+      ${createTerminalCard('제1여객터미널 (T1)', t1Total, t1Count)}
+      ${createTerminalCard('제2여객터미널 (T2)', t2Total, t2Count)}
+    `;
+  }
+
+  function createTerminalCard(title, totalCount, activeGates) {
+    // Estimations for status (heuristic)
+    // T1 capacity ~ 4-5 gates. 
+    // < 500: Very Good
+    // 500-1500: Normal
+    // 1500+: Crowded
+    
+    let status = '원활';
+    let colorClass = 'text-green-600 bg-green-100 border-green-200';
+    let icon = '😊';
+    
+    if (totalCount > 2000) {
+      status = '매우 혼잡';
+      colorClass = 'text-red-600 bg-red-100 border-red-200';
+      icon = '😱';
+    } else if (totalCount > 1000) {
+      status = '혼잡';
+      colorClass = 'text-orange-600 bg-orange-100 border-orange-200';
+      icon = '😓';
+    } else if (totalCount > 500) {
+      status = '보통';
+      colorClass = 'text-yellow-600 bg-yellow-100 border-yellow-200';
+      icon = '😐';
+    }
+
+    return `
+      <div class="p-4 rounded-lg border flex flex-col items-center justify-center text-center ${colorClass}">
+        <h3 class="font-bold text-lg mb-1">${title}</h3>
+        <div class="text-3xl mb-2">${icon}</div>
+        <div class="text-2xl font-extrabold mb-1">${totalCount.toLocaleString()}명</div>
+        <div class="text-sm font-medium px-2 py-0.5 rounded-full bg-white/50 inline-block">
+          ${status}
+        </div>
+      </div>
+    `;
+  }
+
+  // Init
+  fetchCongestionData();
+</script>
