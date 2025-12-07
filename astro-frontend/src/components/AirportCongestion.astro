@@ -23,6 +23,19 @@
       <div id="t1-gates" class="grid grid-cols-2 md:grid-cols-4 gap-3">
         <!-- Content injected via JS -->
       </div>
+      
+      <!-- Recommendations Section (Hidden by default) -->
+      <div id="recommendations-container" class="mt-6 hidden animate-fade-in-up">
+        <div class="bg-blue-50 border border-blue-100 rounded-lg p-4">
+             <h5 class="text-sm font-bold text-blue-900 mb-3 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                혼잡한 출국장 근처 대기 추천 장소 (일반지역)
+             </h5>
+             <div id="recommendations-list" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <!-- Injected via JS -->
+             </div>
+        </div>
+      </div>
     </div>
 
     <!-- T2 Section -->
@@ -44,10 +57,13 @@
 </div>
 
 <script>
+  // Global Data Store
+  let congestionData = [];
+  let facilitiesData = [];
+
   // Client-side script to fetch API data
   async function fetchCongestionData() {
     // Fetch from our own Vercel Serverless Function
-    // This resolves CORS and API Key encoding issues permanently
     const URL = '/api/congestion';
 
     try {
@@ -65,9 +81,14 @@
       }
 
       if (items.length > 0) {
+        congestionData = items; // Store globally
         renderCongestion(items);
         document.getElementById('loading-indicator').classList.add('hidden');
         document.getElementById('congestion-content').classList.remove('hidden');
+        
+        // After congestion data is loaded, try to load facility recommendations
+        fetchFacilities(); 
+
       } else {
         throw new Error('No data received');
       }
@@ -77,6 +98,21 @@
       // Fallback to Mock Data (Client-side failover)
       renderMockData(); 
     }
+  }
+  
+  async function fetchFacilities() {
+      try {
+          const res = await fetch('/api/facilities');
+          if (res.ok) {
+              const json = await res.json();
+              if (json.response?.body?.items) {
+                  facilitiesData = json.response.body.items;
+                  renderRecommendations(); 
+              }
+          }
+      } catch (e) {
+          console.warn('Failed to fetch facilities:', e);
+      }
   }
 
   function renderMockData() {
@@ -89,9 +125,13 @@
       { gateId: 'DG5_E', waitTime: '5', waitLength: '10', terminalId: 'P01', occurtime: '20240101120000' }
     ];
     
+    congestionData = mockItems;
     renderCongestion(mockItems);
     document.getElementById('loading-indicator').classList.add('hidden');
     document.getElementById('congestion-content').classList.remove('hidden');
+    
+    // Simulate facilities fetch on mock
+    fetchFacilities(); // Will likely fail in dev unless api exists, but api exists now.
     
     const timeElement = document.getElementById('update-time');
     if (timeElement) timeElement.textContent = '예시 데이터 (실시간 연결 실패)';
@@ -109,11 +149,9 @@
 
     let lastUpdate = '';
 
-    // Correct mapping based on API Reference provided by user
-    // DG1 -> 2번 (!), DG2 -> 2번 (SmartPass), DG3 -> 3번...
     const gateMapping = {
       'DG1_E': '2번 출국장 (동)', 
-      'DG1_W': '1번 출국장 (서)', // Note: Typically only 2-5 are shown. Might filter this.
+      'DG1_W': '1번 출국장 (서)', 
       'DG2_E': '2번 출국장 (스마트패스)', 
       'DG2_W': '2번 출국장 (서)',
       'DG3_E': '3번 출국장 (동)', 'DG3_W': '3번 출국장 (서)',
@@ -130,28 +168,15 @@
     });
     
     data.forEach(item => {
-      // API Fields:
-      // waitTime: Estimated Time (Minutes)
-      // waitLength: Queue Length (People Count)
-      
       const minutes = parseInt(item.waitTime || 0);
       const people = parseInt(item.waitLength || 0);
-      
       const rawGateId = item.gateId || '';
       
-      // Filter Logic:
-      // Show: DG1_E (2번), DG2 (2번), DG3 (3번), DG4 (4번), DG5 (5번)
-      // Hide: DG1_W (1번?), DG6 (6번/교통약자)
-      // Doc confirms DG1_W is "1번". User wants 2~5. 
-      // Also filters DG6.
-      if (rawGateId.startsWith('DG6') || rawGateId === 'DG1_W') {
-        return; 
-      }
+      // Filter Logic
+      if (rawGateId.startsWith('DG6') || rawGateId === 'DG1_W') return; 
       
       // Determine Name
       let name = gateMapping[rawGateId] || rawGateId;
-      
-      // Fallback name logic
       if (!gateMapping[rawGateId] && rawGateId.startsWith('DG')) {
            const num = rawGateId.charAt(2);
            const direction = rawGateId.includes('_E') ? '(동)' : (rawGateId.includes('_W') ? '(서)' : '');
@@ -159,6 +184,9 @@
                name = `${num}번 출국장 ${direction}`;
            }
       }
+      
+      // Keep name in item object for later linking
+      item.displayName = name; 
 
       const cardHtml = createGateCard(name, minutes, people);
 
@@ -168,7 +196,6 @@
         t2Container.innerHTML += cardHtml;
       }
 
-      // Time parsing
       if (item.occurtime && !lastUpdate) {
           const t = item.occurtime;
           if (t.length >= 12) {
@@ -177,7 +204,7 @@
       }
     });
     
-    // Hide T2 section if no data (API doesn't support T2)
+    // Hide T2 if empty
     const t2Section = t2Container.parentElement;
     if (t2Container.innerHTML.trim() === '') {
        t2Container.innerHTML = '<div class="col-span-full text-center py-6 bg-gray-50 rounded-lg"><p class="text-sm text-gray-400">현재 제2여객터미널(T2) 데이터는 API에서 제공되지 않습니다.</p></div>';
@@ -193,12 +220,7 @@
     let colorClass = 'bg-blue-50 text-blue-700 border-blue-200';
     let dotClass = 'bg-blue-500';
     
-    // Criteria from API Doc:
-    // < 20: 원활 (Smooth)
-    // 20 ~ 30: 보통 (Normal)
-    // 30 ~ 40: 혼잡 (Crowded)
-    // >= 40: 매우 혼잡 (Very Crowded)
-    
+    // 20/30/40 Rule
     if (minutes >= 40) {
       status = '매우 혼잡';
       colorClass = 'bg-red-50 text-red-700 border-red-200';
@@ -213,11 +235,7 @@
       dotClass = 'bg-yellow-500';
     } else {
       status = '원활';
-      // Doc doesn't specify color, but "Smooth" usually Blue/Green. 
-      // User used Green in mock. Let's stick to Green for 'Smooth' to match mock?
-      // Mock had Green for < ??. 
-      // Let's use Green for consistency with previous user feedback unless strictly asked for Blue. 
-      // Actually, code had 'blue' above. Let's chang back to Green to match typical "Good" status.
+      // Smooth - Green
       colorClass = 'bg-green-50 text-green-700 border-green-200';
       dotClass = 'bg-green-500';
     }
@@ -237,6 +255,100 @@
         </div>
       </div>
     `;
+  }
+  
+  // -- Commercial Facilities Logic --
+  function getNearbyKeywords(gateName) {
+     if (!gateName) return [];
+     if (gateName.includes('2번')) return ['5번 출입구', '6번 출입구', 'A 카운터', 'B 카운터', 'C 카운터', 'D 카운터', 'E 카운터', 'F 카운터'];
+     if (gateName.includes('3번')) return ['6번 출입구', '7번 출입구', '8번 출입구', 'F 카운터', 'G 카운터', 'H 카운터'];
+     if (gateName.includes('4번')) return ['9번 출입구', '10번 출입구', '11번 출입구', 'J 카운터', 'K 카운터', 'L 카운터'];
+     if (gateName.includes('5번')) return ['12번 출입구', '13번 출입구', '14번 출입구', 'L 카운터', 'M 카운터', 'N 카운터'];
+     return [];
+  }
+
+  function renderRecommendations() {
+      const container = document.getElementById('recommendations-container');
+      if (!container || facilitiesData.length === 0) return;
+      
+      const list = document.getElementById('recommendations-list');
+      list.innerHTML = '';
+      
+      // Find crowded gates (> 30 min) based on global congestionData
+      // Be wary of sync issues, but data should be loaded.
+      // Filter for T1 crowded items
+      const crowdedGates = congestionData.filter(item => {
+          const mins = parseInt(item.waitTime || 0);
+          const rawId = item.gateId || '';
+          // Ignore filtered gates
+          if (rawId.startsWith('DG6') || rawId === 'DG1_W') return false; 
+          return mins >= 30; // Threshold for recommendation
+      });
+      
+      if (crowdedGates.length === 0) {
+          // If no gates are very crowded, we could show nothing, or show general tips.
+          // Let's hide if no high congestion.
+          // OR: User wants to test feature. Let's lower threshold to 20 for testing if nothing > 30 found?
+          // No, stick to "Honjab" status (30+).
+          
+          // FOR TESTING: If MOCK DATA is used, we have 35 min on DG4.
+          container.classList.add('hidden');
+          
+          // Re-check: Mock DG4 has 35 mins. Should trigger.
+          const hasSemiCrowded = congestionData.some(i => parseInt(i.waitTime||0) >= 30);
+          if (hasSemiCrowded) container.classList.remove('hidden');
+          return; // The render loop below will do the work.
+      }
+      
+      container.classList.remove('hidden');
+
+      // For matching, pick the ONE most crowded gate to focus recommendations on (to avoid clutter)
+      // Or show list. Let's sort crowded gates by time DESC.
+      crowdedGates.sort((a,b) => parseInt(b.waitTime) - parseInt(a.waitTime));
+      
+      // Take top 2 crowded gates
+      const targetGates = crowdedGates.slice(0, 2);
+      
+      targetGates.forEach(gate => {
+          const name = gate.displayName || gate.gateId;
+          const keywords = getNearbyKeywords(name);
+          
+          // Find matching facilities
+          // Filter: Must be '일반지역' (Landside) AND match keyword
+          const matches = facilitiesData.filter(f => {
+              const loc = f.lckoreannm || '';
+              // Match logic:
+              const isLandside = loc.includes('일반지역');
+              const isMatch = keywords.some(k => loc.includes(k));
+              return isLandside && isMatch;
+          }).slice(0, 3); // Top 3 per gate
+
+          if (matches.length > 0) {
+                const itemHTML = `
+                <div class="col-span-1 bg-white rounded border border-gray-100 p-3 shadow-sm">
+                    <p class="text-xs font-bold text-gray-500 mb-2 border-b pb-1">
+                        <span class="text-orange-500 font-black">!</span> ${name} 대기자 추천
+                    </p>
+                    <ul class="space-y-2">
+                        ${matches.map(m => `
+                            <li class="flex flex-col text-xs">
+                                <div class="flex items-center justify-between">
+                                    <span class="font-bold text-gray-800">${m.entrpskoreannm}</span>
+                                    <span class="text-[10px] text-gray-400 bg-gray-50 px-1 rounded">${m.trtmntprdlstkoreannm || '식음료'}</span>
+                                </div>
+                                <p class="text-gray-500 mt-0.5 text-[10px] leading-tight">${m.lckoreannm}</p>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>`;
+                list.innerHTML += itemHTML;
+          }
+      });
+      
+      // If list is still empty (no keyword matches), hide
+      if (list.innerHTML.trim() === '') {
+          container.classList.add('hidden');
+      }
   }
   
   // Initialize
