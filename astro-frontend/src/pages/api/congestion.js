@@ -1,11 +1,15 @@
 export const prerender = false;
 
 export async function GET({ request }) {
-    // Use the Encoded Key directly as provided
-    const API_KEY = '3VQy09yaoEDW9vaJMuhcuAA1m5H%2BwFx17E%2FzHIM0HtiS32TisxVMBrfrGfsaU%2Bk5BHczuT%2Bc19Jt9VUl7qkAbA%3D%3D';
+    // NEW Corrected API Key provided by user
+    const API_KEY = '3VQy09yAoEDW9vaJMuhcuAA1m5H%2BwFx17E%2FzHlM0HtiS32TisxVMbRfrGfSaU%2Bk5BHczuT%2Bc19Jt9VUl7qkAbA%3D%3D';
 
     // Construct URL by string concatenation to preserve the key format
-    const TARGET_URL = `https://apis.data.go.kr/B551177/StatusOfDepartureCongestion/getDepartureCongestion?serviceKey=${API_KEY}&numOfRows=20&pageNo=1&type=json`;
+    // User provided endpoint: https://apis.data.go.kr/B551177/statusOfDepartureCongestion
+    // We append the operation name: /getDepartureCongestion
+    // Also updated casing 'Status' -> 'status' based on user input, though standard is often 'Status'.
+    // Let's try the user's provided casing 'statusOfDepartureCongestion'.
+    const TARGET_URL = `https://apis.data.go.kr/B551177/statusOfDepartureCongestion/getDepartureCongestion?serviceKey=${API_KEY}&numOfRows=20&pageNo=1&type=json`;
 
     try {
         const response = await fetch(TARGET_URL, {
