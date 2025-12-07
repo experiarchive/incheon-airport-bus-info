@@ -80,16 +80,13 @@
   }
 
   function renderMockData() {
-    // Realistic fallback data
+    // Realistic fallback data matching API Reference
     const mockItems = [
       { gateId: 'DG1_E', waitTime: '15', waitLength: '45', terminalId: 'P01', occurtime: '20240101120000' },
       { gateId: 'DG2_E', waitTime: '25', waitLength: '80', terminalId: 'P01', occurtime: '20240101120000' },
       { gateId: 'DG3_E', waitTime: '10', waitLength: '20', terminalId: 'P01', occurtime: '20240101120000' },
       { gateId: 'DG4_E', waitTime: '35', waitLength: '120', terminalId: 'P01', occurtime: '20240101120000' },
-      { gateId: 'DG5_E', waitTime: '5', waitLength: '10', terminalId: 'P01', occurtime: '20240101120000' },
-      
-      { gateId: 'DG252', waitTime: '10', waitLength: '15', terminalId: 'P02', occurtime: '20240101120000' },
-      { gateId: 'DG253', waitTime: '20', waitLength: '40', terminalId: 'P02', occurtime: '20240101120000' }
+      { gateId: 'DG5_E', waitTime: '5', waitLength: '10', terminalId: 'P01', occurtime: '20240101120000' }
     ];
     
     renderCongestion(mockItems);
@@ -112,49 +109,56 @@
 
     let lastUpdate = '';
 
+    // Correct mapping based on API Reference provided by user
+    // DG1 -> 2번 (!), DG2 -> 2번 (SmartPass), DG3 -> 3번...
     const gateMapping = {
-      'DG1_E': '2번 출국장 (동)', 'DG1_W': '2번 출국장 (서)',
-      'DG2_E': '3번 출국장 (동)', 'DG2_W': '3번 출국장 (서)',
-      'DG3_E': '4번 출국장 (동)', 'DG3_W': '4번 출국장 (서)',
-      'DG4_E': '5번 출국장 (동)', 'DG4_W': '5번 출국장 (서)',
-      'DG5_E': '6번 출국장 (동)', 'DG5_W': '6번 출국장 (서)',
-      'DG6_E': '기타 출국장', 'DG6_W': '기타 출국장'
+      'DG1_E': '2번 출국장 (동)', 
+      'DG1_W': '1번 출국장 (서)', // Note: Typically only 2-5 are shown. Might filter this.
+      'DG2_E': '2번 출국장 (스마트패스)', 
+      'DG2_W': '2번 출국장 (서)',
+      'DG3_E': '3번 출국장 (동)', 'DG3_W': '3번 출국장 (서)',
+      'DG4_E': '4번 출국장 (동)', 'DG4_W': '4번 출국장 (서)',
+      'DG5_E': '5번 출국장 (동)', 'DG5_W': '5번 출국장 (서)',
+      'DG6_E': '6번 출국장 (동)', 'DG6_W': '6번 출국장 (서)'
     };
     
-    // Sort logic could go here if needed
+    // Sort logic
+    data.sort((a, b) => {
+       const idA = a.gateId || '';
+       const idB = b.gateId || '';
+       return idA.localeCompare(idB);
+    });
     
     data.forEach(item => {
       // API Fields:
-      // waitTime: Estimated Time (Minutes) - e.g. "9"
-      // waitLength: Queue Length (People Count) - e.g. "51"
+      // waitTime: Estimated Time (Minutes)
+      // waitLength: Queue Length (People Count)
       
       const minutes = parseInt(item.waitTime || 0);
       const people = parseInt(item.waitLength || 0);
       
       const rawGateId = item.gateId || '';
       
-      // Filter: Skip DG5 and DG6 (Gate 6/7) - not displayed in official congestion info
-      // T1 shows 2~5번 출국장 only.
-      if (rawGateId.startsWith('DG5') || rawGateId.startsWith('DG6')) {
-        return; // Skip this item
+      // Filter Logic:
+      // Show: DG1_E (2번), DG2 (2번), DG3 (3번), DG4 (4번), DG5 (5번)
+      // Hide: DG1_W (1번?), DG6 (6번/교통약자)
+      // Doc confirms DG1_W is "1번". User wants 2~5. 
+      // Also filters DG6.
+      if (rawGateId.startsWith('DG6') || rawGateId === 'DG1_W') {
+        return; 
       }
       
       // Determine Name
       let name = gateMapping[rawGateId] || rawGateId;
       
-      if (rawGateId.startsWith('DG')) {
-        const num = parseInt(rawGateId.charAt(2));
-        if (!isNaN(num) && num < 10) { // Safety check for small numbers usually T1
+      // Fallback name logic
+      if (!gateMapping[rawGateId] && rawGateId.startsWith('DG')) {
+           const num = rawGateId.charAt(2);
            const direction = rawGateId.includes('_E') ? '(동)' : (rawGateId.includes('_W') ? '(서)' : '');
-           if (direction) {
-             name = `${num + 1}번 출국장 ${direction}`;
+           if (!isNaN(parseInt(num))) {
+               name = `${num}번 출국장 ${direction}`;
            }
-        }
       }
-
-      // Special handling for T2 if we learn their IDs
-      // T2 IDs often start differently or just map geographically. 
-      // For now, if unmapped, show raw ID.
 
       const cardHtml = createGateCard(name, minutes, people);
 
@@ -173,13 +177,10 @@
       }
     });
     
-    // Hide T2 section if no data
+    // Hide T2 section if no data (API doesn't support T2)
     const t2Section = t2Container.parentElement;
-    if (t2Container.innerHTML.trim() === '' && t2Section) {
-      // Option 1: Hide completely
-      t2Section.classList.add('hidden');
-      // Option 2: Show message (uncomment below)
-      // t2Container.innerHTML = '<p class="text-sm text-gray-400 col-span-full text-center py-4">T2 데이터가 제공되지 않습니다.</p>';
+    if (t2Container.innerHTML.trim() === '') {
+       t2Container.innerHTML = '<div class="col-span-full text-center py-6 bg-gray-50 rounded-lg"><p class="text-sm text-gray-400">현재 제2여객터미널(T2) 데이터는 API에서 제공되지 않습니다.</p></div>';
     }
 
     if (timeElement && lastUpdate) {
@@ -189,21 +190,36 @@
 
   function createGateCard(name, minutes, people) {
     let status = '원활';
-    let colorClass = 'bg-green-50 text-green-700 border-green-200';
-    let dotClass = 'bg-green-500';
+    let colorClass = 'bg-blue-50 text-blue-700 border-blue-200';
+    let dotClass = 'bg-blue-500';
     
-    // Detailed criteria based on Minutes (Wait Time)
-    // < 15 min: Good
-    // 15 - 30 min: Normal/Busy
-    // > 30 min: Crowded
-    if (minutes >= 30) {
+    // Criteria from API Doc:
+    // < 20: 원활 (Smooth)
+    // 20 ~ 30: 보통 (Normal)
+    // 30 ~ 40: 혼잡 (Crowded)
+    // >= 40: 매우 혼잡 (Very Crowded)
+    
+    if (minutes >= 40) {
       status = '매우 혼잡';
       colorClass = 'bg-red-50 text-red-700 border-red-200';
       dotClass = 'bg-red-500';
-    } else if (minutes >= 15) {
-      status = '다소 혼잡';
+    } else if (minutes >= 30) {
+      status = '혼잡';
+      colorClass = 'bg-orange-50 text-orange-700 border-orange-200';
+      dotClass = 'bg-orange-500';
+    } else if (minutes >= 20) {
+      status = '보통';
       colorClass = 'bg-yellow-50 text-yellow-700 border-yellow-200';
       dotClass = 'bg-yellow-500';
+    } else {
+      status = '원활';
+      // Doc doesn't specify color, but "Smooth" usually Blue/Green. 
+      // User used Green in mock. Let's stick to Green for 'Smooth' to match mock?
+      // Mock had Green for < ??. 
+      // Let's use Green for consistency with previous user feedback unless strictly asked for Blue. 
+      // Actually, code had 'blue' above. Let's chang back to Green to match typical "Good" status.
+      colorClass = 'bg-green-50 text-green-700 border-green-200';
+      dotClass = 'bg-green-500';
     }
 
     return `
