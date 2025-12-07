@@ -108,15 +108,17 @@
   }
 </style>
 
-<script>
   // State
   let allFacilities = [];
   let currentTerminal = 'P01'; // Default to T1
   let currentArea = '';       // Default All
   let currentCategory = null; // null = Show Categories View
   let searchQuery = '';
+  // Pagination State
+  let currentPage = 1;
+  const ITEMS_PER_PAGE = 12;
 
-  // Icon Mapping
+  // Icon Mapping (Unchanged)
   const CATEGORY_MAP = {
     '식음료': { icon: '🍽️', label: '식당/카페', keywords: ['식당', '카페', '베이커리', '식음료', '패스트푸드'] },
     '쇼핑': { icon: '🛍️', label: '면세점/쇼핑', keywords: ['면세점', '쇼핑', '편의점', '의류', '화장품', '잡화', '서점'] },
@@ -143,7 +145,6 @@
           allFacilities = json.response.body.items;
           document.getElementById('facilities-loading').classList.add('hidden');
         } else {
-             // Handle empty response
              allFacilities = [];
              document.getElementById('facilities-loading').innerHTML = '<p>데이터가 없습니다.</p>';
         }
@@ -166,7 +167,6 @@
   }
 
   function getAvailableCategories() {
-    // Current Context (Terminal + Area)
     const contextItems = allFacilities.filter(f => {
       if (currentTerminal && f.terminal !== currentTerminal) return false;
       if (currentArea && f.area !== currentArea) return false;
@@ -178,7 +178,6 @@
       groups.add(getGroupedCategory(f.category));
     });
 
-    // Always include these basic groups if they exist, keep order
     return Object.keys(CATEGORY_MAP).filter(key => groups.has(key));
   }
 
@@ -186,7 +185,6 @@
     const categoryView = document.getElementById('category-view');
     const listView = document.getElementById('list-view');
 
-    // Update Toggle Styles
     document.querySelectorAll('.terminal-toggle').forEach(btn => {
       if (btn.dataset.value === currentTerminal) btn.classList.add('active-toggle', 'bg-white', 'dark:bg-gray-600', 'shadow-sm');
       else btn.classList.remove('active-toggle', 'bg-white', 'dark:bg-gray-600', 'shadow-sm');
@@ -197,12 +195,10 @@
     });
 
     if (currentCategory) {
-      // LIST VIEW
       categoryView.classList.add('hidden');
       listView.classList.remove('hidden');
       renderList();
     } else {
-      // CATEGORY VIEW
       listView.classList.add('hidden');
       categoryView.classList.remove('hidden');
       renderCategories();
@@ -220,7 +216,6 @@
 
     grid.innerHTML = available.map(key => {
       const config = CATEGORY_MAP[key];
-      // Count items in this category for current context
       const count = allFacilities.filter(f => {
         if (currentTerminal && f.terminal !== currentTerminal) return false;
         if (currentArea && f.area !== currentArea) return false;
@@ -245,39 +240,67 @@
     const badge = document.getElementById('current-category-badge');
     const countEl = document.getElementById('result-count');
     const empty = document.getElementById('list-empty');
+    let loadMoreContainer = document.getElementById('load-more-container'); // Check if exists
+
+    // Create Load More container if it doesn't exist
+    if (!loadMoreContainer) {
+      loadMoreContainer = document.createElement('div');
+      loadMoreContainer.id = 'load-more-container';
+      loadMoreContainer.className = 'col-span-full text-center mt-6 hidden';
+      loadMoreContainer.innerHTML = `
+        <button id="load-more-btn" class="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm font-semibold rounded-full transition-colors flex items-center justify-center mx-auto gap-2">
+          <span>더 보기</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      `;
+      grid.parentNode.appendChild(loadMoreContainer);
+      
+      // Bind event listener properly
+      document.getElementById('load-more-btn').addEventListener('click', () => {
+        currentPage++;
+        renderList();
+      });
+    }
 
     const config = CATEGORY_MAP[currentCategory];
     badge.textContent = config ? config.label : '전체';
 
-    const items = allFacilities.filter(f => {
+    const allFilteredItems = allFacilities.filter(f => {
       if (currentTerminal && f.terminal !== currentTerminal) return false;
       if (currentArea && f.area !== currentArea) return false;
       if (currentCategory !== '기타' && getGroupedCategory(f.category) !== currentCategory) return false;
       if (currentCategory === '기타' && getGroupedCategory(f.category) !== '기타') return false;
-      
       if (searchQuery && !f.name.toLowerCase().includes(searchQuery)) return false;
       return true;
     });
 
-    countEl.textContent = `총 ${items.length}개`;
+    countEl.textContent = `총 ${allFilteredItems.length}개`;
 
-    if (items.length === 0) {
+    if (allFilteredItems.length === 0) {
       grid.innerHTML = '';
       grid.classList.add('hidden');
       empty.classList.remove('hidden');
+      loadMoreContainer.classList.add('hidden');
       return;
     }
 
     grid.classList.remove('hidden');
     empty.classList.add('hidden');
 
-    grid.innerHTML = items.slice(0, 50).map(f => { // Increased limit to 50 for specific categories
+    // Pagination Logic
+    const displayCount = currentPage * ITEMS_PER_PAGE;
+    const displayItems = allFilteredItems.slice(0, displayCount);
+    
+    // Generate HTML
+    const cardsHtml = displayItems.map(f => {
       const areaLabel = f.area === 'Y' ? '면세' : '일반';
       const areaColor = f.area === 'Y' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300';
       const terminalLabel = f.terminal === 'P01' ? 'T1' : (f.terminal === 'P03' ? 'T2' : '');
 
       return `
-        <div class="border border-gray-100 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow bg-white dark:bg-gray-700 h-full flex flex-col">
+        <div class="border border-gray-100 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow bg-white dark:bg-gray-700 h-full flex flex-col animate-fade-in">
           <div class="flex items-start justify-between gap-2 mb-2">
             <h4 class="font-bold text-gray-800 dark:text-grey-100 text-sm leading-tight dark:text-white">${f.name || '-'}</h4>
             <div class="flex gap-1 flex-shrink-0">
@@ -306,14 +329,26 @@
         </div>
       `;
     }).join('');
+
+    grid.innerHTML = cardsHtml;
+
+    // Show/Hide Load More Button
+    if (allFilteredItems.length > displayCount) {
+      loadMoreContainer.classList.remove('hidden');
+      // Update button text to show remaining count
+      const remaining = allFilteredItems.length - displayCount;
+      const btnSpan = loadMoreContainer.querySelector('span');
+      if (btnSpan) btnSpan.textContent = `더 보기 (${remaining}개)`;
+    } else {
+      loadMoreContainer.classList.add('hidden');
+    }
   }
 
   function setupEventListeners() {
-    // Toggles
     document.querySelectorAll('.terminal-toggle').forEach(btn => {
       btn.addEventListener('click', (e) => {
         currentTerminal = e.target.dataset.value;
-        // If in list view, might need to re-validate category logic, but generally safe to stay
+        currentPage = 1; // Reset pagination
         render(); 
       });
     });
@@ -321,34 +356,35 @@
     document.querySelectorAll('.area-toggle').forEach(btn => {
       btn.addEventListener('click', (e) => {
         currentArea = e.target.dataset.value;
+        currentPage = 1; // Reset pagination
         render();
       });
     });
 
-    // Back Button
     document.getElementById('back-to-categories').addEventListener('click', () => {
       currentCategory = null;
       searchQuery = '';
+      currentPage = 1; // Reset pagination
       document.getElementById('facility-search').value = '';
       render();
     });
 
-    // Search
     document.getElementById('facility-search').addEventListener('input', (e) => {
       searchQuery = e.target.value.toLowerCase();
+      currentPage = 1; // Reset pagination
       renderList();
     });
 
-    // Reset Button
     document.getElementById('reset-filters-btn').addEventListener('click', () => {
       document.getElementById('facility-search').value = '';
       searchQuery = '';
+      currentPage = 1; // Reset pagination
       renderList();
     });
 
-    // Custom Event for Category Selection (needed because of innerHTML generation)
     window.selectCategory = (key) => {
       currentCategory = key;
+      currentPage = 1; // Reset pagination
       render();
     };
   }
