@@ -48,9 +48,10 @@
         try {
           (window.adsbygoogle = window.adsbygoogle || []).push({});
         } catch (e) {
-          if (!window.location.hostname.includes('localhost')) {
-            console.error('AdSense fixed push error:', e);
-          }
+          // Suppress errors (TagError is non-fatal and handled by global handler or retries)
+          // if (!window.location.hostname.includes('localhost')) {
+          //   console.error('AdSense fixed push error:', e);
+          // }
         }
         return true;
       } else if (retryCount < maxRetries) {
