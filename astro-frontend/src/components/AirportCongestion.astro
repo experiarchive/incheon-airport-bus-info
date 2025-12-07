@@ -44,18 +44,10 @@
 
 <script>
   // Client-side script to fetch API data
-  // Client-side script to fetch API data
   async function fetchCongestionData() {
-    // Use the API Key exactly as provided (Encoding Key)
-    const API_KEY = '3VQy09yaoEDW9vaJMuhcuAA1m5H%2BwFx17E%2FzHIM0HtiS32TisxVMBrfrGfsaU%2Bk5BHczuT%2Bc19Jt9VUl7qkAbA%3D%3D';
-    
-    // Construct Target URL
-    // Note: We append the key manually to avoid double-encoding issues if usage of URLSearchParams behaves differently.
-    const TARGET_URL = `https://apis.data.go.kr/B551177/StatusOfDepartureCongestion/getDepartureCongestion?serviceKey=${API_KEY}&numOfRows=20&pageNo=1&type=json`;
-    
-    // Use allorigins.win which is often more reliable for JSON
-    const PROXY_URL = 'https://api.allorigins.win/raw?url=';
-    const URL = PROXY_URL + encodeURIComponent(TARGET_URL);
+    // Fetch from our own Vercel Serverless Function
+    // This resolves CORS and API Key encoding issues permanently
+    const URL = '/api/congestion';
 
     try {
       const response = await fetch(URL);
