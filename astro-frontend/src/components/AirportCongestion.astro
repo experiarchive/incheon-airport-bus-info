@@ -1,45 +1,46 @@
 ---
 ---
 
-<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700" id="airport-congestion-card" style="display: none;">
-  <div class="flex items-center mb-4">
-    <svg class="w-6 h-6 mr-3 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-    </svg>
-    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">
+<div id="airport-congestion-container" class="mt-8 mb-8 bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-xl font-bold flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
       인천공항 출국장 실시간 혼잡도
-    </h2>
-  </div>
-  
-  <p class="text-gray-600 dark:text-gray-300 mb-6 text-sm">
-    <span id="update-time" class="font-medium text-gray-500">업데이트 중...</span> 기준 실시간 대기인원입니다.
-  </p>
-
-  <!-- Terminal 1 -->
-  <div class="mb-6">
-    <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200 mb-3 flex items-center">
-      <span class="w-2 h-8 bg-blue-600 rounded-sm mr-2"></span>
-      제1여객터미널 (T1)
     </h3>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="t1-grid">
-      <!-- T1 Gates will be injected here -->
+    <span id="update-time" class="text-xs text-gray-500 font-mono">업데이트 중...</span>
+  </div>
+
+  <div id="loading-indicator" class="flex justify-center py-8">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+  </div>
+
+  <div id="congestion-content" class="hidden space-y-8">
+    <!-- T1 Section -->
+    <div>
+      <h4 class="text-lg font-bold text-blue-800 border-l-4 border-blue-600 pl-2 mb-4">제1여객터미널 (T1)</h4>
+      <div id="t1-gates" class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <!-- Content injected via JS -->
+      </div>
+    </div>
+
+    <!-- T2 Section -->
+    <div>
+      <h4 class="text-lg font-bold text-green-800 border-l-4 border-green-600 pl-2 mb-4">제2여객터미널 (T2)</h4>
+      <div id="t2-gates" class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <!-- Content injected via JS -->
+      </div>
+    </div>
+    
+    <div class="text-right mt-2">
+      <p class="text-[10px] text-gray-400">데이터 제공: 인천국제공항공사 (API 상태에 따라 지연될 수 있습니다)</p>
     </div>
   </div>
 
-  <!-- Terminal 2 -->
-  <div>
-    <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200 mb-3 flex items-center">
-      <span class="w-2 h-8 bg-green-600 rounded-sm mr-2"></span>
-      제2여객터미널 (T2)
-    </h3>
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="t2-grid">
-      <!-- T2 Gates will be injected here -->
-    </div>
+  <div id="api-error" class="hidden text-center py-4 bg-red-50 rounded-lg">
+    <p class="text-sm text-red-600">데이터를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.</p>
   </div>
-  
-  <p class="mt-6 text-xs text-gray-400 text-right">
-    데이터 제공: 인천국제공항공사 (API 상태에 따라 지연될 수 있습니다)
-  </p>
 </div>
 
 <script>
@@ -50,51 +51,60 @@
     const URL = '/api/congestion';
 
     try {
-      const response = await fetch(URL);
+      const response = await fetch(URL, { headers: { 'Accept': 'application/json' } });
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('API Error Response:', errorText);
         throw new Error(`Network response was not ok: ${response.status}`);
       }
       const data = await response.json();
       
-      const items = data.response?.body?.items;
-      if (items && items.length > 0) {
-        renderCongestionData(items);
-        document.getElementById('airport-congestion-card').style.display = 'block';
+      let items = [];
+      if (data.response && data.response.body && data.response.body.items) {
+        items = data.response.body.items;
+      } else if (Array.isArray(data)) {
+        items = data; // Fallback structure
       }
-    } catch (error) {
-      console.error('Failed to fetch airport congestion data:', error);
-      
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        console.warn('Using mock data for development testing.');
-        const MOCK_DATA = [
-          // T1: Typically Gates 2, 3, 4, 5 are main. Gate 6 is sometimes open. Gate 1 is rare/closed.
-          { ternimalId: 'T1', gatenm: '2번 출국장', gateinfo: 120, cgtdt: '202312071300' },
-          { ternimalId: 'T1', gatenm: '3번 출국장', gateinfo: 230, cgtdt: '202312071300' },
-          { ternimalId: 'T1', gatenm: '4번 출국장', gateinfo: 150, cgtdt: '202312071300' },
-          { ternimalId: 'T1', gatenm: '5번 출국장', gateinfo: 80, cgtdt: '202312071300' },
-          { ternimalId: 'T1', gatenm: '6번 출국장', gateinfo: 90, cgtdt: '202312071300' },
-          
-          // T2: Typically Gates 1, 2
-          { ternimalId: 'T2', gatenm: '1번 출국장', gateinfo: 300, cgtdt: '202312071300' },
-          { ternimalId: 'T2', gatenm: '2번 출국장', gateinfo: 450, cgtdt: '202312071300' }
-        ];
-        renderCongestionData(MOCK_DATA);
-        const card = document.getElementById('airport-congestion-card');
-        if (card) card.style.display = 'block';
+
+      if (items.length > 0) {
+        renderCongestion(items);
+        document.getElementById('loading-indicator').classList.add('hidden');
+        document.getElementById('congestion-content').classList.remove('hidden');
       } else {
-        const card = document.getElementById('airport-congestion-card');
-        if (card) card.style.display = 'none';
+        throw new Error('No data received');
       }
+
+    } catch (error) {
+      console.error('API Fetch failed:', error);
+      // Fallback to Mock Data (Client-side failover)
+      renderMockData(); 
     }
   }
 
-  function renderCongestionData(data) {
-    const t1Container = document.getElementById('t1-grid');
-    const t2Container = document.getElementById('t2-grid');
-    const timeElement = document.getElementById('update-time');
+  function renderMockData() {
+    // Realistic fallback data
+    const mockItems = [
+      { gateId: 'DG1_E', waitTime: '15', waitLength: '45', terminalId: 'P01', occurtime: '20240101120000' },
+      { gateId: 'DG2_E', waitTime: '25', waitLength: '80', terminalId: 'P01', occurtime: '20240101120000' },
+      { gateId: 'DG3_E', waitTime: '10', waitLength: '20', terminalId: 'P01', occurtime: '20240101120000' },
+      { gateId: 'DG4_E', waitTime: '35', waitLength: '120', terminalId: 'P01', occurtime: '20240101120000' },
+      { gateId: 'DG5_E', waitTime: '5', waitLength: '10', terminalId: 'P01', occurtime: '20240101120000' },
+      
+      { gateId: 'DG252', waitTime: '10', waitLength: '15', terminalId: 'P02', occurtime: '20240101120000' },
+      { gateId: 'DG253', waitTime: '20', waitLength: '40', terminalId: 'P02', occurtime: '20240101120000' }
+    ];
     
+    renderCongestion(mockItems);
+    document.getElementById('loading-indicator').classList.add('hidden');
+    document.getElementById('congestion-content').classList.remove('hidden');
+    
+    const timeElement = document.getElementById('update-time');
+    if (timeElement) timeElement.textContent = '예시 데이터 (실시간 연결 실패)';
+  }
+
+  function renderCongestion(data) {
+    const t1Container = document.getElementById('t1-gates');
+    const t2Container = document.getElementById('t2-gates');
+    const timeElement = document.getElementById('update-time');
+
     if (!t1Container || !t2Container) return;
 
     t1Container.innerHTML = '';
@@ -102,65 +112,45 @@
 
     let lastUpdate = '';
 
-    // Sort items by Gate Name properly
-    data.sort((a, b) => {
-      if (a.gatenm < b.gatenm) return -1;
-      if (a.gatenm > b.gatenm) return 1;
-      return 0;
-    });
-
-    // Map Gate IDs to friendly names
-    // T1: DG1_E/W -> 2번, DG2 -> 3번... 
-    // Reference: Incheon Airport usually maps DG codes to physical gate numbers.
-    // Based on common API patterns:
-    // DG1 -> 2번 출국장
-    // DG2 -> 3번 출국장
-    // DG3 -> 4번 출국장
-    // DG4 -> 5번 출국장
-    // DG5 -> 6번 출국장 (Actually T1 has 2-5 common, 6 is special?)
-    // Let's deduce or use generic names if unsure.
-    // Better strategy: Map known IDs.
     const gateMapping = {
       'DG1_E': '2번 출국장 (동)', 'DG1_W': '2번 출국장 (서)',
       'DG2_E': '3번 출국장 (동)', 'DG2_W': '3번 출국장 (서)',
       'DG3_E': '4번 출국장 (동)', 'DG3_W': '4번 출국장 (서)',
       'DG4_E': '5번 출국장 (동)', 'DG4_W': '5번 출국장 (서)',
-      'DG5_E': '6번 출국장 (동)', 'DG5_W': '6번 출국장 (서)', // Assuming structure
+      'DG5_E': '6번 출국장 (동)', 'DG5_W': '6번 출국장 (서)',
       'DG6_E': '기타 출국장', 'DG6_W': '기타 출국장'
     };
     
-    // T1 has gates 2, 3, 4, 5, 6.
-    // Simplifying display to aggregate or show distinct if data allows.
-    // For now, map directly.
-
+    // Sort logic could go here if needed
+    
     data.forEach(item => {
-      // API Field Parsing
-      const count = parseInt(item.waitTime || 0); // 'waitTime' is the field for person count in this API
-      const rawGateId = item.gateId;
+      // API Fields:
+      // waitTime: Estimated Time (Minutes) - e.g. "9"
+      // waitLength: Queue Length (People Count) - e.g. "51"
+      
+      const minutes = parseInt(item.waitTime || 0);
+      const people = parseInt(item.waitLength || 0);
+      
+      const rawGateId = item.gateId || '';
       
       // Determine Name
       let name = gateMapping[rawGateId] || rawGateId;
       
-      // Simplify Name: Remove (동)/(서) to group or just keep detailed
-      // User asked for "2번 출국장", "3번 출국장"...
-      // Let's extract the number. DG1 -> 2, DG2 -> 3.
       if (rawGateId.startsWith('DG')) {
         const num = parseInt(rawGateId.charAt(2));
-        if (!isNaN(num)) {
-          // Approximate mapping based on experience: DG1=2, DG2=3, DG3=4, DG4=5. 
-          // But actually DG1 is Gate 2.
-          // Let's use the explicit generic names for safety.
-          name = `${num + 1}번 출국장`; 
-          
-          // E/W distinction might refer to multiple processing lines. 
-          // We can show them as "2번 출국장 (A)" or just list them.
-          // For clean UI, appending (동/서) is accurate.
-          const direction = rawGateId.includes('_E') ? '(동)' : '(서)';
-          name = `${num + 1}번 출국장 ${direction}`;
+        if (!isNaN(num) && num < 10) { // Safety check for small numbers usually T1
+           const direction = rawGateId.includes('_E') ? '(동)' : (rawGateId.includes('_W') ? '(서)' : '');
+           if (direction) {
+             name = `${num + 1}번 출국장 ${direction}`;
+           }
         }
       }
 
-      const cardHtml = createGateCard(name, count);
+      // Special handling for T2 if we learn their IDs
+      // T2 IDs often start differently or just map geographically. 
+      // For now, if unmapped, show raw ID.
+
+      const cardHtml = createGateCard(name, minutes, people);
 
       if (item.terminalId === 'P01') { // T1
         t1Container.innerHTML += cardHtml;
@@ -168,49 +158,59 @@
         t2Container.innerHTML += cardHtml;
       }
 
-      // Time parsing (occurtime: YYYYMMDDHHMMSS)
+      // Time parsing
       if (item.occurtime && !lastUpdate) {
           const t = item.occurtime;
-          lastUpdate = `${t.substring(8, 10)}:${t.substring(10, 12)}`;
+          if (t.length >= 12) {
+             lastUpdate = `${t.substring(8, 10)}:${t.substring(10, 12)}`;
+          }
       }
     });
 
     if (timeElement && lastUpdate) {
-      timeElement.textContent = `오늘 ${lastUpdate}`;
+      timeElement.textContent = `오늘 ${lastUpdate} 기준`;
     }
   }
 
-  function createGateCard(name, count) {
+  function createGateCard(name, minutes, people) {
     let status = '원활';
     let colorClass = 'bg-green-50 text-green-700 border-green-200';
     let dotClass = 'bg-green-500';
     
-    // Detailed criteria
-    // < 200: Good
-    // 200-500: Normal
-    // 500+: Crowded
-    if (count >= 500) {
+    // Detailed criteria based on Minutes (Wait Time)
+    // < 15 min: Good
+    // 15 - 30 min: Normal/Busy
+    // > 30 min: Crowded
+    if (minutes >= 30) {
       status = '매우 혼잡';
       colorClass = 'bg-red-50 text-red-700 border-red-200';
       dotClass = 'bg-red-500';
-    } else if (count >= 200) {
-      status = '보통';
+    } else if (minutes >= 15) {
+      status = '다소 혼잡';
       colorClass = 'bg-yellow-50 text-yellow-700 border-yellow-200';
       dotClass = 'bg-yellow-500';
     }
 
     return `
-      <div class="p-3 rounded-lg border flex flex-col items-center justify-center text-center ${colorClass}">
-        <div class="text-xs font-semibold mb-1 opacity-80">${name}</div>
-        <div class="text-xl font-bold mb-1">${count}명</div>
-        <div class="flex items-center text-xs font-medium">
-          <span class="w-2 h-2 rounded-full ${dotClass} mr-1.5"></span>
-          ${status}
+      <div class="border rounded-lg p-4 flex flex-col items-center justify-center text-center ${colorClass} transition-all duration-300 hover:shadow-md">
+        <span class="text-xs text-gray-500 mb-1">${name}</span>
+        <div class="text-2xl font-bold flex items-end gap-1">
+          ${minutes}<span class="text-sm font-normal mb-1">분</span>
+        </div>
+        <div class="text-xs text-gray-500 mt-1">
+           대기 ${people}명
+        </div>
+        <div class="flex items-center gap-1.5 mt-2 px-2 py-0.5 rounded-full bg-white/50">
+          <span class="w-1.5 h-1.5 rounded-full ${dotClass}"></span>
+          <span class="text-xs font-medium">${status}</span>
         </div>
       </div>
     `;
   }
-
-  // Init
+  
+  // Initialize
   fetchCongestionData();
+
+  // Refresh every 5 minutes
+  setInterval(fetchCongestionData, 300000);
 </script>
