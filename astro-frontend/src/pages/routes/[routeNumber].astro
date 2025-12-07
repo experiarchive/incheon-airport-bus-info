@@ -417,8 +417,6 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
       )}
     </div>
 
-    <!-- AdSense: 기본운행정보 섹션 밑 -->
-    <AdSense slotId="4961257991" />
 
     <!-- Airport Terminal Stops Section -->
     {jsonData?.airportStopInfo && (jsonData.airportStopInfo.terminal1?.location || jsonData.airportStopInfo.terminal2?.location) && (
@@ -543,8 +541,6 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
       </div>
     )}
 
-    <!-- AdSense: 정류장 위치 섹션 밑 -->
-    <AdSense slotId="7856698853" />
 
     <!-- Timetable Section - Redesigned for Better UX -->
     {Object.keys(groupedTimetables).length > 0 && (
