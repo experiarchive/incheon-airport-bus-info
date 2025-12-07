@@ -133,6 +133,12 @@
       
       const rawGateId = item.gateId || '';
       
+      // Filter: Skip DG5 and DG6 (Gate 6/7) - not displayed in official congestion info
+      // T1 shows 2~5번 출국장 only.
+      if (rawGateId.startsWith('DG5') || rawGateId.startsWith('DG6')) {
+        return; // Skip this item
+      }
+      
       // Determine Name
       let name = gateMapping[rawGateId] || rawGateId;
       
@@ -166,6 +172,15 @@
           }
       }
     });
+    
+    // Hide T2 section if no data
+    const t2Section = t2Container.parentElement;
+    if (t2Container.innerHTML.trim() === '' && t2Section) {
+      // Option 1: Hide completely
+      t2Section.classList.add('hidden');
+      // Option 2: Show message (uncomment below)
+      // t2Container.innerHTML = '<p class="text-sm text-gray-400 col-span-full text-center py-4">T2 데이터가 제공되지 않습니다.</p>';
+    }
 
     if (timeElement && lastUpdate) {
       timeElement.textContent = `오늘 ${lastUpdate} 기준`;
