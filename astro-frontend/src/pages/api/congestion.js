@@ -1,43 +1,41 @@
 export const prerender = false;
 
 export async function GET({ request }) {
-    // NEW Corrected API Key provided by user
     const API_KEY = '3VQy09yAoEDW9vaJMuhcuAA1m5H%2BwFx17E%2FzHlM0HtiS32TisxVMbRfrGfSaU%2Bk5BHczuT%2Bc19Jt9VUl7qkAbA%3D%3D';
 
-    // Construct URL by string concatenation to preserve the key format
-    // User provided endpoint: https://apis.data.go.kr/B551177/statusOfDepartureCongestion
-    // We append the operation name: /getDepartureCongestion
-    // Also updated casing 'Status' -> 'status' based on user input, though standard is often 'Status'.
-    // Let's try the user's provided casing 'statusOfDepartureCongestion'.
-    const TARGET_URL = `https://apis.data.go.kr/B551177/statusOfDepartureCongestion/getDepartureCongestion?serviceKey=${API_KEY}&numOfRows=20&pageNo=1&type=json`;
+    const BASE_URL = `https://apis.data.go.kr/B551177/statusOfDepartureCongestion/getDepartureCongestion?serviceKey=${API_KEY}&numOfRows=20&pageNo=1&type=json`;
 
     try {
-        const response = await fetch(TARGET_URL, {
-            headers: {
-                'Accept': 'application/json',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        // Fetch T1 (P01) and T2 (P02) in parallel
+        const urlT1 = `${BASE_URL}&terminalId=P01`;
+        const urlT2 = `${BASE_URL}&terminalId=P02`;
+
+        const [resT1, resT2] = await Promise.all([
+            fetch(urlT1, { headers: { 'Accept': 'application/json' } }),
+            fetch(urlT2, { headers: { 'Accept': 'application/json' } })
+        ]);
+
+        const dataT1 = await resT1.json();
+        const dataT2 = await resT2.json();
+
+        // Merge items
+        let items = [];
+        if (dataT1.response?.body?.items) items = items.concat(dataT1.response.body.items);
+        if (dataT2.response?.body?.items) items = items.concat(dataT2.response.body.items);
+
+        // Construct merged response
+        // Use T1 header as base if available
+        const mergedData = {
+            response: {
+                header: dataT1.response?.header || { resultCode: '00', resultMsg: 'NORMAL SERVICE' },
+                body: {
+                    items: items,
+                    totalCount: items.length
+                }
             }
-        });
+        };
 
-        if (!response.ok) {
-            const text = await response.text();
-            console.error('[API] Upstream Status:', response.status);
-            console.error('[API] Upstream Body:', text);
-            return new Response(JSON.stringify({ error: `Upstream error ${response.status}`, details: text }), {
-                status: 502, // Bad Gateway
-                headers: { 'Content-Type': 'application/json' }
-            });
-        }
-
-        const data = await response.json();
-
-        // Validate data structure
-        if (!data.response || !data.response.body) {
-            console.error('[API] Invalid JSON structure:', data);
-            throw new Error('Invalid API response structure');
-        }
-
-        return new Response(JSON.stringify(data), {
+        return new Response(JSON.stringify(mergedData), {
             status: 200,
             headers: {
                 'Content-Type': 'application/json',

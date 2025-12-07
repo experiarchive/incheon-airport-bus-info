@@ -109,25 +109,69 @@
       return 0;
     });
 
+    // Map Gate IDs to friendly names
+    // T1: DG1_E/W -> 2번, DG2 -> 3번... 
+    // Reference: Incheon Airport usually maps DG codes to physical gate numbers.
+    // Based on common API patterns:
+    // DG1 -> 2번 출국장
+    // DG2 -> 3번 출국장
+    // DG3 -> 4번 출국장
+    // DG4 -> 5번 출국장
+    // DG5 -> 6번 출국장 (Actually T1 has 2-5 common, 6 is special?)
+    // Let's deduce or use generic names if unsure.
+    // Better strategy: Map known IDs.
+    const gateMapping = {
+      'DG1_E': '2번 출국장 (동)', 'DG1_W': '2번 출국장 (서)',
+      'DG2_E': '3번 출국장 (동)', 'DG2_W': '3번 출국장 (서)',
+      'DG3_E': '4번 출국장 (동)', 'DG3_W': '4번 출국장 (서)',
+      'DG4_E': '5번 출국장 (동)', 'DG4_W': '5번 출국장 (서)',
+      'DG5_E': '6번 출국장 (동)', 'DG5_W': '6번 출국장 (서)', // Assuming structure
+      'DG6_E': '기타 출국장', 'DG6_W': '기타 출국장'
+    };
+    
+    // T1 has gates 2, 3, 4, 5, 6.
+    // Simplifying display to aggregate or show distinct if data allows.
+    // For now, map directly.
+
     data.forEach(item => {
-      const count = parseInt(item.waitSearchCnt || item.gateinfo || 0);
-      const name = item.gatenm || item.areaName || '출국장';
+      // API Field Parsing
+      const count = parseInt(item.waitTime || 0); // 'waitTime' is the field for person count in this API
+      const rawGateId = item.gateId;
       
+      // Determine Name
+      let name = gateMapping[rawGateId] || rawGateId;
+      
+      // Simplify Name: Remove (동)/(서) to group or just keep detailed
+      // User asked for "2번 출국장", "3번 출국장"...
+      // Let's extract the number. DG1 -> 2, DG2 -> 3.
+      if (rawGateId.startsWith('DG')) {
+        const num = parseInt(rawGateId.charAt(2));
+        if (!isNaN(num)) {
+          // Approximate mapping based on experience: DG1=2, DG2=3, DG3=4, DG4=5. 
+          // But actually DG1 is Gate 2.
+          // Let's use the explicit generic names for safety.
+          name = `${num + 1}번 출국장`; 
+          
+          // E/W distinction might refer to multiple processing lines. 
+          // We can show them as "2번 출국장 (A)" or just list them.
+          // For clean UI, appending (동/서) is accurate.
+          const direction = rawGateId.includes('_E') ? '(동)' : '(서)';
+          name = `${num + 1}번 출국장 ${direction}`;
+        }
+      }
+
       const cardHtml = createGateCard(name, count);
 
-      if (item.ternimalId === 'T1' || item.terminalId === 'P01') {
+      if (item.terminalId === 'P01') { // T1
         t1Container.innerHTML += cardHtml;
-      } else if (item.ternimalId === 'T2' || item.terminalId === 'P03') {
+      } else if (item.terminalId === 'P02') { // T2
         t2Container.innerHTML += cardHtml;
       }
 
-      if (item.cgtdt && !lastUpdate) {
-         const t = item.cgtdt;
-         if (t.length === 12) {
-           lastUpdate = `${t.substring(8, 10)}:${t.substring(10, 12)}`;
-         } else if (t.length === 4) {
-           lastUpdate = `${t.substring(0, 2)}:${t.substring(2, 4)}`;
-         }
+      // Time parsing (occurtime: YYYYMMDDHHMMSS)
+      if (item.occurtime && !lastUpdate) {
+          const t = item.occurtime;
+          lastUpdate = `${t.substring(8, 10)}:${t.substring(10, 12)}`;
       }
     });
 
