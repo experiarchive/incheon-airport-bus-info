@@ -37,37 +37,50 @@ const publisherId = 'ca-pub-8355312170222120';
 </div>
 
 <script>
-  // Intersection Observer for early ad loading (rootMargin 300px)
+  // Intersection Observer with retry mechanism for layout timing issues
   document.addEventListener('DOMContentLoaded', () => {
     const adContainers = document.querySelectorAll('.adsense-container');
+    
+    // Helper function to attempt ad load with retry
+    const tryLoadAd = (container, adSlot, retryCount = 0, maxRetries = 3) => {
+      if (adSlot.offsetWidth > 0) {
+        adSlot.setAttribute('data-ad-loaded', 'true');
+        try {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (e) {
+          // Only log on production domain
+          if (!window.location.hostname.includes('localhost')) {
+            console.error('AdSense push error:', e);
+          }
+        }
+        return true; // Success
+      } else if (retryCount < maxRetries) {
+        // Layout not ready, wait for next animation frame and retry
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            tryLoadAd(container, adSlot, retryCount + 1, maxRetries);
+          }, 100); // Small delay between retries
+        });
+        return false; // Will retry
+      }
+      // Max retries exceeded, give up silently
+      return false;
+    };
     
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          const container = entry.target as HTMLElement;
+          const container = entry.target;
           const adSlot = container.querySelector('.adsbygoogle');
           
           if (adSlot && !adSlot.hasAttribute('data-ad-loaded')) {
-            // Check if slot itself has dimensions (it should if w-full is applied and container has width)
-            // Check if slot itself has dimensions (it should if w-full is applied and container has width)
-            if (adSlot.offsetWidth > 0) {
-              adSlot.setAttribute('data-ad-loaded', 'true');
-              try {
-                (window.adsbygoogle = window.adsbygoogle || []).push({});
-              } catch (e) {
-                // Suppress error on localhost
-                if (!window.location.hostname.includes('localhost')) {
-                   console.error('AdSense push error:', e);
-                }
-              }
-              // Only stop observing if we successfully attempted to load
+            const success = tryLoadAd(container, adSlot);
+            if (success) {
               observer.unobserve(container);
-            } else {
-              // If width is 0, keep observing. It might be hidden or layout not ready.
-              // The observer will trigger again if layout changes cause intersection updates,
-              // or we can rely on next scroll event.
-              // console.warn('AdSense slot has 0 width, skipping push'); // Squelch this warning
             }
+            // If not successful, tryLoadAd will handle retries
+            // We still unobserve to prevent duplicate triggers, retries handle the rest
+            observer.unobserve(container);
           }
         }
       });

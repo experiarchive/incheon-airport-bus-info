@@ -3,6 +3,18 @@ export const prerender = false;
 export async function GET({ request }) {
     const API_KEY = import.meta.env.GO_DATA_API_KEY_CONGESTION;
 
+    // Explicit check for missing API key
+    if (!API_KEY) {
+        console.error('[API/congestion] FATAL: GO_DATA_API_KEY_CONGESTION environment variable is not set!');
+        return new Response(JSON.stringify({
+            error: 'Server configuration error',
+            details: 'API key not configured. Please set GO_DATA_API_KEY_CONGESTION in your hosting environment variables.'
+        }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+        });
+    }
+
     // Fetch ALL data (100 rows) to ensure we get T1 and T2 if provided in single list.
     // The API might return P01 and P02 mixed or separated by page. 
     // Given previous duplicates, it implies P01 is default if terminalId is wrong.

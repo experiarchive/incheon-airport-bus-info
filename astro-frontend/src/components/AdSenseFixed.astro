@@ -28,42 +28,53 @@
 </div>
 
 <script>
-  // Intersection Observer for early ad loading - Protects Active View score
+  // Intersection Observer with retry mechanism for layout timing issues
   document.addEventListener('DOMContentLoaded', () => {
     const fixedContainers = document.querySelectorAll('.adsense-fixed-container');
+    
+    // Helper function to find visible slot and attempt ad load with retry
+    const tryLoadFixedAd = (container, retryCount = 0, maxRetries = 3) => {
+      const allSlots = container.querySelectorAll('.adsbygoogle');
+      let visibleSlot = null;
+      
+      allSlots.forEach(slot => {
+        if (slot.offsetWidth > 0 && !slot.hasAttribute('data-ad-loaded')) {
+          visibleSlot = slot;
+        }
+      });
+      
+      if (visibleSlot) {
+        visibleSlot.setAttribute('data-ad-loaded', 'true');
+        try {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (e) {
+          if (!window.location.hostname.includes('localhost')) {
+            console.error('AdSense fixed push error:', e);
+          }
+        }
+        return true;
+      } else if (retryCount < maxRetries) {
+        // Layout not ready, wait and retry
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            tryLoadFixedAd(container, retryCount + 1, maxRetries);
+          }, 100);
+        });
+        return false;
+      }
+      return false;
+    };
     
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           const container = entry.target;
-          
-          // Find ad slots and filter to only those with actual visible width
-          const allSlots = container.querySelectorAll('.adsbygoogle');
-          let visibleSlot = null;
-          
-          allSlots.forEach(slot => {
-            // Check if slot is actually visible (has width > 0)
-            if (slot.offsetWidth > 0 && !slot.hasAttribute('data-ad-loaded')) {
-              visibleSlot = slot;
-            }
-          });
-          
-          if (visibleSlot) {
-             visibleSlot.setAttribute('data-ad-loaded', 'true');
-             try {
-                (window.adsbygoogle = window.adsbygoogle || []).push({});
-             } catch (e) {
-                // Suppress error on localhost (expected 403)
-                if (!window.location.hostname.includes('localhost')) {
-                   console.error('AdSense fixed push error:', e);
-                }
-             }
-             observer.unobserve(container);
-          }
+          tryLoadFixedAd(container);
+          observer.unobserve(container); // Unobserve immediately, retries handle the rest
         }
       });
     }, {
-      rootMargin: '200px 0px', // Pre-load when 200px away
+      rootMargin: '200px 0px',
       threshold: 0
     });
     
