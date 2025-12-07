@@ -1,58 +1,138 @@
 ---
 ---
 
-<div id="airport-facilities-container" class="mt-8 mb-8 bg-white rounded-lg shadow-sm border border-gray-100 p-6">
-  <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
-    <h3 class="text-xl font-bold flex items-center gap-2">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+
+<div id="airport-facilities-container" class="mt-8 mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 transition-all duration-300">
+  
+  <div class="flex items-center justify-between mb-6 flex-wrap gap-2">
+    <h3 class="text-xl font-bold flex items-center gap-2 text-gray-800 dark:text-white">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
       </svg>
       인천공항 편의시설 안내
     </h3>
-    <span id="facility-count" class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full"></span>
+    
+    <!-- Top Level Filters (Always Visible) -->
+    <div class="flex gap-2">
+      <div class="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+        <button class="terminal-toggle px-3 py-1.5 text-xs font-semibold rounded-md transition-all text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" data-value="">전체</button>
+        <button class="terminal-toggle px-3 py-1.5 text-xs font-semibold rounded-md transition-all text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white active-toggle bg-white dark:bg-gray-600 shadow-sm" data-value="P01">제1터미널</button>
+        <button class="terminal-toggle px-3 py-1.5 text-xs font-semibold rounded-md transition-all text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" data-value="P03">제2터미널</button>
+      </div>
+      <div class="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+        <button class="area-toggle px-3 py-1.5 text-xs font-semibold rounded-md transition-all text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white active-toggle bg-white dark:bg-gray-600 shadow-sm" data-value="">전체</button>
+        <button class="area-toggle px-3 py-1.5 text-xs font-semibold rounded-md transition-all text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" data-value="N">일반</button>
+        <button class="area-toggle px-3 py-1.5 text-xs font-semibold rounded-md transition-all text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white" data-value="Y">면세</button>
+      </div>
+    </div>
   </div>
 
-  <!-- Filters -->
-  <div class="flex flex-wrap gap-2 mb-6 p-3 bg-gray-50 rounded-lg">
-    <select id="filter-terminal" class="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-purple-300 focus:border-purple-400">
-      <option value="">전체 터미널</option>
-      <option value="P01">제1터미널 (T1)</option>
-      <option value="P03">제2터미널 (T2)</option>
-    </select>
-    <select id="filter-area" class="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-purple-300 focus:border-purple-400">
-      <option value="">전체 지역</option>
-      <option value="N">일반지역 (출국 전)</option>
-      <option value="Y">면세지역 (출국 후)</option>
-    </select>
-    <select id="filter-category" class="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-purple-300 focus:border-purple-400">
-      <option value="">전체 카테고리</option>
-    </select>
-    <input type="text" id="filter-search" placeholder="시설명 검색..." class="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-purple-300 focus:border-purple-400 flex-1 min-w-[150px]" />
+  <!-- Loading State -->
+  <div id="facilities-loading" class="flex flex-col items-center justify-center py-12">
+    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600"></div>
+    <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">편의시설 정보를 불러오는 중입니다...</p>
   </div>
 
-  <!-- Loading -->
-  <div id="facilities-loading" class="flex justify-center py-8">
-    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+  <!-- VIEW 1: Category Selection Grid (Initial View) -->
+  <div id="category-view" class="hidden animate-fade-in">
+    <p class="text-center text-gray-600 dark:text-gray-300 mb-6">찾으시는 편의시설 종류를 선택해주세요.</p>
+    <div id="category-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <!-- Generated via JS -->
+    </div>
   </div>
 
-  <!-- Facility Grid -->
-  <div id="facilities-grid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    <!-- Cards injected via JS -->
+  <!-- VIEW 2: Results List (Filtered View) -->
+  <div id="list-view" class="hidden animate-fade-in">
+    <!-- List Header / Back Button -->
+    <div class="flex items-center justify-between mb-4 bg-purple-50 dark:bg-purple-900/20 p-3 rounded-lg border border-purple-100 dark:border-purple-800">
+      <button id="back-to-categories" class="flex items-center text-sm font-semibold text-purple-700 dark:text-purple-300 hover:text-purple-900 dark:hover:text-purple-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        카테고리 다시 선택
+      </button>
+      <div class="flex items-center gap-2">
+        <span id="current-category-badge" class="px-2 py-1 bg-white dark:bg-purple-800 text-purple-700 dark:text-purple-200 rounded text-xs font-bold shadow-sm">
+          전체
+        </span>
+        <span id="result-count" class="text-xs text-gray-500 dark:text-gray-400"></span>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="relative mb-4">
+      <input type="text" id="facility-search" placeholder="결과 내 시설명 검색..." class="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-sm focus:ring-2 focus:ring-purple-300 dark:focus:ring-purple-500 focus:outline-none dark:text-white" />
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 absolute left-3 top-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+    </div>
+
+    <!-- Results Grid -->
+    <div id="results-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 min-h-[200px]">
+      <!-- Cards Injected Here -->
+    </div>
+    
+    <!-- Empty State for List -->
+    <div id="list-empty" class="hidden text-center py-10 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-dashed border-gray-200 dark:border-gray-600">
+      <p class="text-gray-500 dark:text-gray-400">이 카테고리에는 해당 조건의 시설이 없습니다.</p>
+      <button id="reset-filters-btn" class="mt-2 text-sm text-purple-600 dark:text-purple-400 underline hover:text-purple-800 dark:hover:text-purple-300">필터 초기화</button>
+    </div>
   </div>
 
-  <!-- Empty State -->
-  <div id="facilities-empty" class="hidden text-center py-8">
-    <p class="text-gray-500">검색 결과가 없습니다.</p>
-  </div>
-
-  <div class="text-right mt-4">
-    <p class="text-[10px] text-gray-400">데이터 제공: 인천국제공항공사</p>
+  <div class="text-right mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
+    <p class="text-[10px] text-gray-400 dark:text-gray-500">데이터 제공: 인천국제공항공사 (실시간 API)</p>
   </div>
 </div>
 
+<style>
+  .active-toggle {
+    background-color: white;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    color: #4b5563; /* gray-600 */
+    border: 1px solid #e5e7eb; /* gray-200 */
+  }
+  
+  :global(.dark) .active-toggle {
+    background-color: #4b5563; /* gray-600 */
+    color: white;
+    border: 1px solid #374151; /* gray-700 */
+  }
+
+  /* Custom Scrollbar for list view if needed */
+  #results-grid::-webkit-scrollbar {
+    width: 6px;
+  }
+  #results-grid::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 4px;
+  }
+</style>
+
 <script>
+  // State
   let allFacilities = [];
-  let filteredFacilities = [];
+  let currentTerminal = 'P01'; // Default to T1
+  let currentArea = '';       // Default All
+  let currentCategory = null; // null = Show Categories View
+  let searchQuery = '';
+
+  // Icon Mapping
+  const CATEGORY_MAP = {
+    '식음료': { icon: '🍽️', label: '식당/카페', keywords: ['식당', '카페', '베이커리', '식음료', '패스트푸드'] },
+    '쇼핑': { icon: '🛍️', label: '면세점/쇼핑', keywords: ['면세점', '쇼핑', '편의점', '의류', '화장품', '잡화', '서점'] },
+    '안내': { icon: 'ℹ️', label: '안내/서비스', keywords: ['안내', '로밍', '통신', '환전', '은행', '보험', '택배', '세탁'] },
+    '의료': { icon: '💊', label: '의료/약국', keywords: ['약국', '병원', '의료'] },
+    '휴식': { icon: '🛋️', label: '휴식/라운지', keywords: ['라운지', '휴식', '호텔', '스파'] },
+    '편의': { icon: '🚽', label: '편의시설', keywords: ['화장실', '흡연실', '샤워실', '기도실', '유아휴게실', '키즈'] },
+    '교통': { icon: '🚌', label: '교통/주차', keywords: ['주차', '렌터카', '발렛', '교통'] },
+    '기타': { icon: '🔎', label: '기타 시설', keywords: [] }
+  };
+
+  async function init() {
+    await fetchFacilities();
+    setupEventListeners();
+    render();
+  }
 
   async function fetchFacilities() {
     try {
@@ -61,10 +141,11 @@
         const json = await res.json();
         if (json.response?.body?.items) {
           allFacilities = json.response.body.items;
-          populateCategoryFilter();
-          applyFilters();
           document.getElementById('facilities-loading').classList.add('hidden');
-          document.getElementById('facilities-grid').classList.remove('hidden');
+        } else {
+             // Handle empty response
+             allFacilities = [];
+             document.getElementById('facilities-loading').innerHTML = '<p>데이터가 없습니다.</p>';
         }
       }
     } catch (e) {
@@ -73,94 +154,205 @@
     }
   }
 
-  function populateCategoryFilter() {
-    const categories = [...new Set(allFacilities.map(f => f.category).filter(Boolean))];
-    const select = document.getElementById('filter-category');
-    categories.sort().forEach(cat => {
-      const option = document.createElement('option');
-      option.value = cat;
-      option.textContent = cat;
-      select.appendChild(option);
-    });
+  function getGroupedCategory(apiCategory) {
+    if (!apiCategory) return '기타';
+    for (const [key, config] of Object.entries(CATEGORY_MAP)) {
+      if (key === '기타') continue;
+      if (apiCategory.includes(key) || config.keywords.some(k => apiCategory.includes(k))) {
+        return key;
+      }
+    }
+    return '기타';
   }
 
-  function applyFilters() {
-    const terminal = document.getElementById('filter-terminal').value;
-    const area = document.getElementById('filter-area').value;
-    const category = document.getElementById('filter-category').value;
-    const search = document.getElementById('filter-search').value.toLowerCase();
-
-    filteredFacilities = allFacilities.filter(f => {
-      if (terminal && f.terminal !== terminal) return false;
-      if (area && f.area !== area) return false;
-      if (category && f.category !== category) return false;
-      if (search && !f.name?.toLowerCase().includes(search)) return false;
+  function getAvailableCategories() {
+    // Current Context (Terminal + Area)
+    const contextItems = allFacilities.filter(f => {
+      if (currentTerminal && f.terminal !== currentTerminal) return false;
+      if (currentArea && f.area !== currentArea) return false;
       return true;
     });
 
-    renderFacilities();
+    const groups = new Set();
+    contextItems.forEach(f => {
+      groups.add(getGroupedCategory(f.category));
+    });
+
+    // Always include these basic groups if they exist, keep order
+    return Object.keys(CATEGORY_MAP).filter(key => groups.has(key));
   }
 
-  function renderFacilities() {
-    const grid = document.getElementById('facilities-grid');
-    const empty = document.getElementById('facilities-empty');
-    const countEl = document.getElementById('facility-count');
+  function render() {
+    const categoryView = document.getElementById('category-view');
+    const listView = document.getElementById('list-view');
 
-    countEl.textContent = `총 ${filteredFacilities.length}개`;
+    // Update Toggle Styles
+    document.querySelectorAll('.terminal-toggle').forEach(btn => {
+      if (btn.dataset.value === currentTerminal) btn.classList.add('active-toggle', 'bg-white', 'dark:bg-gray-600', 'shadow-sm');
+      else btn.classList.remove('active-toggle', 'bg-white', 'dark:bg-gray-600', 'shadow-sm');
+    });
+    document.querySelectorAll('.area-toggle').forEach(btn => {
+      if (btn.dataset.value === currentArea) btn.classList.add('active-toggle', 'bg-white', 'dark:bg-gray-600', 'shadow-sm');
+      else btn.classList.remove('active-toggle', 'bg-white', 'dark:bg-gray-600', 'shadow-sm');
+    });
 
-    if (filteredFacilities.length === 0) {
+    if (currentCategory) {
+      // LIST VIEW
+      categoryView.classList.add('hidden');
+      listView.classList.remove('hidden');
+      renderList();
+    } else {
+      // CATEGORY VIEW
+      listView.classList.add('hidden');
+      categoryView.classList.remove('hidden');
+      renderCategories();
+    }
+  }
+
+  function renderCategories() {
+    const grid = document.getElementById('category-grid');
+    const available = getAvailableCategories();
+
+    if (available.length === 0) {
+      grid.innerHTML = '<div class="col-span-full text-center py-8 bg-gray-50 dark:bg-gray-700/50 rounded-lg"><p class="text-gray-500 dark:text-gray-400">해당 조건에 맞는 시설이 없습니다.</p></div>';
+      return;
+    }
+
+    grid.innerHTML = available.map(key => {
+      const config = CATEGORY_MAP[key];
+      // Count items in this category for current context
+      const count = allFacilities.filter(f => {
+        if (currentTerminal && f.terminal !== currentTerminal) return false;
+        if (currentArea && f.area !== currentArea) return false;
+        return getGroupedCategory(f.category) === key;
+      }).length;
+
+      return `
+        <button 
+          onclick="selectCategory('${key}')"
+          class="flex flex-col items-center justify-center p-6 bg-white dark:bg-gray-700 border border-gray-100 dark:border-gray-600 rounded-xl shadow-sm hover:shadow-md hover:border-purple-300 dark:hover:border-purple-500 hover:-translate-y-1 transition-all duration-200 group"
+        >
+          <span class="text-3xl mb-3 group-hover:scale-110 transition-transform">${config.icon}</span>
+          <span class="font-bold text-gray-800 dark:text-gray-100 text-sm md:text-base">${config.label}</span>
+          <span class="text-xs text-gray-400 dark:text-gray-500 mt-1">${count}곳</span>
+        </button>
+      `;
+    }).join('');
+  }
+
+  function renderList() {
+    const grid = document.getElementById('results-grid');
+    const badge = document.getElementById('current-category-badge');
+    const countEl = document.getElementById('result-count');
+    const empty = document.getElementById('list-empty');
+
+    const config = CATEGORY_MAP[currentCategory];
+    badge.textContent = config ? config.label : '전체';
+
+    const items = allFacilities.filter(f => {
+      if (currentTerminal && f.terminal !== currentTerminal) return false;
+      if (currentArea && f.area !== currentArea) return false;
+      if (currentCategory !== '기타' && getGroupedCategory(f.category) !== currentCategory) return false;
+      if (currentCategory === '기타' && getGroupedCategory(f.category) !== '기타') return false;
+      
+      if (searchQuery && !f.name.toLowerCase().includes(searchQuery)) return false;
+      return true;
+    });
+
+    countEl.textContent = `총 ${items.length}개`;
+
+    if (items.length === 0) {
+      grid.innerHTML = '';
       grid.classList.add('hidden');
       empty.classList.remove('hidden');
       return;
     }
 
-    empty.classList.add('hidden');
     grid.classList.remove('hidden');
+    empty.classList.add('hidden');
 
-    // Show max 30 items to avoid performance issues
-    const displayItems = filteredFacilities.slice(0, 30);
-
-    grid.innerHTML = displayItems.map(f => {
+    grid.innerHTML = items.slice(0, 50).map(f => { // Increased limit to 50 for specific categories
       const areaLabel = f.area === 'Y' ? '면세' : '일반';
-      const areaColor = f.area === 'Y' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700';
+      const areaColor = f.area === 'Y' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300';
       const terminalLabel = f.terminal === 'P01' ? 'T1' : (f.terminal === 'P03' ? 'T2' : '');
 
       return `
-        <div class="border border-gray-100 rounded-lg p-4 hover:shadow-md transition-shadow bg-white">
+        <div class="border border-gray-100 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow bg-white dark:bg-gray-700 h-full flex flex-col">
           <div class="flex items-start justify-between gap-2 mb-2">
-            <h4 class="font-bold text-gray-800 text-sm leading-tight">${f.name || '-'}</h4>
+            <h4 class="font-bold text-gray-800 dark:text-grey-100 text-sm leading-tight dark:text-white">${f.name || '-'}</h4>
             <div class="flex gap-1 flex-shrink-0">
-              ${terminalLabel ? `<span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">${terminalLabel}</span>` : ''}
-              <span class="text-[10px] px-1.5 py-0.5 rounded ${areaColor}">${areaLabel}</span>
+               ${terminalLabel ? `<span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">${terminalLabel}</span>` : ''}
+              <span class="text-[10px] px-1.5 py-0.5 rounded border border-transparent ${areaColor}">${areaLabel}</span>
             </div>
           </div>
-          <p class="text-xs text-gray-500 mb-2 line-clamp-2">${f.location || ''}</p>
-          <div class="flex items-center justify-between text-xs text-gray-600">
-            <span class="flex items-center gap-1">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              ${f.servicetime || '-'}
-            </span>
-            ${f.tel ? `<span class="text-purple-600">${f.tel}</span>` : ''}
+          <p class="text-xs text-gray-500 dark:text-gray-400 mb-3 line-clamp-2 min-h-[2.5em]">${f.location || '위치 정보 없음'}</p>
+          
+          <div class="mt-auto pt-3 border-t border-gray-50 dark:border-gray-600 flex flex-col gap-1.5">
+            <div class="flex items-center text-xs text-gray-600 dark:text-gray-300">
+               <span class="w-4 flex justify-center mr-1.5">🕒</span>
+               <span class="truncate">${f.servicetime || '운영시간 정보 없음'}</span>
+            </div>
+            ${f.tel ? `
+            <div class="flex items-center text-xs text-gray-600 dark:text-gray-300">
+               <span class="w-4 flex justify-center mr-1.5">📞</span>
+               <a href="tel:${f.tel}" class="hover:text-purple-600 dark:hover:text-purple-400 underline decoration-dotted">${f.tel}</a>
+            </div>` : ''}
+             ${f.items ? `
+             <div class="flex items-center text-xs text-gray-500 dark:text-gray-400 mt-1">
+               <span class="w-4 flex justify-center mr-1.5">🏷️</span>
+               <span class="truncate">${f.items}</span>
+            </div>` : ''}
           </div>
-          ${f.items ? `<p class="text-[10px] text-gray-400 mt-2 line-clamp-1">${f.items}</p>` : ''}
         </div>
       `;
     }).join('');
-
-    // Show "more" indicator if truncated
-    if (filteredFacilities.length > 30) {
-      grid.innerHTML += `<div class="col-span-full text-center py-4"><p class="text-sm text-gray-400">검색 조건을 좁혀서 더 많은 결과를 확인하세요 (${filteredFacilities.length - 30}개 더)</p></div>`;
-    }
   }
 
-  // Event Listeners
-  document.getElementById('filter-terminal').addEventListener('change', applyFilters);
-  document.getElementById('filter-area').addEventListener('change', applyFilters);
-  document.getElementById('filter-category').addEventListener('change', applyFilters);
-  document.getElementById('filter-search').addEventListener('input', applyFilters);
+  function setupEventListeners() {
+    // Toggles
+    document.querySelectorAll('.terminal-toggle').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        currentTerminal = e.target.dataset.value;
+        // If in list view, might need to re-validate category logic, but generally safe to stay
+        render(); 
+      });
+    });
+    
+    document.querySelectorAll('.area-toggle').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        currentArea = e.target.dataset.value;
+        render();
+      });
+    });
 
-  // Initialize
-  fetchFacilities();
+    // Back Button
+    document.getElementById('back-to-categories').addEventListener('click', () => {
+      currentCategory = null;
+      searchQuery = '';
+      document.getElementById('facility-search').value = '';
+      render();
+    });
+
+    // Search
+    document.getElementById('facility-search').addEventListener('input', (e) => {
+      searchQuery = e.target.value.toLowerCase();
+      renderList();
+    });
+
+    // Reset Button
+    document.getElementById('reset-filters-btn').addEventListener('click', () => {
+      document.getElementById('facility-search').value = '';
+      searchQuery = '';
+      renderList();
+    });
+
+    // Custom Event for Category Selection (needed because of innerHTML generation)
+    window.selectCategory = (key) => {
+      currentCategory = key;
+      render();
+    };
+  }
+
+  // Auto Init
+  init();
 </script>
