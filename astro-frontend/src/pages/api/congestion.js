@@ -1,7 +1,7 @@
 export const prerender = false;
 
 export async function GET({ request }) {
-    const API_KEY = '3VQy09yAoEDW9vaJMuhcuAA1m5H%2BwFx17E%2FzHlM0HtiS32TisxVMbRfrGfSaU%2Bk5BHczuT%2Bc19Jt9VUl7qkAbA%3D%3D';
+    const API_KEY = import.meta.env.GO_DATA_API_KEY_CONGESTION;
 
     // Fetch ALL data (100 rows) to ensure we get T1 and T2 if provided in single list.
     // The API might return P01 and P02 mixed or separated by page. 

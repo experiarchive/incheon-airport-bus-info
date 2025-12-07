@@ -1,0 +1,166 @@
+---
+---
+
+<div id="airport-facilities-container" class="mt-8 mb-8 bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+  <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+    <h3 class="text-xl font-bold flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+      </svg>
+      인천공항 편의시설 안내
+    </h3>
+    <span id="facility-count" class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full"></span>
+  </div>
+
+  <!-- Filters -->
+  <div class="flex flex-wrap gap-2 mb-6 p-3 bg-gray-50 rounded-lg">
+    <select id="filter-terminal" class="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-purple-300 focus:border-purple-400">
+      <option value="">전체 터미널</option>
+      <option value="P01">제1터미널 (T1)</option>
+      <option value="P03">제2터미널 (T2)</option>
+    </select>
+    <select id="filter-area" class="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-purple-300 focus:border-purple-400">
+      <option value="">전체 지역</option>
+      <option value="N">일반지역 (출국 전)</option>
+      <option value="Y">면세지역 (출국 후)</option>
+    </select>
+    <select id="filter-category" class="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-purple-300 focus:border-purple-400">
+      <option value="">전체 카테고리</option>
+    </select>
+    <input type="text" id="filter-search" placeholder="시설명 검색..." class="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-purple-300 focus:border-purple-400 flex-1 min-w-[150px]" />
+  </div>
+
+  <!-- Loading -->
+  <div id="facilities-loading" class="flex justify-center py-8">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+  </div>
+
+  <!-- Facility Grid -->
+  <div id="facilities-grid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <!-- Cards injected via JS -->
+  </div>
+
+  <!-- Empty State -->
+  <div id="facilities-empty" class="hidden text-center py-8">
+    <p class="text-gray-500">검색 결과가 없습니다.</p>
+  </div>
+
+  <div class="text-right mt-4">
+    <p class="text-[10px] text-gray-400">데이터 제공: 인천국제공항공사</p>
+  </div>
+</div>
+
+<script>
+  let allFacilities = [];
+  let filteredFacilities = [];
+
+  async function fetchFacilities() {
+    try {
+      const res = await fetch('/api/facilities');
+      if (res.ok) {
+        const json = await res.json();
+        if (json.response?.body?.items) {
+          allFacilities = json.response.body.items;
+          populateCategoryFilter();
+          applyFilters();
+          document.getElementById('facilities-loading').classList.add('hidden');
+          document.getElementById('facilities-grid').classList.remove('hidden');
+        }
+      }
+    } catch (e) {
+      console.error('Failed to fetch facilities:', e);
+      document.getElementById('facilities-loading').innerHTML = '<p class="text-red-500">데이터를 불러올 수 없습니다.</p>';
+    }
+  }
+
+  function populateCategoryFilter() {
+    const categories = [...new Set(allFacilities.map(f => f.category).filter(Boolean))];
+    const select = document.getElementById('filter-category');
+    categories.sort().forEach(cat => {
+      const option = document.createElement('option');
+      option.value = cat;
+      option.textContent = cat;
+      select.appendChild(option);
+    });
+  }
+
+  function applyFilters() {
+    const terminal = document.getElementById('filter-terminal').value;
+    const area = document.getElementById('filter-area').value;
+    const category = document.getElementById('filter-category').value;
+    const search = document.getElementById('filter-search').value.toLowerCase();
+
+    filteredFacilities = allFacilities.filter(f => {
+      if (terminal && f.terminal !== terminal) return false;
+      if (area && f.area !== area) return false;
+      if (category && f.category !== category) return false;
+      if (search && !f.name?.toLowerCase().includes(search)) return false;
+      return true;
+    });
+
+    renderFacilities();
+  }
+
+  function renderFacilities() {
+    const grid = document.getElementById('facilities-grid');
+    const empty = document.getElementById('facilities-empty');
+    const countEl = document.getElementById('facility-count');
+
+    countEl.textContent = `총 ${filteredFacilities.length}개`;
+
+    if (filteredFacilities.length === 0) {
+      grid.classList.add('hidden');
+      empty.classList.remove('hidden');
+      return;
+    }
+
+    empty.classList.add('hidden');
+    grid.classList.remove('hidden');
+
+    // Show max 30 items to avoid performance issues
+    const displayItems = filteredFacilities.slice(0, 30);
+
+    grid.innerHTML = displayItems.map(f => {
+      const areaLabel = f.area === 'Y' ? '면세' : '일반';
+      const areaColor = f.area === 'Y' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700';
+      const terminalLabel = f.terminal === 'P01' ? 'T1' : (f.terminal === 'P03' ? 'T2' : '');
+
+      return `
+        <div class="border border-gray-100 rounded-lg p-4 hover:shadow-md transition-shadow bg-white">
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <h4 class="font-bold text-gray-800 text-sm leading-tight">${f.name || '-'}</h4>
+            <div class="flex gap-1 flex-shrink-0">
+              ${terminalLabel ? `<span class="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700">${terminalLabel}</span>` : ''}
+              <span class="text-[10px] px-1.5 py-0.5 rounded ${areaColor}">${areaLabel}</span>
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 mb-2 line-clamp-2">${f.location || ''}</p>
+          <div class="flex items-center justify-between text-xs text-gray-600">
+            <span class="flex items-center gap-1">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              ${f.servicetime || '-'}
+            </span>
+            ${f.tel ? `<span class="text-purple-600">${f.tel}</span>` : ''}
+          </div>
+          ${f.items ? `<p class="text-[10px] text-gray-400 mt-2 line-clamp-1">${f.items}</p>` : ''}
+        </div>
+      `;
+    }).join('');
+
+    // Show "more" indicator if truncated
+    if (filteredFacilities.length > 30) {
+      grid.innerHTML += `<div class="col-span-full text-center py-4"><p class="text-sm text-gray-400">검색 조건을 좁혀서 더 많은 결과를 확인하세요 (${filteredFacilities.length - 30}개 더)</p></div>`;
+    }
+  }
+
+  // Event Listeners
+  document.getElementById('filter-terminal').addEventListener('change', applyFilters);
+  document.getElementById('filter-area').addEventListener('change', applyFilters);
+  document.getElementById('filter-category').addEventListener('change', applyFilters);
+  document.getElementById('filter-search').addEventListener('input', applyFilters);
+
+  // Initialize
+  fetchFacilities();
+</script>

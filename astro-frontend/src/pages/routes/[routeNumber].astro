@@ -1,8 +1,10 @@
 ﻿---
 import Layout from '../../layouts/Layout.astro';
 import AdSense from '../../components/AdSense.astro';
+import AdSenseFixed from '../../components/AdSenseFixed.astro';
 import TravelChecklist from '../../components/TravelChecklist.astro';
 import AirportCongestion from '../../components/AirportCongestion.astro';
+import AirportFacilities from '../../components/AirportFacilities.astro';
 import { client } from '../../lib/sanityClient.js';
 import { toHTML } from '@portabletext/to-html';
 
@@ -703,6 +705,12 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
 
     <!-- Airport Congestion Section -->
     <AirportCongestion />
+
+    <!-- Fixed-Size AdSense between sections -->
+    <AdSenseFixed />
+
+    <!-- Airport Facilities Section -->
+    <AirportFacilities />
 
     <!-- Travel Checklist Section -->
     <TravelChecklist />

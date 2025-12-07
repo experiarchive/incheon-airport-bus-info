@@ -1,9 +1,11 @@
 export const prerender = false;
 
 export async function GET({ request }) {
-    const API_KEY = '3VQy09yAoEDW9vaJMuhcuAA1m5H%2BwFx17E%2FzHlM0HtiS32TisxVMbRfrGfSaU%2Bk5BHczuT%2Bc19Jt9VUl7qkAbA%3D%3D';
     // Endpoint from user provided spec
-    const BASE_URL = `https://apis.data.go.kr/B551177/StatusOfFacility/getFacilityKR?serviceKey=${API_KEY}&numOfRows=500&pageNo=1&type=json`;
+    const API_KEY = import.meta.env.GO_DATA_API_KEY_COMMERCIAL;
+    // Correct Operation Name: getFacilitesInfo (Note the spelling in spec)
+    // Removed lcduty filter to fetch ALL facilities (both duty-free and general)
+    const BASE_URL = `https://apis.data.go.kr/B551177/FacilitiesInformation/getFacilitesInfo?serviceKey=${API_KEY}&numOfRows=1000&pageNo=1&type=json&lang=K`;
 
     try {
         // Attempt Live Fetch
@@ -15,21 +17,51 @@ export async function GET({ request }) {
         if (response.ok) {
             // Try parsing JSON
             try {
-                data = await response.json();
-                // Verify structure
-                if (!data.response?.body?.items) {
-                    console.warn('[API] Facilities: Valid response but no items found or likely XML default.');
-                    data = null; // Trigger fallback if structure is weird (e.g. XML returned despite type=json)
+                const rawData = await response.json();
+
+                if (rawData.response?.body?.items) {
+                    let items = rawData.response.body.items;
+                    if (!Array.isArray(items) && items.item) {
+                        items = Array.isArray(items.item) ? items.item : [items.item];
+                    }
+
+                    // Map to frontend-friendly format with additional fields for filtering
+                    const mappedItems = items.map(item => ({
+                        name: item.facilitynm,
+                        location: item.lcnm,
+                        items: item.facilityitem,
+                        servicetime: item.servicetime,
+                        tel: item.tel,
+                        arrordep: item.arrordep,
+                        // New fields for filtering
+                        terminal: item.terminalid, // P01, P03
+                        floor: item.floorinfo,     // 1F, 2F, 3F, 4F
+                        area: item.lcduty,         // Y=면세, N=일반
+                        category: item.lcategorynm // 대분류
+                    }));
+
+                    data = {
+                        response: {
+                            header: rawData.response.header,
+                            body: {
+                                items: mappedItems,
+                                totalCount: rawData.response.body.totalCount
+                            }
+                        }
+                    };
                 }
             } catch (e) {
-                console.warn('[API] Facilities: Failed to parse JSON, falling back to Mock.');
+                console.warn('[API] Facilities: Failed to parse JSON or Map Data, falling back to Mock.');
+                // console.error(e); // Debug
                 data = null;
             }
         } else {
             console.warn(`[API] Facilities: Upstream error ${response.status}. Falling back to Mock Data.`);
+            if (response.status === 403) {
+                console.error('[API] Facilities: 403 Forbidden. The API Key may not be authorized for "FacilitiesInformation/getFacilitesInfo".');
+            }
         }
 
-        // If live data failed or empty, use MOCK DATA
         if (!data) {
             data = getMockData();
         }

@@ -1,0 +1,72 @@
+---
+// Fixed-size AdSense component for airport bus info
+// PC: 728x90, Mobile: 320x100
+---
+
+<div class="adsense-fixed-container my-10 text-center">
+  <p class="text-[10px] text-gray-400 text-center mb-1 font-sans">
+    Sponsored
+  </p>
+  
+  <div class="ad-wrapper w-full overflow-hidden bg-gray-50 dark:bg-gray-800/50 rounded-lg flex justify-center items-center py-4">
+    <!-- PC Ad (hidden on mobile) -->
+    <div class="hidden md:block">
+      <ins class="adsbygoogle"
+           style="display:inline-block;width:728px;height:90px"
+           data-ad-client="ca-pub-8355312170222120"
+           data-ad-slot="9700153785"></ins>
+    </div>
+    
+    <!-- Mobile Ad (hidden on PC) -->
+    <div class="block md:hidden">
+      <ins class="adsbygoogle"
+           style="display:inline-block;width:320px;height:100px"
+           data-ad-client="ca-pub-8355312170222120"
+           data-ad-slot="8387072118"></ins>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Intersection Observer for early ad loading - Protects Active View score
+  document.addEventListener('DOMContentLoaded', () => {
+    const fixedContainers = document.querySelectorAll('.adsense-fixed-container');
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const container = entry.target;
+          
+          // Find ad slots and filter to only those with actual visible width
+          const allSlots = container.querySelectorAll('.adsbygoogle');
+          let visibleSlot = null;
+          
+          allSlots.forEach(slot => {
+            // Check if slot is actually visible (has width > 0)
+            if (slot.offsetWidth > 0 && !slot.hasAttribute('data-ad-loaded')) {
+              visibleSlot = slot;
+            }
+          });
+          
+          if (visibleSlot) {
+             visibleSlot.setAttribute('data-ad-loaded', 'true');
+             try {
+                (window.adsbygoogle = window.adsbygoogle || []).push({});
+             } catch (e) {
+                // Suppress error on localhost (expected 403)
+                if (!window.location.hostname.includes('localhost')) {
+                   console.error('AdSense fixed push error:', e);
+                }
+             }
+             observer.unobserve(container);
+          }
+        }
+      });
+    }, {
+      rootMargin: '200px 0px', // Pre-load when 200px away
+      threshold: 0
+    });
+    
+    fixedContainers.forEach((c) => observer.observe(c));
+  });
+</script>
