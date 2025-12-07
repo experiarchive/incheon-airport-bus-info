@@ -224,16 +224,16 @@
 
     return `
       <div class="border rounded-lg p-4 flex flex-col items-center justify-center text-center ${colorClass} transition-all duration-300 hover:shadow-md">
-        <span class="text-xs text-gray-500 mb-1">${name}</span>
-        <div class="text-2xl font-bold flex items-end gap-1">
-          ${minutes}<span class="text-sm font-normal mb-1">분</span>
+        <span class="text-sm font-semibold text-gray-600 mb-2">${name}</span>
+        <div class="text-3xl font-bold flex items-end gap-1 mb-1">
+          ${minutes}<span class="text-lg font-medium mb-1">분</span>
         </div>
-        <div class="text-xs text-gray-500 mt-1">
-           대기 ${people}명
+        <div class="text-sm text-gray-700 font-medium">
+           대기 <span class="font-bold">${people}</span>명
         </div>
-        <div class="flex items-center gap-1.5 mt-2 px-2 py-0.5 rounded-full bg-white/50">
-          <span class="w-1.5 h-1.5 rounded-full ${dotClass}"></span>
-          <span class="text-xs font-medium">${status}</span>
+        <div class="flex items-center gap-1.5 mt-3 px-3 py-1 rounded-full bg-white/60 shadow-sm">
+          <span class="w-2 h-2 rounded-full ${dotClass}"></span>
+          <span class="text-sm font-bold text-gray-800">${status}</span>
         </div>
       </div>
     `;
