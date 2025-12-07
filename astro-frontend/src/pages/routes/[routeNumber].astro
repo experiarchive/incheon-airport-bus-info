@@ -240,7 +240,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
   <meta name="keywords" content={`${route.routeNumber} 공항버스, ${route.routeNumber} 공항버스 시간표, ${route.routeNumber} 공항버스 예매, ${route.routeNumber} 공항버스 요금, ${mainArea} 공항버스, 공항버스 정류장, 공항버스 소요시간`} />
   
   <!-- Kakao Map API -->
-  <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9dee7ba39e07c39710261487dceadbcb&libraries=services,clusterer,drawing,roadview&autoload=false"></script>
+  <script is:inline type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9dee7ba39e07c39710261487dceadbcb&libraries=services,clusterer,drawing,roadview&autoload=false"></script>
   
   <!-- Structured Data for Transportation Service -->
   <script type="application/ld+json" set:html={JSON.stringify({
@@ -774,10 +774,16 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
 <script is:inline>
 document.addEventListener('DOMContentLoaded', function() {
   // Initialize all components
+  // Initialize all components
   // Use kakao.maps.load to ensure SDK is ready (autoload=false)
-  kakao.maps.load(function() {
-    initializeMap();
-  });
+  if (window.kakao && window.kakao.maps) {
+    kakao.maps.load(function() {
+      console.log('Kakao maps loaded, initializing map...');
+      initializeMap();
+    });
+  } else {
+    console.error('Kakao SDK not loaded');
+  }
   initializeTimetable();
   updateCurrentTime();
   
