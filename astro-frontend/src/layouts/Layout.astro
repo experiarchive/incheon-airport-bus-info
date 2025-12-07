@@ -53,6 +53,16 @@ const canonicalUrl = canonical ? new URL(canonical, Astro.site) : currentUrl;
 		<!-- Google AdSense -->
 		<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8355312170222120"
      crossorigin="anonymous"></script>
+		<!-- Suppress AdSense internal errors (TagError) which are non-fatal -->
+		<script>
+			window.addEventListener('error', function(e) {
+				// Check if this is an AdSense TagError (these are non-fatal and expected in some scenarios)
+				if (e.error && e.error.name === 'TagError' && e.message && e.message.includes('adsbygoogle')) {
+					e.preventDefault(); // Prevent the error from showing in console
+					return true;
+				}
+			});
+		</script>
 		
 		<!-- Twitter Card 메타 태그 -->
 		<meta name="twitter:card" content="summary_large_image" />
