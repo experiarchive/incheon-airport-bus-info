@@ -647,6 +647,9 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
       </div>
     )}
 
+    <!-- AdSense: 시간표 섹션 밑 (이용안내 위) -->
+    <AdSense slotId="3189845476" />
+
     <!-- Usage Guide Section - Enhanced with JSON data -->
     {(route.usageGuide || jsonData?.usageGuide) && (
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
@@ -692,8 +695,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
       </div>
     )}
 
-    <!-- AdSense: 실시간버스 위치 섹션 위 -->
-    <AdSense slotId="3189845476" />
+
 
     <!-- Kakao Map Section (iframe fallback) -->
     {route.kakaoMapIframeUrl && (
