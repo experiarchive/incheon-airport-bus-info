@@ -24,13 +24,15 @@ const publisherId = 'ca-pub-8355312170222120';
       {label}
     </p>
   )}
-  <div class="ad-wrapper overflow-hidden min-h-[280px] bg-gray-50 dark:bg-gray-800/50 rounded-lg flex justify-center items-center">
+  <div class="ad-wrapper w-full overflow-hidden min-h-[280px] bg-gray-50 dark:bg-gray-800/50 rounded-lg flex justify-center items-center">
     <ins class="adsbygoogle"
        style={style}
        data-ad-client={publisherId}
        data-ad-slot={slotId}
        data-ad-format={format}
-       data-full-width-responsive={responsive ? "true" : "false"}></ins>
+       data-full-width-responsive={responsive ? "true" : "false"}
+       class="w-full block"
+    ></ins>
   </div>
 </div>
 
@@ -46,22 +48,23 @@ const publisherId = 'ca-pub-8355312170222120';
           const adSlot = container.querySelector('.adsbygoogle');
           
           if (adSlot && !adSlot.hasAttribute('data-ad-loaded')) {
-            // Check if container has dimensions to prevent "No slot size" error
-            if (container.clientWidth > 0 && container.clientHeight > 0) {
+            // Check if slot itself has dimensions (it should if w-full is applied and container has width)
+            if (adSlot.clientWidth > 0) {
               adSlot.setAttribute('data-ad-loaded', 'true');
               try {
                 (window.adsbygoogle = window.adsbygoogle || []).push({});
               } catch (e) {
                 console.error('AdSense push error:', e);
               }
+              // Only stop observing if we successfully attempted to load
+              observer.unobserve(container);
             } else {
-              // If hidden, observe again later or ignore (it will trigger again when visible if observer stays)
-              // For now, we just don't push. The observer will trigger again if it enters viewport and has size.
-              // Actually, IntersectionObserver triggers when it intersects. If it has 0 size, it might not intersect?
-              // But if it does, we skip pushing.
+              // If width is 0, keep observing. It might be hidden or layout not ready.
+              // The observer will trigger again if layout changes cause intersection updates,
+              // or we can rely on next scroll event.
+              console.warn('AdSense slot has 0 width, skipping push');
             }
           }
-          observer.unobserve(container);
         }
       });
     }, {
