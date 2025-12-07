@@ -1,6 +1,7 @@
 ﻿---
 import Layout from '../../layouts/Layout.astro';
 import AdSense from '../../components/AdSense.astro';
+import TravelChecklist from '../../components/TravelChecklist.astro';
 import { client } from '../../lib/sanityClient.js';
 import { toHTML } from '@portabletext/to-html';
 
@@ -696,6 +697,10 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
     )}
 
 
+
+
+    <!-- Travel Checklist Section -->
+    <TravelChecklist />
 
     <!-- Kakao Map Section (iframe fallback) -->
     {route.kakaoMapIframeUrl && (

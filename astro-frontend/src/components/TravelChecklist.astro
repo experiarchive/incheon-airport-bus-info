@@ -1,0 +1,112 @@
+---
+const checklistItems = [
+  { id: 'passport', label: '여권 (유효기간 6개월 이상)' },
+  { id: 'ticket', label: 'E-티켓 / 항공권 (캡쳐/출력)' },
+  { id: 'wallet', label: '현금 / 환전 / 신용카드 (트래블로그 등)' },
+  { id: 'sim', label: '유심 / 이심 / 로밍 / 포켓와이파이' },
+  { id: 'charger', label: '충전기 / 보조배터리 / 케이블' },
+  { id: 'adapter', label: '해외 여행용 어댑터 (돼지코)' },
+  { id: 'meds', label: '상비약 (소화제, 두통약, 반창고)' },
+  { id: 'insurance', label: '여행자 보험 가입' },
+  { id: 'hotel', label: '숙소 바우처 / 예약 확인서' },
+  { id: 'pen', label: '볼펜 (입국신고서 작성용)' },
+];
+---
+
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
+  <div class="flex items-center mb-4">
+    <svg class="w-6 h-6 mr-3 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+    </svg>
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">
+      해외여행 체크리스트
+    </h2>
+  </div>
+  
+  <p class="text-gray-600 dark:text-gray-300 mb-6">
+    공항으로 가는 버스 안에서 마지막으로 점검해보세요!
+  </p>
+
+  <!-- Progress Bar -->
+  <div class="mb-6">
+    <div class="flex justify-between mb-1">
+      <span class="text-sm font-medium text-blue-700 dark:text-blue-300">준비 완료</span>
+      <span class="text-sm font-medium text-blue-700 dark:text-blue-300" id="progress-text">0%</span>
+    </div>
+    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+      <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-500 ease-out" id="progress-bar" style="width: 0%"></div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+    {checklistItems.map((item) => (
+      <label class="flex items-center p-3 border border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
+        <input 
+          type="checkbox" 
+          id={`check-${item.id}`} 
+          class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+          data-item-id={item.id}
+        >
+        <span class="ml-3 text-gray-700 dark:text-gray-300 font-medium select-none">{item.label}</span>
+      </label>
+    ))}
+  </div>
+  
+  <div class="mt-6 text-center">
+    <button id="reset-checklist" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 underline">
+      초기화
+    </button>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"][data-item-id]');
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    const resetButton = document.getElementById('reset-checklist');
+    
+    // Load state from localStorage
+    const savedState = JSON.parse(localStorage.getItem('travelChecklist') || '{}');
+    
+    checkboxes.forEach((checkbox) => {
+      const input = checkbox as HTMLInputElement;
+      const id = input.dataset.itemId;
+      if (id && savedState[id]) {
+        input.checked = true;
+      }
+      
+      input.addEventListener('change', updateProgress);
+    });
+    
+    resetButton?.addEventListener('click', () => {
+      checkboxes.forEach((checkbox) => {
+        (checkbox as HTMLInputElement).checked = false;
+      });
+      updateProgress();
+    });
+
+    // Initial update
+    updateProgress();
+
+    function updateProgress() {
+      const total = checkboxes.length;
+      const checked = Array.from(checkboxes).filter(c => (c as HTMLInputElement).checked).length;
+      const percentage = Math.round((checked / total) * 100);
+      
+      // Update UI
+      if (progressBar) progressBar.style.width = `${percentage}%`;
+      if (progressText) progressText.textContent = `${percentage}%`;
+      
+      // Save state
+      const newState: Record<string, boolean> = {};
+      checkboxes.forEach((checkbox) => {
+        const input = checkbox as HTMLInputElement;
+        if (input.dataset.itemId) {
+          newState[input.dataset.itemId] = input.checked;
+        }
+      });
+      localStorage.setItem('travelChecklist', JSON.stringify(newState));
+    }
+  });
+</script>
