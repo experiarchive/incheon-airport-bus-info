@@ -91,6 +91,17 @@ const pageDescription = "인천공항 제1여객터미널(T1) 및 제2여객터�
         <p class="font-bold">꿀팁! ✨</p>
         <p>짐이 많다면 공항버스 내리는 곳 근처에 카트를 이용해 출국장까지 편리하게 이동하세요!</p>
       </div>
+
+      <!-- AdSense: 하차장 섹션 후 -->
+      <div class="my-8 text-center">
+        <p class="text-[10px] text-gray-400 mb-1">Sponsored</p>
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-8355312170222120"
+             data-ad-slot="5389142175"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+      </div>
     </section>
 
     <section class="mb-16">
@@ -175,6 +186,17 @@ const pageDescription = "인천공항 제1여객터미널(T1) 및 제2여객터�
         <p class="font-bold">꿀팁! ✨</p>
         <p>탑승 전, 본인이 타야 할 버스 노선과 승차장 번호를 다시 한번 확인하는 습관을 들이면 좋습니다. 공항 홈페이지나 앱에서도 실시간 버스 정보를 확인할 수 있어요!</p>
       </div>
+
+      <!-- AdSense: 승차장 섹션 후 -->
+      <div class="my-8 text-center">
+        <p class="text-[10px] text-gray-400 mb-1">Sponsored</p>
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-8355312170222120"
+             data-ad-slot="5389142175"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+      </div>
     </section>
 
     {/* Call to Action Button for Next Post */}
@@ -192,4 +214,18 @@ const pageDescription = "인천공항 제1여객터미널(T1) 및 제2여객터�
     </footer>
 
   </div>
-</Layout> 
+</Layout>
+
+<script>
+  // Initialize AdSense ads on this page
+  document.addEventListener('DOMContentLoaded', () => {
+    const ads = document.querySelectorAll('.adsbygoogle');
+    ads.forEach(() => {
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (e) {
+        // Suppress errors
+      }
+    });
+  });
+</script> 
