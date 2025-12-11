@@ -186,13 +186,8 @@
             "links": []
         },
         {
-            "text": "서울지역: 티맵 예매",
-            "links": [
-                {
-                    "text": "티맵",
-                    "url": "https://tmapairportbus.com/search/bus?buslineId=0"
-                }
-            ]
+            "text": "서울지역: 예매 불가(현장 선착순 탑승)",
+            "links": []
         },
         {
             "text": "인천공항: 현장 예매(매표소, 무인발권기 이용)",
