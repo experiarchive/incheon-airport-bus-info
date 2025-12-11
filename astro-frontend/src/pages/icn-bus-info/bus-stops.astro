@@ -6,6 +6,7 @@ import t1DropoffImg1 from '../../assets/incheon-airport-bus-stop-T1 (1).webp';
 import t1DropoffImg2 from '../../assets/incheon-airport-bus-stop-T1 (2).webp';
 import t2DropoffImg1 from '../../assets/incheon-airport-bus-stop-T2 (1).webp';
 import t2DropoffImg2 from '../../assets/incheon-airport-bus-stop-T2 (2).webp';
+import AdSense from '../../components/AdSense.astro';
 
 // New imports for T1 Bus Stop (Arrivals)
 import t1BusStopOverviewImage from '../../assets/airport-bus-arrival-stop-t1.webp';
@@ -93,15 +94,9 @@ const pageDescription = "인천공항 제1여객터미널(T1) 및 제2여객터�
       </div>
 
       <!-- AdSense: 하차장 섹션 후 -->
-      <div class="my-8 text-center">
-        <p class="text-[10px] text-gray-400 mb-1">Sponsored</p>
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-8355312170222120"
-             data-ad-slot="5389142175"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-      </div>
+      <!-- AdSense: 하차장 섹션 후 -->
+      <AdSense slotId="5389142175" />
+    </div>
     </section>
 
     <section class="mb-16">
@@ -188,15 +183,9 @@ const pageDescription = "인천공항 제1여객터미널(T1) 및 제2여객터�
       </div>
 
       <!-- AdSense: 승차장 섹션 후 -->
-      <div class="my-8 text-center">
-        <p class="text-[10px] text-gray-400 mb-1">Sponsored</p>
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-8355312170222120"
-             data-ad-slot="5389142175"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-      </div>
+      <!-- AdSense: 승차장 섹션 후 -->
+      <AdSense slotId="5389142175" />
+    </div>
     </section>
 
     {/* Call to Action Button for Next Post */}
@@ -214,18 +203,4 @@ const pageDescription = "인천공항 제1여객터미널(T1) 및 제2여객터�
     </footer>
 
   </div>
-</Layout>
-
-<script>
-  // Initialize AdSense ads on this page
-  document.addEventListener('DOMContentLoaded', () => {
-    const ads = document.querySelectorAll('.adsbygoogle');
-    ads.forEach(() => {
-      try {
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-      } catch (e) {
-        // Suppress errors
-      }
-    });
-  });
-</script> 
+</Layout> 
