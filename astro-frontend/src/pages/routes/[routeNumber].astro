@@ -522,7 +522,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
     <!-- Main Stops Section (fallback if no JSON data) -->
     {(!jsonData?.geoInfo?.stops || jsonData.geoInfo.stops.length === 0) && route.mainStops && route.mainStops.length > 0 && (
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center bg-gray-50 dark:bg-gray-700/50 p-3 rounded-r-lg border-l-4 border-blue-600">
           <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -549,7 +549,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
     <!-- Timetable Section - Redesigned for Better UX -->
     {Object.keys(groupedTimetables).length > 0 && (
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center bg-gray-50 dark:bg-gray-700/50 p-3 rounded-r-lg border-l-4 border-blue-600">
           <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
@@ -689,7 +689,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
     <!-- Usage Guide Section - Enhanced with JSON data -->
     {(route.usageGuide || jsonData?.usageGuide) && (
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center bg-gray-50 dark:bg-gray-700/50 p-3 rounded-r-lg border-l-4 border-blue-600">
           <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
@@ -750,7 +750,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
     <!-- Kakao Map Section (iframe fallback) -->
     {route.kakaoMapIframeUrl && (
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center bg-gray-50 dark:bg-gray-700/50 p-3 rounded-r-lg border-l-4 border-blue-600">
           <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m-6 3l6-3"></path>
           </svg>
@@ -779,7 +779,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
 
     <!-- Airport Usage Guide Section -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
-      <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6">
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center bg-gray-50 dark:bg-gray-700/50 p-3 rounded-r-lg border-l-4 border-green-600">
         공항 이용 가이드
       </h2>
       <div class="space-y-4">
