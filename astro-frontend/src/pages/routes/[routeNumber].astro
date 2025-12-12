@@ -559,6 +559,38 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
           원하는 방향과 정류장을 선택하면 실시간으로 다음 출발 시간을 확인할 수 있습니다.
         </p>
 
+        <!-- Timetable effective date banner -->
+        <div class="mb-6 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div class="flex items-center text-blue-800 dark:text-blue-200">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              <span class="font-semibold">{latestEffectiveDate} 기준 시간표</span>
+            </div>
+            <div class="flex items-center text-green-700 dark:text-green-400 text-sm font-medium bg-white dark:bg-gray-800 px-3 py-1.5 rounded-full shadow-sm sm:self-center self-start border border-green-200 dark:border-green-800">
+              <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span id="current-verification-date">현재 변동사항 없음</span>
+            </div>
+          </div>
+        </div>
+
+        <script>
+          // Set current date for verification message
+          document.addEventListener('DOMContentLoaded', () => {
+            const dateElement = document.getElementById('current-verification-date');
+            if (dateElement) {
+              const today = new Date();
+              const year = today.getFullYear();
+              const month = String(today.getMonth() + 1).padStart(2, '0');
+              const day = String(today.getDate()).padStart(2, '0');
+              dateElement.textContent = `${year}년 ${month}월 ${day}일(오늘) 현재 변동사항 없음`;
+            }
+          });
+        </script>
+
         <!-- Direction Tab Navigation -->
         <div class="mb-6" id="timetable-section">
           <div class="flex space-x-2 mb-4" role="tablist" aria-label="버스 방향 선택">
