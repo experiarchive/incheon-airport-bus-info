@@ -425,8 +425,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
     <!-- Airport Terminal Stops Section -->
     {jsonData?.airportStopInfo && (jsonData.airportStopInfo.terminal1?.location || jsonData.airportStopInfo.terminal2?.location) && (
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
-          <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-r-lg border-l-4 border-blue-600">
           {route.routeNumber} 공항버스 인천공항 터미널 안내
         </h2>
         <div class="space-y-4">
@@ -467,11 +466,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
     <!-- Bus Stops with Kakao Map -->
     {jsonData?.geoInfo?.stops && jsonData.geoInfo.stops.length > 0 && (
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center">
-          <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-          </svg>
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-r-lg border-l-4 border-blue-600">
           {route.routeNumber} 공항버스 정류장 위치
         </h2>
         <p class="text-gray-600 dark:text-gray-300 mb-6">
@@ -522,11 +517,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
     <!-- Main Stops Section (fallback if no JSON data) -->
     {(!jsonData?.geoInfo?.stops || jsonData.geoInfo.stops.length === 0) && route.mainStops && route.mainStops.length > 0 && (
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center bg-gray-50 dark:bg-gray-700/50 p-3 rounded-r-lg border-l-4 border-blue-600">
-          <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-          </svg>
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-r-lg border-l-4 border-blue-600">
           정류장 위치 안내
         </h2>
         <p class="text-gray-600 dark:text-gray-300 mb-4">
@@ -549,10 +540,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
     <!-- Timetable Section - Redesigned for Better UX -->
     {Object.keys(groupedTimetables).length > 0 && (
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center bg-gray-50 dark:bg-gray-700/50 p-3 rounded-r-lg border-l-4 border-blue-600">
-          <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-r-lg border-l-4 border-blue-600">
           {route.routeNumber} 공항버스 시간표
         </h2>
         <p class="text-gray-600 dark:text-gray-300 mb-6">
@@ -689,10 +677,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
     <!-- Usage Guide Section - Enhanced with JSON data -->
     {(route.usageGuide || jsonData?.usageGuide) && (
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center bg-gray-50 dark:bg-gray-700/50 p-3 rounded-r-lg border-l-4 border-blue-600">
-          <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-r-lg border-l-4 border-blue-600">
           이용 안내 및 예매 정보
         </h2>
         
@@ -750,10 +735,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
     <!-- Kakao Map Section (iframe fallback) -->
     {route.kakaoMapIframeUrl && (
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center bg-gray-50 dark:bg-gray-700/50 p-3 rounded-r-lg border-l-4 border-blue-600">
-          <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m-6 3l6-3"></path>
-          </svg>
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-r-lg border-l-4 border-blue-600">
           실시간 버스 위치
         </h2>
         <p class="text-gray-600 dark:text-gray-300 mb-4">
@@ -779,7 +761,7 @@ const seoDescription = `${route.routeNumber} 공항버스 실시간 시간표와
 
     <!-- Airport Usage Guide Section -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8 border border-gray-200 dark:border-gray-700">
-      <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 flex items-center bg-gray-50 dark:bg-gray-700/50 p-3 rounded-r-lg border-l-4 border-green-600">
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-6 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-r-lg border-l-4 border-green-600">
         공항 이용 가이드
       </h2>
       <div class="space-y-4">
